@@ -1,0 +1,177 @@
+import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:hassanjewellers/Components/drop_down_field.dart';
+import 'package:hassanjewellers/Components/user_text_input_field.dart';
+
+class NewScheme extends StatefulWidget {
+  const NewScheme({super.key});
+
+  @override
+  State<NewScheme> createState() => _NewSchemeState();
+}
+
+class _NewSchemeState extends State<NewScheme> {
+  final _firestore = FirebaseFirestore.instance;
+
+  TextEditingController nameController = TextEditingController();
+  TextEditingController fatherMotherHusbandController = TextEditingController();
+  TextEditingController nomineeNameController = TextEditingController();
+  TextEditingController addressController = TextEditingController();
+  TextEditingController ageController = TextEditingController();
+  TextEditingController mobileNumberController = TextEditingController();
+  TextEditingController mailController = TextEditingController();
+  TextEditingController alternateMobileController = TextEditingController();
+  TextEditingController applicantIDProofController = TextEditingController();
+  TextEditingController nomineeIDProofController = TextEditingController();
+
+  List<String> monthlyInstallmentAmounts = [
+    '500 ₹',
+    '1000 ₹',
+    '2000 ₹',
+    '5000 ₹',
+    '10000 ₹'
+  ];
+
+  List<String> occupationList = [
+    'Business',
+    'Housewife',
+    'Employee',
+    'Child',
+    'Teacher'
+  ];
+
+  List<String> nomineeList = [
+    'Father',
+    'Mother',
+    'Spouse',
+    'Son',
+    'Daughter',
+    'Brother',
+    'Sister',
+    'Uncle',
+    'Aunt',
+    'Grand Father',
+    'Grand Mother',
+    'Nephew',
+    'Niece'
+  ];
+
+  String monthlySelectedAmount = "500 ₹";
+  String selectedOccupation = "Business";
+  String selectedNominee = "Father";
+
+  List<Map<String, dynamic>> generateProgress() {
+    List<Map<String, dynamic>> listOfMaps = [];
+    DateTime currentDate = DateTime.now();
+
+    for (int i = 0; i < 12; i++) {
+      DateTime date = currentDate.add(Duration(days: 30 * i));
+      Map<String, dynamic> map = {'date': date, 'paid': false};
+      listOfMaps.add(map);
+    }
+
+    listOfMaps[0]['paid'] = true;
+    return listOfMaps;
+  }
+
+  void setSelectedDropDownOption(String label, String value) {
+    setState(() {
+      if (label == "Installment Amount") {
+        monthlySelectedAmount = value;
+      } else if (label == "Occupation") {
+        selectedOccupation = value;
+      } else if (label == "Relationship with nominee") {
+        selectedNominee = value;
+      }
+    });
+  }
+
+  void submitData() {
+    _firestore.collection('savings').add({
+      "name": nameController.text,
+      "installmentAmount": monthlySelectedAmount,
+      "guardianName": fatherMotherHusbandController.text,
+      "occupation": selectedOccupation,
+      "nomineeName": nomineeNameController.text,
+      "nomineeRelation": selectedNominee,
+      "address": addressController.text,
+      "age": ageController.text,
+      "mobileNumber": mobileNumberController.text,
+      "mail": mailController.text,
+      "alternateMobile": alternateMobileController.text,
+      "applicantIDProof": applicantIDProofController.text,
+      "nomineeIDProof": nomineeIDProofController.text,
+      "date": DateTime.now(),
+      "progress": generateProgress()
+    });
+  }
+
+  void clearForm() {}
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Join New Scheme"),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: ListView(
+          children: [
+            UserDropDownField(
+                label: "Installment Amount",
+                selectionList: monthlyInstallmentAmounts,
+                selectedItem: monthlySelectedAmount,
+                setSelectedItem: setSelectedDropDownOption),
+            UserTextInputField(
+                label: "Name of the Applicant", textController: nameController),
+            UserTextInputField(
+                label: 'Father/Mother/Husband Name',
+                textController: fatherMotherHusbandController),
+            UserDropDownField(
+                label: "Occupation",
+                selectionList: occupationList,
+                selectedItem: selectedOccupation,
+                setSelectedItem: setSelectedDropDownOption),
+            UserTextInputField(
+                label: 'Nominee Name', textController: nomineeNameController),
+            UserDropDownField(
+                label: "Relationship with nominee",
+                selectionList: nomineeList,
+                selectedItem: selectedNominee,
+                setSelectedItem: setSelectedDropDownOption),
+            UserTextInputField(
+                label: 'Address', textController: addressController),
+            UserTextInputField(label: 'Age', textController: ageController),
+            UserTextInputField(
+                label: 'Mobile Number', textController: mobileNumberController),
+            UserTextInputField(
+                label: 'Email Address', textController: mailController),
+            UserTextInputField(
+                label: 'Alternate Mobile',
+                textController: alternateMobileController),
+            UserTextInputField(
+                label: 'Application ID Proof',
+                textController: applicantIDProofController),
+            UserTextInputField(
+                label: 'Nominee ID Proof',
+                textController: nomineeIDProofController),
+            Padding(
+              padding:
+                  const EdgeInsets.only(top: 4, right: 4, left: 4, bottom: 40),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  ElevatedButton(
+                      onPressed: submitData, child: const Text("Submit")),
+                  TextButton(
+                      onPressed: clearForm, child: const Text("Clear form"))
+                ],
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+}

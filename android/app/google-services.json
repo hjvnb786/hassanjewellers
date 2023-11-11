@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "374772324682",
+    "project_id": "hassan-jewellers",
+    "storage_bucket": "hassan-jewellers.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:374772324682:android:1cc03a45d0f0146e9a89b3",
+        "android_client_info": {
+          "package_name": "com.hassanjewellers.savingsapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCjs39nasLsKRoVyYfqWXFik61WTB8Jhgo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
