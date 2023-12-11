@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:hassanjewellers/Screens/login.dart';
 import 'package:hassanjewellers/Screens/otp_screen.dart';
@@ -10,100 +11,164 @@ class Register extends StatefulWidget {
 }
 
 class _RegisterState extends State<Register> {
-  TextEditingController nameController = TextEditingController();
+  TextEditingController name = TextEditingController();
   TextEditingController email = TextEditingController();
   TextEditingController phone = TextEditingController();
-  TextEditingController password = TextEditingController();
-  TextEditingController confirmPassword = TextEditingController();
+
+  final _formKey = GlobalKey<FormState>();
+
+  Future<bool> checkDocumentExists(String fieldValue) async {
+    final querySnapshot = await FirebaseFirestore.instance
+        .collection('users') // Ensure this is the correct collection name
+        .where("phone", isEqualTo: fieldValue)
+        .limit(1)
+        .get();
+    return querySnapshot.docs.isNotEmpty;
+  }
+
+  void showUserExistsDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('User Already Registered'),
+          content: const Text(
+              'This phone number is already registered. Please login.'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Register"),
+    return Container(
+      decoration: const BoxDecoration(
+        image: DecorationImage(
+          image: AssetImage(
+            'assets/talha.png',
+          ),
+          fit: BoxFit.fill,
+        ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: ListView(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextField(
-                controller: nameController,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  hintText: 'Full Name',
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextField(
-                controller: email,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  hintText: 'Mail',
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextField(
-                controller: phone,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  hintText: 'Phone',
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextField(
-                controller: password,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  hintText: 'Password',
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextField(
-                controller: confirmPassword,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  hintText: 'Confirm Password',
-                ),
-              ),
-            ),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          OtpScreen(phoneNumber: phone.text.toString()),
+      child: Form(
+        key: _formKey,
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          body: Container(
+              padding: EdgeInsets.only(
+                  top: MediaQuery.of(context).size.height * 0.24),
+              child: ListView(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 30),
+                    child: TextFormField(
+                      keyboardType: TextInputType.name,
+                      controller: name,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Enter your Name';
+                        } else if (value.length < 5) {
+                          return 'Your name should be least 5 digits';
+                        }
+                        return null;
+                      },
+                      decoration: const InputDecoration(
+                        labelText: 'Name',
+                        border: OutlineInputBorder(),
+                      ),
                     ),
-                  );
-                },
-                child: const Text("Submit"),
-              ),
-            ),
-            SizedBox(
-              width: double.infinity,
-              child: TextButton(
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => Login(),
+                  ),
+                  const SizedBox(height: 12),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 30),
+                    child: TextFormField(
+                      controller: phone,
+                      keyboardType: TextInputType.phone,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Enter your Mail Please!';
+                        } else if (value.length < 10) {
+                          return 'Please enter your 10 digit phone number';
+                        }
+                        return null;
+                      },
+                      decoration: const InputDecoration(
+                        labelText: 'Phone',
+                        border: OutlineInputBorder(),
+                      ),
                     ),
-                  );
-                },
-                child: const Text("Already have an account? Login"),
-              ),
-            ),
-          ],
+                  ),
+                  const SizedBox(height: 12),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 30),
+                    child: TextFormField(
+                      controller: email,
+                      keyboardType: TextInputType.emailAddress,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Enter your Mail Please';
+                        } else if (value.contains("@") == false) {
+                          return 'Enter your Mail Correctly';
+                        }
+                        return null;
+                      },
+                      decoration: const InputDecoration(
+                        labelText: 'Email',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 12, horizontal: 30),
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        if (_formKey.currentState!.validate()) {
+                          String phoneNumber = "+91${phone.text}";
+
+                          bool userExists =
+                              await checkDocumentExists(phoneNumber);
+                          if (userExists) {
+                            showUserExistsDialog();
+                          } else {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    OtpScreen(phoneNumber: phoneNumber, isRegister: true),
+                              ),
+                            );
+                          }
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 15)),
+                      child: const Text('Register'),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => Login(),
+                          ));
+                    },
+                    child: const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 20),
+                      child: Text("Already a customer, login."),
+                    ),
+                  ),
+                ],
+              )),
         ),
       ),
     );

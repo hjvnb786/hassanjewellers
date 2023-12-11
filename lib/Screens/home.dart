@@ -1,4 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_nav_bar/google_nav_bar.dart';
+import 'package:hassanjewellers/Screens/Account.dart';
 import 'package:hassanjewellers/Screens/existing_schemes.dart';
 import 'package:hassanjewellers/Screens/new_scheme.dart';
 
@@ -10,45 +13,55 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  int currentPageIndex = 0;
+
+  List<Widget> screens = [
+    const ExistingSchemes(),
+    NewScheme(),
+    Account(),
+  ];
+
   @override
   Widget build(BuildContext context) {
-    return  Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(38.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => const NewScheme(),
-                    ),
-                  );
-                },
-                child: const Text("New Savings Scheme"),
-              ),
-            ),
-
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => const ExistingSchemes(),
-                    ),
-                  );
-                },
-                child: const Text("Existing Savings Scheme"),
-              ),
-            ),
-
-          ],
-        ),
+    return Scaffold(
+      body: screens[currentPageIndex],
+      bottomNavigationBar:  GNav(
+        padding: EdgeInsetsGeometry.infinity,
+        backgroundColor: Colors.brown,
+        onTabChange: (index) {
+          setState(() {
+            currentPageIndex = index;
+          });
+        },
+        tabs: const [
+          GButton(
+            backgroundColor: Colors.white,
+            padding: EdgeInsets.all(8),
+            margin: EdgeInsets.all(15),
+            iconColor: Colors.white,
+            icon: Icons.home,
+            text: "Home",
+            gap: 8,
+          ),
+          GButton(
+            backgroundColor: Colors.white,
+            padding: EdgeInsets.all(8),
+            margin: EdgeInsets.all(15),
+            iconColor: Colors.white,
+            icon: Icons.inventory_sharp,
+            text: "installments",
+            gap: 8,
+          ),
+          GButton(
+            backgroundColor: Colors.white,
+            padding: EdgeInsets.all(8),
+            margin: EdgeInsets.all(15),
+            iconColor: Colors.white,
+            icon: Icons.account_box,
+            text: "account",
+            gap: 8,
+          ),
+        ],
       ),
     );
   }

@@ -17,8 +17,7 @@ class _SchemeProgressState extends State<SchemeProgress> {
   Widget controlsBuilder(context, details, {data}) {
     return Row(
       children: [
-        ElevatedButton(onPressed: () {
-        }, child: const Text("pay")),
+        ElevatedButton(onPressed: () {}, child: const Text("pay")),
       ],
     );
   }

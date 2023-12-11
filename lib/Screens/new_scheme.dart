@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hassanjewellers/Components/drop_down_field.dart';
@@ -88,6 +89,7 @@ class _NewSchemeState extends State<NewScheme> {
 
   void submitData() {
     _firestore.collection('savings').add({
+      "userId": FirebaseAuth.instance.currentUser!.uid.toString(),
       "name": nameController.text,
       "installmentAmount": monthlySelectedAmount,
       "guardianName": fatherMotherHusbandController.text,
@@ -106,71 +108,63 @@ class _NewSchemeState extends State<NewScheme> {
     });
   }
 
-  void clearForm() {}
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Join New Scheme"),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: ListView(
-          children: [
-            UserDropDownField(
-                label: "Installment Amount",
-                selectionList: monthlyInstallmentAmounts,
-                selectedItem: monthlySelectedAmount,
-                setSelectedItem: setSelectedDropDownOption),
-            UserTextInputField(
-                label: "Name of the Applicant", textController: nameController),
-            UserTextInputField(
-                label: 'Father/Mother/Husband Name',
-                textController: fatherMotherHusbandController),
-            UserDropDownField(
-                label: "Occupation",
-                selectionList: occupationList,
-                selectedItem: selectedOccupation,
-                setSelectedItem: setSelectedDropDownOption),
-            UserTextInputField(
-                label: 'Nominee Name', textController: nomineeNameController),
-            UserDropDownField(
-                label: "Relationship with nominee",
-                selectionList: nomineeList,
-                selectedItem: selectedNominee,
-                setSelectedItem: setSelectedDropDownOption),
-            UserTextInputField(
-                label: 'Address', textController: addressController),
-            UserTextInputField(label: 'Age', textController: ageController),
-            UserTextInputField(
-                label: 'Mobile Number', textController: mobileNumberController),
-            UserTextInputField(
-                label: 'Email Address', textController: mailController),
-            UserTextInputField(
-                label: 'Alternate Mobile',
-                textController: alternateMobileController),
-            UserTextInputField(
-                label: 'Application ID Proof',
-                textController: applicantIDProofController),
-            UserTextInputField(
-                label: 'Nominee ID Proof',
-                textController: nomineeIDProofController),
-            Padding(
-              padding:
-                  const EdgeInsets.only(top: 4, right: 4, left: 4, bottom: 40),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  ElevatedButton(
-                      onPressed: submitData, child: const Text("Submit")),
-                  TextButton(
-                      onPressed: clearForm, child: const Text("Clear form"))
-                ],
-              ),
-            )
-          ],
-        ),
+      body: ListView(
+        children: [
+          UserDropDownField(
+              label: "Installment Amount",
+              selectionList: monthlyInstallmentAmounts,
+              selectedItem: monthlySelectedAmount,
+              setSelectedItem: setSelectedDropDownOption),
+          UserTextInputField(
+              label: "Name of the Applicant", textController: nameController),
+          UserTextInputField(
+              label: 'Father/Mother/Husband Name',
+              textController: fatherMotherHusbandController),
+          UserDropDownField(
+              label: "Occupation",
+              selectionList: occupationList,
+              selectedItem: selectedOccupation,
+              setSelectedItem: setSelectedDropDownOption),
+          UserTextInputField(
+              label: 'Nominee Name', textController: nomineeNameController),
+          UserDropDownField(
+              label: "Relationship with nominee",
+              selectionList: nomineeList,
+              selectedItem: selectedNominee,
+              setSelectedItem: setSelectedDropDownOption),
+          UserTextInputField(
+              label: 'Address', textController: addressController),
+          UserTextInputField(label: 'Age', textController: ageController),
+          UserTextInputField(
+              label: 'Mobile Number', textController: mobileNumberController),
+          UserTextInputField(
+              label: 'Email Address', textController: mailController),
+          UserTextInputField(
+              label: 'Alternate Mobile',
+              textController: alternateMobileController),
+          UserTextInputField(
+              label: 'Application ID Proof',
+              textController: applicantIDProofController),
+          UserTextInputField(
+              label: 'Nominee ID Proof',
+              textController: nomineeIDProofController),
+
+          Padding(
+            padding: const EdgeInsets.only(bottom: 10, right: 20, left: 20),
+            child: ElevatedButton(
+              onPressed: submitData,
+              style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 15)),
+              child: const Text('Submit'),
+            ),
+          ),
+        ],
       ),
     );
   }

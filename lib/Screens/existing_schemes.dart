@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hassanjewellers/Components/scheme_item.dart';
 
@@ -19,7 +20,11 @@ class _ExistingSchemesState extends State<ExistingSchemes> {
           title: const Text("Existing Schemes"),
         ),
         body: StreamBuilder<QuerySnapshot>(
-          stream: _firestore.collection("savings").snapshots(),
+          stream: _firestore
+              .collection("savings")
+              .where("userId",
+                  isEqualTo: FirebaseAuth.instance.currentUser!.uid.toString())
+              .snapshots(),
           builder: (context, snapshot) {
             final schemes = snapshot.data?.docs;
             if (schemes != null) {
