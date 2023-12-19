@@ -22,16 +22,85 @@ class _SchemeProgressState extends State<SchemeProgress> {
     );
   }
 
+  List<String> installmentLabels = [
+    "First Installment",
+    "Second Installment",
+    "Third Installment",
+    "Fourth Installment",
+    "Fifth Installment",
+    "Sixth Installment",
+    "Seventh Installment",
+    "Eighth Installment",
+    "Ninth Installment",
+    "Tenth Installment",
+    "Eleventh Installment",
+    "Twelfth Installment",
+  ];
+
   @override
   Widget build(BuildContext context) {
-    List<Map<String, dynamic>> progressList = widget.progress.map((element) {
-      Timestamp timestamp = element["date"];
-      DateTime dateTime = timestamp.toDate();
+    List<Map<String, dynamic>> progressList =
+        widget.progress.asMap().entries.map((entry) {
+      int index = entry.key;
+      Map<String, dynamic> element = entry.value;
+
+      String formattedDate = "";
+
+      String getMonthName(int month) {
+        const List<String> monthNames = [
+          "January",
+          "February",
+          "March",
+          "April",
+          "May",
+          "June",
+          "July",
+          "August",
+          "September",
+          "October",
+          "November",
+          "December"
+        ];
+        return monthNames[month - 1]; // Adjust for 0-based indexing
+      }
+
+      if (element["date"] != null) {
+        Timestamp timestamp = element["date"];
+        DateTime dateTime = timestamp.toDate();
+        //formattedDate = "${dateTime.day}-${dateTime.month}-${dateTime.year}";
+        formattedDate =
+            "${dateTime.day} ${getMonthName(dateTime.month)} ${dateTime.year}";
+      }
+
       return {
-        'date': DateFormat("MMMM d, y").format(dateTime),
-        'paid': element['paid']
+        'paid': element['paid'],
+        'label': installmentLabels[index],
+        'date': formattedDate
       };
     }).toList();
+
+    String addOneMonth(String dateString) {
+      // Parse the input string to a DateTime object
+      DateTime originalDate = DateFormat("dd MMMM yyyy").parse(dateString);
+
+      // Add one month to the date
+      DateTime newDate =
+          DateTime(originalDate.year, originalDate.month + 1, originalDate.day);
+
+      // Format the new date back to the string format
+      return DateFormat("dd MMMM yyyy").format(newDate);
+    }
+
+    for (var i = 0; i < progressList.length; i++) {
+      if (progressList[i]['paid'] == false) {
+        String eligibleDate = addOneMonth(progressList[i - 1]['date']);
+
+        progressList[i]["eligibleDate"] = eligibleDate;
+
+        //progressList[i]['payButton']  = true;
+        break;
+      }
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -47,22 +116,31 @@ class _SchemeProgressState extends State<SchemeProgress> {
         steps: progressList
             .map(
               (item) => Step(
-                title: Text(item['date']),
+                isActive: item["paid"] ? true : false,
+                title: Text(item["label"]),
                 subtitle: Text(item['paid'] == true ? "Paid" : "Not Paid"),
                 content: Padding(
                   padding: const EdgeInsets.only(bottom: 8),
                   child: Row(
                     children: [
-                      Text(item['paid'] == true
-                          ? "Paid on November 11, 2023 at${item["paidDate"]}"
-                          : "Not Paid"),
+                      item['paid'] == true
+                          ? Text("Paid on ${(item["date"])}")
+                          : ElevatedButton(
+                              onPressed:
+                                  item["payButton"] == true ? () {} : null,
+                              child: Text(item["eligibleDate"] == null
+                                  ? "complete your previous payments"
+                                  : "You due date is ${item["eligibleDate"]}"),
+                            ),
                     ],
                   ),
                 ),
               ),
             )
             .toList(),
-        controlsBuilder: controlsBuilder,
+        controlsBuilder: (BuildContext context, ControlsDetails controls) {
+          return const SizedBox.shrink();
+        },
       ),
     );
   }

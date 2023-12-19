@@ -1,164 +1,132 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:hassanjewellers/Screens/home.dart';
+import 'package:hassanjewellers/Components/snack_bar.dart';
+import 'package:hassanjewellers/Utils/Services/authentication.dart';
+import 'package:hassanjewellers/main.dart';
 
 class OtpScreen extends StatefulWidget {
   final String phoneNumber;
   final bool isRegister;
+  final String verifyId;
 
   const OtpScreen(
-      {super.key, required this.phoneNumber, required this.isRegister});
+      {super.key,
+      required this.phoneNumber,
+      required this.isRegister,
+      required this.verifyId});
 
   @override
   State<OtpScreen> createState() => _OtpScreenState();
 }
 
 class _OtpScreenState extends State<OtpScreen> {
-  String verifyId = "";
   TextEditingController otpController = TextEditingController();
-
+  bool isLoading = false;
   final _formKey = GlobalKey<FormState>();
 
-  @override
-  void initState() {
-    generateOTP(widget.phoneNumber);
-    super.initState();
+  void toggleLoading() {
+    setState(() {
+      isLoading = !isLoading;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        image: DecorationImage(
-          image: AssetImage(
-            'assets/come.png',
-          ),
-          fit: BoxFit.fill,
-        ),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Enter your OTP"),
       ),
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 30),
-          child: Container(
-            padding:
-                EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.29),
-            child: Form(
-              key: _formKey,
-              child: ListView(
-                children: [
-                  TextFormField(
-                    controller: otpController,
-                    keyboardType: TextInputType.number,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your 6 digit otp!';
-                      } else if (value.length < 10) {
-                        return 'Your otp is only 6 digits';
-                      }
-                      return null;
-                    },
-                    decoration: const InputDecoration(
-                      labelText: 'OTP',
-                      border: OutlineInputBorder(),
-                    ),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 30),
+        child: Container(
+          padding:
+              EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.29),
+          child: Form(
+            key: _formKey,
+            child: ListView(
+              children: [
+                TextFormField(
+                  controller: otpController,
+                  keyboardType: TextInputType.number,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your 6 digit otp!';
+                    } else if (value.length < 10) {
+                      return 'Your otp is only 6 digits';
+                    }
+                    return null;
+                  },
+                  decoration: const InputDecoration(
+                    labelText: 'OTP',
+                    border: OutlineInputBorder(),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 10),
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 15)),
-                      onPressed: () async {
-                        await verifyOTP().then((validOTP) {
-                          if (validOTP) {
-                            if (widget.isRegister) {
-                              FirebaseFirestore.instance
-                                  .collection("users")
-                                  .add({
-                                "uid": FirebaseAuth.instance.currentUser?.uid,
-                                "phone": widget.phoneNumber
-                              });
-                            }
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) => const Home(),
-                              ),
-                            ); // Added semicolon
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text("Invalid OTP"),
-                              ),
-                            ); // Added semicolon
-                          }
-                        }).catchError((error) {
-                          // Handle errors here
-                          print("error error error");
-                          print(error);
-                        });
-                      },
-                      child: const Text('Validate OTP'),
-                    ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 10),
+                  child: Column(
+                    children: [
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 15)),
+                          onPressed: () {
+                            toggleLoading();
+
+                            verifyOTP(widget.verifyId, otpController.text)
+                                .then((validOTP) {
+                              if (validOTP) {
+                                if (widget.isRegister) {
+                                  FirebaseFirestore.instance
+                                      .collection("users")
+                                      .add({
+                                    "uid":
+                                        FirebaseAuth.instance.currentUser?.uid,
+                                    "phone": widget.phoneNumber
+                                  });
+                                }
+
+                                Navigator.pushAndRemoveUntil(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => MyApp()),
+                                  (Route<dynamic> route) =>
+                                      false, // This predicate ensures all routes are removed
+                                );
+                              } else {
+                                displaySnackBar(
+                                    context, "Invalid OTP"); // Added semicolon
+                              }
+                            }).catchError((error) {
+                              displaySnackBar(context, "Something went wrong");
+                            }).whenComplete(() => toggleLoading());
+                          },
+                          child: const Text('Validate OTP'),
+                        ),
+                      ),
+                      Visibility(
+                        visible: isLoading,
+                        child: const Padding(
+                          padding: EdgeInsets.only(top: 10),
+                          child: LinearProgressIndicator(color: Colors.white),
+                        ),
+                      ),
+                    ],
                   ),
-                  TextButton(
-                    onPressed: () {
-                      generateOTP(widget.phoneNumber);
-                    },
-                    child: const Text('Resend OTP'),
-                  )
-                ],
-              ),
+                ),
+                TextButton(
+                  onPressed: () {
+                    generateOTP(widget.phoneNumber);
+                  },
+                  child: const Text('Resend OTP'),
+                )
+              ],
             ),
           ),
         ),
       ),
     );
-  }
-
-  void generateOTP(String phone) async {
-    try {
-      await FirebaseAuth.instance.verifyPhoneNumber(
-        phoneNumber: phone,
-        verificationCompleted: (PhoneAuthCredential credential) {},
-        verificationFailed: (FirebaseAuthException e) {},
-        codeSent: (String verificationId, int? resendToken) {
-          verifyId = verificationId;
-        },
-        codeAutoRetrievalTimeout: (String verificationId) {},
-      );
-    } catch (e) {
-      if (kDebugMode) {
-        print(e);
-      }
-    }
-  }
-
-  Future<bool> verifyOTP() async {
-    try {
-      PhoneAuthCredential credential = PhoneAuthProvider.credential(
-          verificationId: verifyId, smsCode: otpController.text);
-
-      UserCredential userCredential =
-          await FirebaseAuth.instance.signInWithCredential(credential);
-
-      final currentUser = userCredential.user;
-
-      print("we are about to do it");
-
-      if (currentUser != null) {
-        print("we did it");
-        return true;
-      }
-
-      print("we cant do it, it seems");
-      return false;
-    } catch (e) {
-      // Handle the error (e.g., invalid OTP, network issues)
-      print("error");
-      print(e);
-      return false;
-    }
   }
 }

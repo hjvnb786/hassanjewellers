@@ -1,8 +1,7 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
-import 'package:hassanjewellers/Screens/Account.dart';
-import 'package:hassanjewellers/Screens/existing_schemes.dart';
+import 'package:hassanjewellers/Screens/account.dart';
+import 'package:hassanjewellers/Screens/schemes.dart';
 import 'package:hassanjewellers/Screens/new_scheme.dart';
 
 class Home extends StatefulWidget {
@@ -16,8 +15,8 @@ class _HomeState extends State<Home> {
   int currentPageIndex = 0;
 
   List<Widget> screens = [
-    const ExistingSchemes(),
-    NewScheme(),
+    const Schemes(),
+    const NewScheme(),
     Account(),
   ];
 
@@ -25,7 +24,7 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: screens[currentPageIndex],
-      bottomNavigationBar:  GNav(
+      bottomNavigationBar: GNav(
         padding: EdgeInsetsGeometry.infinity,
         backgroundColor: Colors.brown,
         onTabChange: (index) {

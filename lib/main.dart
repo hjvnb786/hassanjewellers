@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:hassanjewellers/Screens/home.dart';
 import 'package:hassanjewellers/Screens/register.dart';
+import 'package:hassanjewellers/Utils/UI/theme_data.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,21 +20,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          colorScheme: const ColorScheme(
-              background: Colors.brown,
-              brightness: Brightness.light,
-              primary: Colors.brown,
-              onPrimary: Colors.white,
-              secondary: Colors.orange,
-              onSecondary: Colors.white,
-              error: Colors.brown,
-              onError: Colors.brown,
-              onBackground: Colors.red,
-              surface: Colors.brown,
-              onSurface: Colors.brown),
-        ),
+        debugShowCheckedModeBanner: false,
+        theme: themeData,
         home: currentUser != null && currentUser!.uid.isNotEmpty
             ? const Home()
             : const Register());

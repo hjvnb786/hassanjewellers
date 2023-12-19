@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hassanjewellers/Components/drop_down_field.dart';
 import 'package:hassanjewellers/Components/user_text_input_field.dart';
+import 'package:ntp/ntp.dart';
 
 class NewScheme extends StatefulWidget {
   const NewScheme({super.key});
@@ -61,17 +62,19 @@ class _NewSchemeState extends State<NewScheme> {
   String selectedOccupation = "Business";
   String selectedNominee = "Father";
 
+
+
   List<Map<String, dynamic>> generateProgress() {
     List<Map<String, dynamic>> listOfMaps = [];
     DateTime currentDate = DateTime.now();
 
     for (int i = 0; i < 12; i++) {
-      DateTime date = currentDate.add(Duration(days: 30 * i));
-      Map<String, dynamic> map = {'date': date, 'paid': false};
+      Map<String, dynamic> map = {'paid': false};
       listOfMaps.add(map);
     }
 
     listOfMaps[0]['paid'] = true;
+    listOfMaps[0]['date'] = currentDate;
     return listOfMaps;
   }
 
@@ -106,6 +109,43 @@ class _NewSchemeState extends State<NewScheme> {
       "date": DateTime.now(),
       "progress": generateProgress()
     });
+  }
+
+  Future<void> domains() async {
+    [
+      'time.google.com',
+      'time.facebook.com',
+      'time.euro.apple.com',
+      'pool.ntp.org',
+    ].forEach(checkTime);
+  }
+
+  Future<void> checkTime(String lookupAddress) async {
+    DateTime _myTime;
+    DateTime _ntpTime;
+
+    /// Or you could get NTP current (It will call DateTime.now() and add NTP offset to it)
+    _myTime = DateTime.now();
+
+    /// Or get NTP offset (in milliseconds) and add it yourself
+    final int offset =
+    await NTP.getNtpOffset(localTime: _myTime, lookUpAddress: lookupAddress);
+
+    _ntpTime = _myTime.add(Duration(milliseconds: offset));
+
+    print('\n==== $lookupAddress ====');
+    print('My time: $_myTime');
+    print('NTP time: $_ntpTime');
+    print('Difference: ${_myTime.difference(_ntpTime).inMilliseconds}ms');
+
+    return;
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    domains();
   }
 
   @override
