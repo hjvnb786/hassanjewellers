@@ -1,23 +1,22 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:hassanjewellers/Utils/Services/firebase_service.dart';
 import 'package:hassanjewellers/main.dart';
 
-class Account extends StatelessWidget {
-  Account({super.key});
+class Account extends StatefulWidget {
+  const Account({super.key});
 
   @override
+  State<Account> createState() => _AccountState();
+}
+
+class _AccountState extends State<Account> {
+  @override
   Widget build(BuildContext context) {
-    final name = FirebaseAuth.instance.currentUser?.phoneNumber;
+    final uid = FirebaseAuth.instance.currentUser?.uid;
 
-    String? setName = "";
 
-    if (name != null) {
-      print(name);
-      setName = name;
-    }
-
-    print(name);
 
     return Scaffold(
       appBar: AppBar(
@@ -25,9 +24,9 @@ class Account extends StatelessWidget {
       ),
       body: ListView(
         children: [
-          Card(child: ListTile(title: Text('Kaki Mohammed Tuaha'))),
-          Card(child: ListTile(title: Text('9944266275'))),
-          Card(child: ListTile(title: Text('tuahakst@gmail.com'))),
+          Card(child: ListTile(title: Text("taha"))),
+          Card(child: ListTile(title: Text("asf"))),
+          Card(child: ListTile(title: Text("asfsadf"))),
 
           ListTile(
             title: Text(
@@ -37,11 +36,11 @@ class Account extends StatelessWidget {
             onTap: () async {
               await FirebaseAuth.instance.signOut();
 
-
               Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(builder: (context) => MyApp()),
-                    (Route<dynamic> route) => false, // This predicate ensures all routes are removed
+                (Route<dynamic> route) =>
+                    false, // This predicate ensures all routes are removed
               );
               // Navigator.of(context).push(
               //   MaterialPageRoute(

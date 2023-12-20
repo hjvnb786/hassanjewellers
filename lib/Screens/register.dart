@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hassanjewellers/Components/user_exists_dialog.dart';
 import 'package:hassanjewellers/Screens/login.dart';
 import 'package:hassanjewellers/Screens/otp_screen.dart';
+import 'package:hassanjewellers/Utils/Services/authentication.dart';
 import 'package:hassanjewellers/Utils/Services/firebase_service.dart';
 
 class Register extends StatefulWidget {
@@ -18,6 +19,12 @@ class _RegisterState extends State<Register> {
 
   final _formKey = GlobalKey<FormState>();
   bool isLoading = false;
+
+  void toggleLoading() {
+    setState(() {
+      isLoading = !isLoading;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -98,21 +105,30 @@ class _RegisterState extends State<Register> {
                         child: ElevatedButton(
                           onPressed: () {
                             if (_formKey.currentState!.validate()) {
+                              toggleLoading();
                               String phoneNumber = "+91${phone.text}";
                               checkPhoneExists(phoneNumber).then((value) {
                                 if (value) {
                                   showUserExistsDialog(context);
                                 } else {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => OtpScreen(
-                                        phoneNumber: phoneNumber,
-                                        isRegister: true,
-                                        verifyId: "",
+                                  String verifyId = "";
+                                  generateOTP(phoneNumber).then((value) {
+                                    verifyId = value!;
+                                  }).whenComplete(() {
+                                    toggleLoading();
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => OtpScreen(
+                                          phoneNumber: phoneNumber,
+                                          isRegister: true,
+                                          verifyId: verifyId,
+                                          name: name.text,
+                                          email: email.text,
+                                        ),
                                       ),
-                                    ),
-                                  );
+                                    );
+                                  });
                                 }
                               });
                             }

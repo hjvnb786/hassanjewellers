@@ -3,9 +3,13 @@ import 'package:flutter/material.dart';
 class UserTextInputField extends StatelessWidget {
   final String label;
   final TextEditingController textController;
+  final String? Function(String?) validationCriteria;
 
   const UserTextInputField(
-      {super.key, required this.label, required this.textController});
+      {super.key,
+      required this.label,
+      required this.textController,
+      required this.validationCriteria});
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +24,8 @@ class UserTextInputField extends StatelessWidget {
               label,
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w300),
             ),
-            TextField(
+            TextFormField(
+              validator: validationCriteria,
               controller: textController,
               style: const TextStyle(),
               decoration: const InputDecoration(hintText: "Your answer"),

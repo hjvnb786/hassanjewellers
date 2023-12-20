@@ -9,12 +9,16 @@ class OtpScreen extends StatefulWidget {
   final String phoneNumber;
   final bool isRegister;
   final String verifyId;
+  final String? name;
+  final String? email;
 
   const OtpScreen(
       {super.key,
       required this.phoneNumber,
       required this.isRegister,
-      required this.verifyId});
+      required this.verifyId,
+      this.name,
+      this.email});
 
   @override
   State<OtpScreen> createState() => _OtpScreenState();
@@ -84,7 +88,9 @@ class _OtpScreenState extends State<OtpScreen> {
                                       .add({
                                     "uid":
                                         FirebaseAuth.instance.currentUser?.uid,
-                                    "phone": widget.phoneNumber
+                                    "phone": widget.phoneNumber,
+                                    "email": widget.email,
+                                    "name": widget.name
                                   });
                                 }
 
