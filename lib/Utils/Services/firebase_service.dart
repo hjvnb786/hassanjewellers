@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hassanjewellers/Utils/Helpers/utils.dart';
@@ -11,20 +12,62 @@ Future<bool> checkPhoneExists(String fieldValue) async {
   return querySnapshot.docs.isNotEmpty;
 }
 
-Future<List> getAccountDetails(uid) async {
-  final getDetails = await FirebaseFirestore.instance
-      .collection("users")
-      .where("uid", isEqualTo: uid)
-      .get()
-      .then((value) {
-    return [
-      value.docs.first.get("name"),
-      value.docs.first.get("email"),
-      value.docs.first.get("phone")
-    ];
-  });
+Future<dynamic> updateProgressItem() async {
+  try {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    CollectionReference collectionRef =
+        FirebaseFirestore.instance.collection('savings');
+    QuerySnapshot querySnapshot =
+        await collectionRef.where("userId", isEqualTo: uid).get();
 
-  return getDetails;
+    if (querySnapshot.docs.isNotEmpty) {
+      List<dynamic> progress = querySnapshot.docs.first["progress"];
+
+
+      final getDate = await getAccurateTime().then((time) => time);
+
+      for (int i = 0; i < 12; i++) {
+        if (progress[i]["paid"] == false) {
+          progress[i]["paid"] = true;
+          progress[i]["date"] = getDate;
+          break;
+        }
+      }
+      String documentID = querySnapshot.docs.first.id;
+
+      await collectionRef.doc(documentID).update({
+        'progress': progress,
+      });
+
+      return await collectionRef
+          .doc(documentID)
+          .get()
+          .then((value) => value["progress"]);
+    } else {
+      print('No document found with the specified criteria');
+    }
+  } catch (error) {
+    print('Error updating third index: $error');
+  }
+  return null;
+}
+
+Future<QueryDocumentSnapshot<Map<String, dynamic>>?> getDocumentByUid(
+    String? uid) async {
+  try {
+    final querySnapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .where("uid", isEqualTo: uid)
+        .get();
+
+    if (querySnapshot.docs.isEmpty) {
+      return null;
+    }
+
+    return querySnapshot.docs.first;
+  } catch (e) {
+    return null;
+  }
 }
 
 Future<bool> addNewScheme(

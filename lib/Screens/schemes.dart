@@ -42,28 +42,30 @@ class _SchemesState extends State<Schemes> with TickerProviderStateMixin {
         body: TabBarView(
           controller: _tabController,
           children: <Widget>[
-            StreamBuilder<QuerySnapshot>(
-              stream: _firestore
-                  .collection("savings")
-                  .where("userId",
-                      isEqualTo:
-                          FirebaseAuth.instance.currentUser!.uid.toString())
-                  .snapshots(),
-              builder: (context, snapshot) {
-                final schemes = snapshot.data?.docs;
-                if (schemes != null) {
-                  return ListView(
-                      children: schemes
-                          .map((data) => SchemeItem(
-                                name: data["name"],
-                                amount: data["installmentAmount"],
-                                progress: data["progress"],
-                              ))
-                          .toList());
-                } else {
-                  return const LinearProgressIndicator();
-                }
-              },
+            Scaffold(
+              body: StreamBuilder<QuerySnapshot>(
+                stream: _firestore
+                    .collection("savings")
+                    .where("userId",
+                        isEqualTo:
+                            FirebaseAuth.instance.currentUser!.uid.toString())
+                    .snapshots(),
+                builder: (context, snapshot) {
+                  final schemes = snapshot.data?.docs;
+                  if (schemes != null) {
+                    return ListView(
+                        children: schemes
+                            .map((data) => SchemeItem(
+                                  name: data["name"],
+                                  amount: data["installmentAmount"],
+                                  progress: data["progress"],
+                                ))
+                            .toList());
+                  } else {
+                    return const LinearProgressIndicator();
+                  }
+                },
+              ),
             ),
             const Center(child: Text("Closed"))
           ],

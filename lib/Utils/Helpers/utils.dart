@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ntp/ntp.dart';
 
 Future<DateTime> getAccurateTime() async {
@@ -35,4 +36,62 @@ List<Map<String, dynamic>> generateProgress() {
   listOfMaps[0]['paid'] = true;
   listOfMaps[0]['date'] = currentDate;
   return listOfMaps;
+}
+
+List<Map<String, dynamic>> getProgressList(List<dynamic> progress) {
+  List<String> installmentLabels = [
+    "First Installment",
+    "Second Installment",
+    "Third Installment",
+    "Fourth Installment",
+    "Fifth Installment",
+    "Sixth Installment",
+    "Seventh Installment",
+    "Eighth Installment",
+    "Ninth Installment",
+    "Tenth Installment",
+    "Eleventh Installment",
+    "Twelfth Installment",
+  ];
+
+  final progressValue = progress.asMap().entries.map((entry) {
+    int index = entry.key;
+    Map<String, dynamic> element = entry.value;
+
+    String formattedDate = "";
+
+    String getMonthName(int month) {
+      const List<String> monthNames = [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December"
+      ];
+      return monthNames[month - 1]; // Adjust for 0-based indexing
+    }
+
+    if (element["date"] != null) {
+      Timestamp timestamp = element["date"];
+      DateTime dateTime = timestamp.toDate();
+      //formattedDate = "${dateTime.day}-${dateTime.month}-${dateTime.year}";
+      formattedDate =
+          "${dateTime.day} ${getMonthName(dateTime.month)} ${dateTime.year}";
+    }
+
+    return {
+      'paid': element['paid'],
+      'label': installmentLabels[index],
+      'date': formattedDate
+    };
+  }).toList();
+
+  return progressValue;
 }

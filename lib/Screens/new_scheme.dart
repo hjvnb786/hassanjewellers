@@ -1,7 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:hassanjewellers/Components/confirm_details.dart';
 import 'package:hassanjewellers/Components/drop_down_field.dart';
 import 'package:hassanjewellers/Components/user_text_input_field.dart';
+import 'package:hassanjewellers/Utils/Helpers/validate_fields.dart';
 import 'package:hassanjewellers/Utils/Services/firebase_service.dart';
 
 class NewScheme extends StatefulWidget {
@@ -12,18 +14,14 @@ class NewScheme extends StatefulWidget {
 }
 
 class _NewSchemeState extends State<NewScheme> {
-  final _formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   TextEditingController nameController = TextEditingController();
   TextEditingController fatherMotherHusbandController = TextEditingController();
   TextEditingController nomineeNameController = TextEditingController();
   TextEditingController addressController = TextEditingController();
   TextEditingController ageController = TextEditingController();
-  TextEditingController mobileNumberController = TextEditingController();
-  TextEditingController mailController = TextEditingController();
   TextEditingController alternateMobileController = TextEditingController();
-  TextEditingController applicantIDProofController = TextEditingController();
-  TextEditingController nomineeIDProofController = TextEditingController();
 
   List<String> monthlyInstallmentAmounts = [
     '500 ₹',
@@ -73,20 +71,6 @@ class _NewSchemeState extends State<NewScheme> {
     });
   }
 
-  String? validateFName(String? value) {
-    if (value == null || value.isEmpty) {
-      return "Please enter f some value";
-    }
-    return null;
-  }
-
-  String? validateName(String? value) {
-    if (value == null || value.isEmpty) {
-      return "Please enter some value";
-    }
-    return null;
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -95,92 +79,111 @@ class _NewSchemeState extends State<NewScheme> {
       ),
       body: Form(
         key: _formKey,
-        child: ListView(
-          children: [
-            UserDropDownField(
-                label: "Installment Amount",
-                selectionList: monthlyInstallmentAmounts,
-                selectedItem: monthlySelectedAmount,
-                setSelectedItem: setSelectedDropDownOption),
-            UserTextInputField(
-                label: "Name of the Applicant",
-                textController: nameController,
-                validationCriteria: validateFName),
-            UserTextInputField(
-                label: 'Guardian Name',
-                textController: fatherMotherHusbandController,
-                validationCriteria: validateFName),
-            UserDropDownField(
-                label: "Occupation",
-                selectionList: occupationList,
-                selectedItem: selectedOccupation,
-                setSelectedItem: setSelectedDropDownOption),
-            UserTextInputField(
-                label: 'Nominee Name',
-                textController: nomineeNameController,
-                validationCriteria: validateName),
-            UserDropDownField(
-                label: "Relationship with nominee",
-                selectionList: nomineeList,
-                selectedItem: selectedNominee,
-                setSelectedItem: setSelectedDropDownOption),
-            UserTextInputField(
-                label: 'Address',
-                textController: addressController,
-                validationCriteria: validateName),
-            UserTextInputField(
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              UserDropDownField(
+                  key: const Key("Field1"),
+                  label: "Installment Amount",
+                  selectionList: monthlyInstallmentAmounts,
+                  selectedItem: monthlySelectedAmount,
+                  setSelectedItem: setSelectedDropDownOption),
+              UserTextInputField(
+                  label: "Name of the Applicant",
+                  textController: nameController,
+                  validationCriteria: validateName),
+              UserTextInputField(
+                  label: 'Guardian Name',
+                  textController: fatherMotherHusbandController,
+                  validationCriteria: validateGuardianName),
+              UserDropDownField(
+                  label: "Occupation",
+                  selectionList: occupationList,
+                  selectedItem: selectedOccupation,
+                  setSelectedItem: setSelectedDropDownOption),
+              UserTextInputField(
+                  label: 'Nominee Name',
+                  textController: nomineeNameController,
+                  validationCriteria: validateNomineeName),
+              UserDropDownField(
+                  label: "Relationship with nominee",
+                  selectionList: nomineeList,
+                  selectedItem: selectedNominee,
+                  setSelectedItem: setSelectedDropDownOption),
+              UserTextInputField(
+                  label: 'Address',
+                  textController: addressController,
+                  validationCriteria: validateAddress),
+              UserTextInputField(
                 label: 'Age',
                 textController: ageController,
-                validationCriteria: validateName),
-            UserTextInputField(
-                label: 'Mobile Number',
-                textController: mobileNumberController,
-                validationCriteria: validateName),
-            UserTextInputField(
-                label: 'Email Address',
-                textController: mailController,
-                validationCriteria: validateName),
-            UserTextInputField(
-                label: 'Alternate Mobile',
-                textController: alternateMobileController,
-                validationCriteria: validateName),
-            UserTextInputField(
-                label: 'Application ID Proof',
-                textController: applicantIDProofController,
-                validationCriteria: validateName),
-            UserTextInputField(
-                label: 'Nominee ID Proof',
-                textController: nomineeIDProofController,
-                validationCriteria: validateName),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 10, right: 20, left: 20),
-              child: ElevatedButton(
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    addNewScheme(
-                            nameController.text,
-                            monthlySelectedAmount,
-                            fatherMotherHusbandController.text,
-                            selectedOccupation,
-                            nomineeNameController.text,
-                            selectedNominee,
-                            addressController.text,
-                            ageController.text)
-                        .then((value) {
-                      if (kDebugMode) {
-                        print("we did it");
-                      }
-                    });
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 15)),
-                child: const Text('Submit'),
+                validationCriteria: validateAge,
+                isNumber: true,
               ),
-            ),
-          ],
+              UserTextInputField(
+                  label: 'Alternate Mobile',
+                  isNumber: true,
+                  textController: alternateMobileController,
+                  validationCriteria: validateAlternativeMobile),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 10, right: 20, left: 20),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () async {
+
+                      if (_formKey.currentState?.validate() ?? false) {
+
+                        final confirmed = await showConfirmationDialog(
+                          context,
+                          nameController.text,
+                          fatherMotherHusbandController.text,
+                          nomineeNameController.text,
+                          addressController.text,
+                          ageController.text,
+                          alternateMobileController.text,
+                        );
+
+                        if (confirmed != null && confirmed) {
+                          // User confirmed, you can now proceed with submitting the data
+                          // submitData();
+
+
+                          addNewScheme(
+                              nameController.text,
+                              monthlySelectedAmount,
+                              fatherMotherHusbandController.text,
+                              selectedOccupation,
+                              nomineeNameController.text,
+                              selectedNominee,
+                              addressController.text,
+                              ageController.text)
+                              .then((value) {
+                            if (kDebugMode) {
+                              print("we did it");
+                            }
+                          });
+                          print('Data submitted');
+                        } else {
+                          // User canceled, handle accordingly
+                          print('User canceled');
+                        }
+
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 15)),
+                    child: const Text('Submit'),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 }
+
+
+

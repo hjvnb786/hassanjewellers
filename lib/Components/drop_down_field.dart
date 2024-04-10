@@ -15,35 +15,38 @@ class UserDropDownField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      child: Padding(
-        padding: const EdgeInsets.all(25.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              label,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w300),
-            ),
-            DropdownButton<String>(
-              borderRadius: BorderRadius.circular(5.5),
-              value: selectedItem,
-              items: selectionList
-                  .map(
-                    (item) => DropdownMenuItem<String>(
-                      value: item,
-                      child: Text(
-                        item,
-                        style: const TextStyle(
-                            fontWeight: FontWeight.w300, fontSize: 20),
+    return SizedBox(
+      width: double.infinity,
+      child: Card(
+        margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        child: Padding(
+          padding: const EdgeInsets.all(25.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w300),
+              ),
+              DropdownButton<String>(
+                borderRadius: BorderRadius.circular(5.5),
+                value: selectedItem,
+                items: selectionList
+                    .map(
+                      (item) => DropdownMenuItem<String>(
+                        value: item,
+                        child: Text(
+                          item,
+                          style: const TextStyle(
+                              fontWeight: FontWeight.w300, fontSize: 20),
+                        ),
                       ),
-                    ),
-                  )
-                  .toList(),
-              onChanged: (String? value) => setSelectedItem(label, value),
-            ),
-          ],
+                    )
+                    .toList(),
+                onChanged: (String? value) => setSelectedItem(label, value),
+              ),
+            ],
+          ),
         ),
       ),
     );

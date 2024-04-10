@@ -4,12 +4,14 @@ class UserTextInputField extends StatelessWidget {
   final String label;
   final TextEditingController textController;
   final String? Function(String?) validationCriteria;
+  final bool? isNumber;
 
   const UserTextInputField(
       {super.key,
       required this.label,
       required this.textController,
-      required this.validationCriteria});
+      required this.validationCriteria,
+      this.isNumber = false});
 
   @override
   Widget build(BuildContext context) {
@@ -25,9 +27,11 @@ class UserTextInputField extends StatelessWidget {
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w300),
             ),
             TextFormField(
+              autovalidateMode: AutovalidateMode.onUserInteraction,
               validator: validationCriteria,
               controller: textController,
               style: const TextStyle(),
+              keyboardType: isNumber! ? TextInputType.phone : TextInputType.text,
               decoration: const InputDecoration(hintText: "Your answer"),
             ),
           ],

@@ -1,6 +1,6 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:hassanjewellers/Utils/Helpers/utils.dart';
+import 'package:hassanjewellers/Utils/Services/firebase_service.dart';
 
 class SchemeProgress extends StatefulWidget {
   final List<dynamic> progress;
@@ -13,6 +13,7 @@ class SchemeProgress extends StatefulWidget {
 
 class _SchemeProgressState extends State<SchemeProgress> {
   int currentStep = 0;
+  late List<Map<String, dynamic>> progressList;
 
   Widget controlsBuilder(context, details, {data}) {
     return Row(
@@ -20,6 +21,16 @@ class _SchemeProgressState extends State<SchemeProgress> {
         ElevatedButton(onPressed: () {}, child: const Text("pay")),
       ],
     );
+  }
+
+  void handlePay() {
+    updateProgressItem().then((value) {
+      if (value != null) {
+        setState(() {
+          progressList = getProgressList(value);
+        });
+      }
+    });
   }
 
   List<String> installmentLabels = [
@@ -38,66 +49,17 @@ class _SchemeProgressState extends State<SchemeProgress> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    progressList = getProgressList(widget.progress);
+  }
+
+  @override
   Widget build(BuildContext context) {
-    List<Map<String, dynamic>> progressList =
-        widget.progress.asMap().entries.map((entry) {
-      int index = entry.key;
-      Map<String, dynamic> element = entry.value;
-
-      String formattedDate = "";
-
-      String getMonthName(int month) {
-        const List<String> monthNames = [
-          "January",
-          "February",
-          "March",
-          "April",
-          "May",
-          "June",
-          "July",
-          "August",
-          "September",
-          "October",
-          "November",
-          "December"
-        ];
-        return monthNames[month - 1]; // Adjust for 0-based indexing
-      }
-
-      if (element["date"] != null) {
-        Timestamp timestamp = element["date"];
-        DateTime dateTime = timestamp.toDate();
-        //formattedDate = "${dateTime.day}-${dateTime.month}-${dateTime.year}";
-        formattedDate =
-            "${dateTime.day} ${getMonthName(dateTime.month)} ${dateTime.year}";
-      }
-
-      return {
-        'paid': element['paid'],
-        'label': installmentLabels[index],
-        'date': formattedDate
-      };
-    }).toList();
-
-    String addOneMonth(String dateString) {
-      // Parse the input string to a DateTime object
-      DateTime originalDate = DateFormat("dd MMMM yyyy").parse(dateString);
-
-      // Add one month to the date
-      DateTime newDate =
-          DateTime(originalDate.year, originalDate.month + 1, originalDate.day);
-
-      // Format the new date back to the string format
-      return DateFormat("dd MMMM yyyy").format(newDate);
-    }
 
     for (var i = 0; i < progressList.length; i++) {
       if (progressList[i]['paid'] == false) {
-        String eligibleDate = addOneMonth(progressList[i - 1]['date']);
-
-        progressList[i]["eligibleDate"] = eligibleDate;
-
-        //progressList[i]['payButton']  = true;
+        progressList[i]['payButton'] = true;
         break;
       }
     }
@@ -127,10 +89,8 @@ class _SchemeProgressState extends State<SchemeProgress> {
                           ? Text("Paid on ${(item["date"])}")
                           : ElevatedButton(
                               onPressed:
-                                  item["payButton"] == true ? () {} : null,
-                              child: Text(item["eligibleDate"] == null
-                                  ? "complete your previous payments"
-                                  : "You due date is ${item["eligibleDate"]}"),
+                                  item["payButton"] == true ? handlePay : null,
+                              child: const Text("Pay"),
                             ),
                     ],
                   ),
