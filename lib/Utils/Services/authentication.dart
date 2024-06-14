@@ -8,14 +8,22 @@ Future<String?> generateOTP(String phone) async {
     await FirebaseAuth.instance.verifyPhoneNumber(
       phoneNumber: phone,
       verificationCompleted: (PhoneAuthCredential credential) {},
-      verificationFailed: (FirebaseAuthException e) {},
+
+      verificationFailed: (FirebaseAuthException firebaseAuthException) {
+        print("exception occurred");
+        completer.complete(firebaseAuthException.code);
+      },
+
       codeSent: (String verificationId, int? resendToken) {
+        print("verification id sent successfully");
         completer.complete(verificationId);
       },
       codeAutoRetrievalTimeout: (String verificationId) {},
     );
+
     return completer.future;
   } catch (e) {
+
     completer.completeError("something went wrong, please try again");
     return completer.future;
   }

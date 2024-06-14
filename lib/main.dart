@@ -3,7 +3,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:hassanjewellers/Screens/home.dart';
 import 'package:hassanjewellers/Screens/register.dart';
-import 'package:hassanjewellers/Utils/UI/theme_data.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,7 +20,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
         debugShowCheckedModeBanner: false,
-        theme: themeData,
+        //theme: themeData,
         home: currentUser != null && currentUser!.uid.isNotEmpty
             ? const Home()
             : const Register());
