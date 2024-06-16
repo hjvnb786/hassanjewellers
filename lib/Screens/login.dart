@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:hassanjewellers/Screens/otp_screen.dart';
 import 'package:hassanjewellers/Utils/Services/authentication.dart';
+import 'package:hassanjewellers/Utils/Services/firebase_service.dart';
 import 'package:hassanjewellers/Utils/UI/styles.dart';
+import 'package:hassanjewellers/Components/user_exists_dialog.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -53,37 +55,61 @@ class _LoginState extends State<Login> {
                         child: ElevatedButton(
                           onPressed: isLoading == false
                               ? () {
+                                  String phoneNumber =
+                                      "+91${phone.text.toString()}";
                                   if (_formKey.currentState!.validate()) {
                                     toggleLoading();
                                     String verifyId = "";
-                                    generateOTP("+91${phone.text.toString()}")
-                                        .then((value) {
-                                      if (value == "too-many-requests") {
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          SnackBar(
-                                            content: Text(value.toString()),
-                                            backgroundColor: Colors.red,
-                                          ),
-                                        );
-                                        return;
-                                      }
-                                      verifyId = value!;
-                                    }).whenComplete(() {
-                                      toggleLoading();
-                                      if (verifyId != "") {
-                                        Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) => OtpScreen(
-                                                phoneNumber:
-                                                    "+91${phone.text.toString()}",
-                                                isRegister: false,
-                                                verifyId: verifyId,
-                                              ),
-                                            ));
-                                      }
-                                    });
+
+                                    checkPhoneExists(phoneNumber)
+                                        .then((value) => {
+                                              if (!value)
+                                                {
+                                                  showCustomDialog(
+                                                      context,
+                                                      "The user is not registered",
+                                                      "The phone number you entered is not registered. Please create an account."),
+                                                  toggleLoading()
+                                                }
+                                              else
+                                                {
+                                                  generateOTP(phoneNumber)
+                                                      .then((value) {
+                                                    if (value ==
+                                                        "too-many-requests") {
+                                                      ScaffoldMessenger.of(
+                                                              context)
+                                                          .showSnackBar(
+                                                        SnackBar(
+                                                          content: Text(
+                                                              value.toString()),
+                                                          backgroundColor:
+                                                              Colors.red,
+                                                        ),
+                                                      );
+                                                      return;
+                                                    }
+                                                    verifyId = value!;
+                                                  }).whenComplete(() {
+                                                    toggleLoading();
+                                                    if (verifyId != "") {
+                                                      Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                            builder:
+                                                                (context) =>
+                                                                    OtpScreen(
+                                                              phoneNumber:
+                                                                  "+91${phone.text.toString()}",
+                                                              isRegister: false,
+                                                              verifyId:
+                                                                  verifyId,
+                                                            ),
+                                                          ));
+                                                    }
+                                                  })
+                                                }
+                                            });
                                   }
                                 }
                               : () {},

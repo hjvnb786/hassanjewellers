@@ -35,7 +35,8 @@ class _RegisterState extends State<Register> {
       //check phone number exists
       checkPhoneExists(phoneNumber).then((phoneExists) {
         if (phoneExists) {
-          showUserExistsDialog(context);
+          showCustomDialog(context, "The user is already registered",
+              "The phone number you entered is already registered. Please log in to your account.");
           toggleLoading();
         }
         // if phone number doesn't exist

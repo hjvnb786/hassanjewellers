@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hassanjewellers/Components/snack_bar.dart';
 import 'package:hassanjewellers/Utils/Services/authentication.dart';
+import 'package:hassanjewellers/Utils/UI/styles.dart';
 import 'package:hassanjewellers/main.dart';
 
 class OtpScreen extends StatefulWidget {
@@ -51,21 +52,18 @@ class _OtpScreenState extends State<OtpScreen> {
             child: ListView(
               children: [
                 TextFormField(
-                  controller: otpController,
-                  keyboardType: TextInputType.number,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your 6 digit otp!';
-                    } else if (value.length < 10) {
-                      return 'Your otp is only 6 digits';
-                    }
-                    return null;
-                  },
-                  decoration: const InputDecoration(
-                    labelText: 'OTP',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
+                    controller: otpController,
+                    keyboardType: TextInputType.number,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your 6 digit otp!';
+                      } else if (value.length < 10) {
+                        return 'Your otp is only 6 digits';
+                      }
+                      return null;
+                    },
+                    decoration:
+                        textFieldDecoration("OTP", Icons.message_sharp)),
                 Padding(
                   padding: const EdgeInsets.only(top: 10),
                   child: Column(
@@ -73,9 +71,7 @@ class _OtpScreenState extends State<OtpScreen> {
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 15)),
+                          style: elevatedButtonStyle(),
                           onPressed: () {
                             toggleLoading();
 
@@ -126,7 +122,7 @@ class _OtpScreenState extends State<OtpScreen> {
                   onPressed: () {
                     generateOTP(widget.phoneNumber);
                   },
-                  child: const Text('Resend OTP'),
+                  child: const Text('0:60 Resend OTP', style: TextStyle(color: Colors.grey),),
                 )
               ],
             ),

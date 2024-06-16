@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-void showUserExistsDialog(BuildContext context) {
+void showCustomDialog(
+    BuildContext context, String headerText, String bodyContent) {
   showDialog(
     context: context,
     builder: (context) {
       return AlertDialog(
-        title: const Text('User Already Registered'),
-        content: const Text(
-            'This phone number is already registered. Please login.'),
+        title: Text(headerText),
+        content: Text(bodyContent),
         actions: <Widget>[
           TextButton(
             child: const Text('OK'),
