@@ -18,6 +18,8 @@ class UserDropDownField extends StatelessWidget {
     return SizedBox(
       width: double.infinity,
       child: Card(
+        elevation: 0,
+        color: const Color(0xFFEEEEEE),
         margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         child: Padding(
           padding: const EdgeInsets.all(25.0),
@@ -26,7 +28,8 @@ class UserDropDownField extends StatelessWidget {
             children: [
               Text(
                 label,
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w300),
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.w300),
               ),
               DropdownButton<String>(
                 borderRadius: BorderRadius.circular(5.5),

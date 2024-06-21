@@ -5,6 +5,7 @@ import 'package:hassanjewellers/Components/drop_down_field.dart';
 import 'package:hassanjewellers/Components/user_text_input_field.dart';
 import 'package:hassanjewellers/Utils/Helpers/validate_fields.dart';
 import 'package:hassanjewellers/Utils/Services/firebase_service.dart';
+import 'package:hassanjewellers/Utils/UI/styles.dart';
 
 class NewScheme extends StatefulWidget {
   const NewScheme({super.key});
@@ -126,7 +127,7 @@ class _NewSchemeState extends State<NewScheme> {
                   textController: alternateMobileController,
                   validationCriteria: validateAlternativeMobile),
               Padding(
-                padding: const EdgeInsets.only(bottom: 10, right: 20, left: 20),
+                padding: const EdgeInsets.only(bottom: 20, top: 10, right: 20, left: 20),
                 child: SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
@@ -171,8 +172,7 @@ class _NewSchemeState extends State<NewScheme> {
 
                       }
                     },
-                    style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 15)),
+                    style: elevatedButtonStyle(),
                     child: const Text('Submit'),
                   ),
                 ),

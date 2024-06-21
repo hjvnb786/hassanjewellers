@@ -27,7 +27,7 @@ class _AccountState extends State<Account> {
         title: const Text("Profile"),
       ),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 30),
+        padding: const EdgeInsets.symmetric(horizontal: 20),
         child: ListView(
           children: [
             AccountDetailsCard(name: widget.name, title: "Name"),
