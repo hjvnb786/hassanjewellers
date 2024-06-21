@@ -1,80 +1,87 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:hassanjewellers/Utils/Services/firebase_service.dart';
+import 'package:hassanjewellers/Components/AccountDetailsCard.dart';
+import 'package:hassanjewellers/Utils/UI/styles.dart';
 import 'package:hassanjewellers/main.dart';
 
 class Account extends StatefulWidget {
-  const Account({super.key});
+  const Account(
+      {super.key,
+      required this.name,
+      required this.phone,
+      required this.email});
+
+  final String name;
+  final String phone;
+  final String email;
 
   @override
   State<Account> createState() => _AccountState();
 }
 
 class _AccountState extends State<Account> {
-  String name = "taha";
-  String phone = "taha";
-  String email = "taha";
-
-  final String? uid = FirebaseAuth.instance.currentUser?.uid;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Profile"),
       ),
-      body: FutureBuilder<dynamic>(
-        future: getDocumentByUid(uid),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const LinearProgressIndicator();
-          }
-          return ListView(
-            children: [
-              Card(child: ListTile(title: Text(snapshot.data["name"] ?? ""))),
-              Card(child: ListTile(title: Text(snapshot.data["phone"] ?? ""))),
-              Card(child: ListTile(title: Text(snapshot.data["email"] ?? ""))),
-              ListTile(
-                title: const Text(
-                  'Log out',
-                  style: TextStyle(color: Colors.red),
-                ),
-                onTap: () async {
-                  await FirebaseAuth.instance.signOut().then((value) {
-                    Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(builder: (context) => MyApp()),
-                      (Route<dynamic> route) =>
-                          false, // This predicate ensures all routes are removed
-                    );
-                  });
-                },
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 30),
+        child: ListView(
+          children: [
+            AccountDetailsCard(name: widget.name, title: "Name"),
+            AccountDetailsCard(name: widget.phone, title: "Phone"),
+            AccountDetailsCard(name: widget.email, title: "Email"),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                showDialog(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        title: const Text(
+                          "Are you sure you want to log out?",
+                          style: TextStyle(fontSize: 20),
+                        ),
+                        actions: <Widget>[
+                          TextButton(
+                            child: const Text('Cancel'),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                          TextButton(
+                            child: const Text(
+                              'Log Out',
+                              style: TextStyle(color: Colors.red),
+                            ),
+                            onPressed: () async {
+                              await FirebaseAuth.instance
+                                  .signOut()
+                                  .then((value) {})
+                                  .whenComplete(
+                                      () => Navigator.pushAndRemoveUntil(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) => MyApp()),
+                                            (Route<dynamic> route) =>
+                                                false, // This predicate ensures all routes are removed
+                                          ));
+                            },
+                          ),
+                        ],
+                      );
+                    });
+              },
+              style: elevatedButtonStyle(),
+              child: const Text(
+                'LOG OUT',
+                style: TextStyle(color: Colors.red),
               ),
-              const Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Text('More Options',
-                    style:
-                        TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-              ),
-              ListTile(
-                title: const Text('Share'),
-                onTap: () {/* Implement Share Functionality */},
-              ),
-              ListTile(
-                title: const Text('About Us'),
-                onTap: () {/* Navigate to About Us Page */},
-              ),
-              ListTile(
-                title: const Text('Share the App'),
-                onTap: () {/* Navigate to About Us Page */},
-              ),
-              ListTile(
-                title: const Text('Rate Us'),
-                onTap: () {/* Navigate to About Us Page */},
-              ),
-            ],
-          );
-        },
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hassanjewellers/Components/user_exists_dialog.dart';
+import 'package:hassanjewellers/Components/show_custom_dialog.dart';
 import 'package:hassanjewellers/Screens/login.dart';
 import 'package:hassanjewellers/Screens/otp_screen.dart';
 import 'package:hassanjewellers/Utils/Services/authentication.dart';

@@ -3,7 +3,7 @@ import 'package:hassanjewellers/Screens/otp_screen.dart';
 import 'package:hassanjewellers/Utils/Services/authentication.dart';
 import 'package:hassanjewellers/Utils/Services/firebase_service.dart';
 import 'package:hassanjewellers/Utils/UI/styles.dart';
-import 'package:hassanjewellers/Components/user_exists_dialog.dart';
+import 'package:hassanjewellers/Components/show_custom_dialog.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
