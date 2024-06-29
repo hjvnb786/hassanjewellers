@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:hassanjewellers/Components/confirm_details.dart';
 import 'package:hassanjewellers/Components/drop_down_field.dart';
 import 'package:hassanjewellers/Components/user_text_input_field.dart';
+import 'package:hassanjewellers/Screens/payment_successfull.dart';
+import 'package:hassanjewellers/Utils/Helpers/animated_route.dart';
 import 'package:hassanjewellers/Utils/Helpers/validate_fields.dart';
 import 'package:hassanjewellers/Utils/Services/firebase_service.dart';
 import 'package:hassanjewellers/Utils/UI/styles.dart';
@@ -22,7 +24,7 @@ class _NewSchemeState extends State<NewScheme> {
   TextEditingController nomineeNameController = TextEditingController();
   TextEditingController addressController = TextEditingController();
   TextEditingController ageController = TextEditingController();
-  TextEditingController alternateMobileController = TextEditingController();
+  TextEditingController mobileNumber = TextEditingController();
 
   List<String> monthlyInstallmentAmounts = [
     '500 ₹',
@@ -122,54 +124,55 @@ class _NewSchemeState extends State<NewScheme> {
                 isNumber: true,
               ),
               UserTextInputField(
-                  label: 'Alternate Mobile',
+                  label: 'Mobile Number',
                   isNumber: true,
-                  textController: alternateMobileController,
+                  textController: mobileNumber,
                   validationCriteria: validateAlternativeMobile),
               Padding(
-                padding: const EdgeInsets.only(bottom: 20, top: 10, right: 20, left: 20),
+                padding: const EdgeInsets.only(
+                    bottom: 20, top: 10, right: 20, left: 20),
                 child: SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: () async {
+                      FocusScope.of(context).unfocus();
 
                       if (_formKey.currentState?.validate() ?? false) {
-
                         final confirmed = await showConfirmationDialog(
                           context,
+                          monthlySelectedAmount,
                           nameController.text,
                           fatherMotherHusbandController.text,
+                          selectedOccupation,
                           nomineeNameController.text,
+                          selectedNominee,
                           addressController.text,
                           ageController.text,
-                          alternateMobileController.text,
+                          mobileNumber.text,
                         );
 
                         if (confirmed != null && confirmed) {
                           // User confirmed, you can now proceed with submitting the data
                           // submitData();
 
-
                           addNewScheme(
-                              nameController.text,
-                              monthlySelectedAmount,
-                              fatherMotherHusbandController.text,
-                              selectedOccupation,
-                              nomineeNameController.text,
-                              selectedNominee,
-                              addressController.text,
-                              ageController.text)
-                              .then((value) {
-                            if (kDebugMode) {
-                              print("we did it");
-                            }
-                          });
+                                  nameController.text,
+                                  monthlySelectedAmount,
+                                  fatherMotherHusbandController.text,
+                                  selectedOccupation,
+                                  nomineeNameController.text,
+                                  selectedNominee,
+                                  addressController.text,
+                                  ageController.text)
+                              .then((value) {})
+                              .whenComplete(() => Navigator.of(context).push(
+                                  animatedRoute(
+                                      const PaymentSuccessfull(), context)));
                           print('Data submitted');
                         } else {
                           // User canceled, handle accordingly
                           print('User canceled');
                         }
-
                       }
                     },
                     style: elevatedButtonStyle(),
@@ -184,6 +187,3 @@ class _NewSchemeState extends State<NewScheme> {
     );
   }
 }
-
-
-

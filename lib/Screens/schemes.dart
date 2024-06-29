@@ -13,11 +13,26 @@ class Schemes extends StatefulWidget {
 class _SchemesState extends State<Schemes> with TickerProviderStateMixin {
   final _firestore = FirebaseFirestore.instance;
   late final TabController _tabController;
+  final uid = FirebaseAuth.instance.currentUser?.uid;
+  late Stream<QuerySnapshot<Map<String, dynamic>>> activeSchemeList;
+  late Stream<QuerySnapshot<Map<String, dynamic>>> closedSchemeList;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+
+    activeSchemeList = _firestore
+        .collection("savings")
+        .where("userId", isEqualTo: uid)
+        .where("status", isEqualTo: true)
+        .snapshots();
+
+    closedSchemeList = _firestore
+        .collection("savings")
+        .where("userId", isEqualTo: uid)
+        .where("status", isEqualTo: false)
+        .snapshots();
   }
 
   @override
@@ -44,25 +59,28 @@ class _SchemesState extends State<Schemes> with TickerProviderStateMixin {
           children: <Widget>[
             Scaffold(
               body: StreamBuilder<QuerySnapshot>(
-                stream: _firestore
-                    .collection("savings")
-                    .where("userId",
-                        isEqualTo:
-                            FirebaseAuth.instance.currentUser!.uid.toString())
-                    .snapshots(),
+                stream: activeSchemeList,
                 builder: (context, snapshot) {
                   final schemes = snapshot.data?.docs;
                   if (schemes != null) {
                     return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-                      child: ListView(
-                          children: schemes
-                              .map((data) => SchemeItem(
-                                    name: data["name"],
-                                    amount: data["installmentAmount"],
-                                    progress: data["progress"],
-                                  ))
-                              .toList()),
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: ListView(children: [
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        ...schemes
+                            .map((data) => SchemeItem(
+                                  id: data.id,
+                                  name: data["name"],
+                                  amount: data["installmentAmount"],
+                                  progress: data["progress"],
+                                ))
+                            .toList(),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                      ]),
                     );
                   } else {
                     return const LinearProgressIndicator();
@@ -70,7 +88,37 @@ class _SchemesState extends State<Schemes> with TickerProviderStateMixin {
                 },
               ),
             ),
-            const Center(child: Text("Closed"))
+            Scaffold(
+              body: StreamBuilder<QuerySnapshot>(
+                stream: closedSchemeList,
+                builder: (context, snapshot) {
+                  final schemes = snapshot.data?.docs;
+                  if (schemes != null) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: ListView(children: [
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        ...schemes
+                            .map((data) => SchemeItem(
+                                  id: data.id,
+                                  name: data["name"],
+                                  amount: data["installmentAmount"],
+                                  progress: data["progress"],
+                                ))
+                            .toList(),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                      ]),
+                    );
+                  } else {
+                    return const LinearProgressIndicator();
+                  }
+                },
+              ),
+            ),
           ],
         ));
   }

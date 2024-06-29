@@ -12,32 +12,62 @@ Future<bool> checkPhoneExists(String fieldValue) async {
   return querySnapshot.docs.isNotEmpty;
 }
 
-Future<dynamic> updateProgressItem() async {
+Future<dynamic> updateProgressItem(id) async {
   try {
+    // Get the unique identifier (uid) of the currently authenticated user
     final uid = FirebaseAuth.instance.currentUser?.uid;
+    bool schemeStatus = true;
+
+    // Create a reference to the 'savings' collection in Firestore
     CollectionReference collectionRef =
         FirebaseFirestore.instance.collection('savings');
+
+    // Query the 'savings' collection for documents where the 'userId' field is equal to the current user's uid
     QuerySnapshot querySnapshot =
         await collectionRef.where("userId", isEqualTo: uid).get();
 
-    if (querySnapshot.docs.isNotEmpty) {
-      List<dynamic> progress = querySnapshot.docs.first["progress"];
+    int prog = querySnapshot.docs.length;
+    print("hello world");
+    print("id: " + id);
+    print(prog);
 
+    int indexMatch = 00000;
+
+    for (var i = 0; i < prog; i++) {
+      print(querySnapshot.docs[i].id);
+      if (querySnapshot.docs[i].id == id) {
+        print("match");
+        indexMatch = i;
+      }
+    }
+
+    if (querySnapshot.docs.isNotEmpty) {
+      List<dynamic> progress = querySnapshot.docs[indexMatch]["progress"];
 
       final getDate = await getAccurateTime().then((time) => time);
 
       for (int i = 0; i < 12; i++) {
+
+        print("job done ya index number $i");
+
+        if (i == 11) {
+          print("job done ya habibi");
+          schemeStatus = false;
+        }
+
         if (progress[i]["paid"] == false) {
           progress[i]["paid"] = true;
           progress[i]["date"] = getDate;
           break;
         }
-      }
-      String documentID = querySnapshot.docs.first.id;
 
-      await collectionRef.doc(documentID).update({
-        'progress': progress,
-      });
+      }
+
+      String documentID = querySnapshot.docs[indexMatch].id;
+
+      await collectionRef
+          .doc(documentID)
+          .update({'progress': progress, 'status': schemeStatus});
 
       return await collectionRef
           .doc(documentID)
@@ -53,10 +83,10 @@ Future<dynamic> updateProgressItem() async {
 }
 
 Future<QueryDocumentSnapshot<Map<String, dynamic>>?> getDocumentByUid(
-    String? uid) async {
+    String? uid, String collectionName) async {
   try {
     final querySnapshot = await FirebaseFirestore.instance
-        .collection('users')
+        .collection(collectionName)
         .where("uid", isEqualTo: uid)
         .get();
 
@@ -92,7 +122,8 @@ Future<bool> addNewScheme(
       "address": address,
       "age": age,
       "date": time,
-      "progress": generateProgress()
+      "progress": generateProgress(),
+      "status": true
     });
   });
   return true;

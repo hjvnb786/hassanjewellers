@@ -3,9 +3,10 @@ import 'package:hassanjewellers/Utils/Helpers/utils.dart';
 import 'package:hassanjewellers/Utils/Services/firebase_service.dart';
 
 class SchemeProgress extends StatefulWidget {
+  final String id;
   final List<dynamic> progress;
 
-  const SchemeProgress({super.key, required this.progress});
+  const SchemeProgress({super.key, required this.progress, required this.id});
 
   @override
   State<SchemeProgress> createState() => _SchemeProgressState();
@@ -14,6 +15,7 @@ class SchemeProgress extends StatefulWidget {
 class _SchemeProgressState extends State<SchemeProgress> {
   int currentStep = 0;
   late List<Map<String, dynamic>> progressList;
+  bool enableButton = true;
 
   Widget controlsBuilder(context, details, {data}) {
     return Row(
@@ -24,10 +26,15 @@ class _SchemeProgressState extends State<SchemeProgress> {
   }
 
   void handlePay() {
-    updateProgressItem().then((value) {
+    setState(() {
+      enableButton = false;
+    });
+
+    updateProgressItem(widget.id).then((value) {
       if (value != null) {
         setState(() {
           progressList = getProgressList(value);
+          enableButton = true;
         });
       }
     });
@@ -56,7 +63,6 @@ class _SchemeProgressState extends State<SchemeProgress> {
 
   @override
   Widget build(BuildContext context) {
-
     for (var i = 0; i < progressList.length; i++) {
       if (progressList[i]['paid'] == false) {
         progressList[i]['payButton'] = true;
@@ -87,11 +93,17 @@ class _SchemeProgressState extends State<SchemeProgress> {
                     children: [
                       item['paid'] == true
                           ? Text("Paid on ${(item["date"])}")
-                          : ElevatedButton(
-                              onPressed:
-                                  item["payButton"] == true ? handlePay : null,
-                              child: const Text("Pay"),
-                            ),
+                          : enableButton
+                              ? ElevatedButton(
+                                  onPressed: item["payButton"] == true
+                                      ? handlePay
+                                      : null,
+                                  child: const Text("Pay"),
+                                )
+                              : const SizedBox(
+                                  width: 100,
+                                  child: LinearProgressIndicator(),
+                                ),
                     ],
                   ),
                 ),

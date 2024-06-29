@@ -23,7 +23,7 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
-    userAccountDetails = getDocumentByUid(uid);
+    userAccountDetails = getDocumentByUid(uid, "users");
     userAccountDetails.then((value) => {
           setState(() {
             customerName = value["name"];

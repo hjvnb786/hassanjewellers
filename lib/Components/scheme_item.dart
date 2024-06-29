@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:hassanjewellers/Screens/scheme_progress.dart';
 
 class SchemeItem extends StatelessWidget {
+  final String id;
   final String name;
   final String amount;
   final List<dynamic> progress;
 
   const SchemeItem(
       {super.key,
+      required this.id,
       required this.name,
       required this.amount,
       required this.progress});
@@ -15,7 +17,7 @@ class SchemeItem extends StatelessWidget {
   Route createRoute() {
     return PageRouteBuilder(
       pageBuilder: (context, animation, secondaryAnimation) =>
-          SchemeProgress(progress: progress),
+          SchemeProgress(id: id, progress: progress),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         const begin = Offset(1.0, 0.0);
         const end = Offset.zero;

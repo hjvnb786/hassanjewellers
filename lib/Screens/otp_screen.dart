@@ -110,6 +110,8 @@ class _OtpScreenState extends State<OtpScreen> {
                             child: ElevatedButton(
                               style: elevatedButtonStyle(),
                               onPressed: () {
+
+                                print("otp button pressed");
                                 toggleLoading();
 
                                 verifyOTP(widget.verifyId, otpController.text)
