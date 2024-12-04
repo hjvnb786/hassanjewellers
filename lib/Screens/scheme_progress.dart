@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hassanjewellers/Screens/payment.dart';
 import 'package:hassanjewellers/Utils/Helpers/utils.dart';
 import 'package:hassanjewellers/Utils/Services/firebase_service.dart';
 
@@ -26,19 +27,26 @@ class _SchemeProgressState extends State<SchemeProgress> {
   }
 
   void handlePay() {
-    setState(() {
-      enableButton = false;
-    });
-
-    updateProgressItem(widget.id).then((value) {
-      if (value != null) {
-        setState(() {
-          progressList = getProgressList(value);
-          enableButton = true;
-        });
-      }
-    });
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const Payment()),
+    );
   }
+
+  // void handlePay() {
+  //   setState(() {
+  //     enableButton = false;
+  //   });
+  //
+  //   updateProgressItem(widget.id).then((value) {
+  //     if (value != null) {
+  //       setState(() {
+  //         progressList = getProgressList(value);
+  //         enableButton = true;
+  //       });
+  //     }
+  //   });
+  // }
 
   List<String> installmentLabels = [
     "First Installment",

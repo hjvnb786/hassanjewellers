@@ -53,7 +53,7 @@ class _OtpScreenState extends State<OtpScreen> {
           print(counter);
           counter--;
         } else {
-          print("bro its time ${counter}");
+          print("bro its time $counter");
           resendOtpEnabled = true;
           timer.cancel();
         }
@@ -78,7 +78,7 @@ class _OtpScreenState extends State<OtpScreen> {
               Expanded(
                 child: ListView(
                   children: [
-                    SizedBox(height: 100),
+                    const SizedBox(height: 100),
                     Text(
                       "We have sent the verification code to your phone number ${widget.phoneNumber}",
                       textAlign: TextAlign.center,
