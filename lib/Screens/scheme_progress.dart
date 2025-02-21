@@ -29,24 +29,9 @@ class _SchemeProgressState extends State<SchemeProgress> {
   void handlePay() {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const Payment()),
+      MaterialPageRoute(builder: (context) => Payment(id: widget.id)),
     );
   }
-
-  // void handlePay() {
-  //   setState(() {
-  //     enableButton = false;
-  //   });
-  //
-  //   updateProgressItem(widget.id).then((value) {
-  //     if (value != null) {
-  //       setState(() {
-  //         progressList = getProgressList(value);
-  //         enableButton = true;
-  //       });
-  //     }
-  //   });
-  // }
 
   List<String> installmentLabels = [
     "First Installment",
@@ -66,6 +51,7 @@ class _SchemeProgressState extends State<SchemeProgress> {
   @override
   void initState() {
     super.initState();
+    print("It is doc Id I think: ${widget.id}");
     progressList = getProgressList(widget.progress);
   }
 
@@ -83,12 +69,14 @@ class _SchemeProgressState extends State<SchemeProgress> {
         title: const Text("Scheme Progress"),
       ),
       body: Stepper(
+        type: StepperType.vertical,
         currentStep: currentStep,
         onStepTapped: (value) {
           setState(() {
             currentStep = value;
           });
         },
+
         steps: progressList
             .map(
               (item) => Step(

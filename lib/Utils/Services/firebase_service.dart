@@ -3,13 +3,28 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hassanjewellers/Utils/Helpers/utils.dart';
 
-Future<bool> checkPhoneExists(String fieldValue) async {
+Future<bool> checkPhoneExist(String fieldValue) async {
   final querySnapshot = await FirebaseFirestore.instance
       .collection('users')
       .where("phone", isEqualTo: fieldValue)
       .limit(1)
       .get();
-  return querySnapshot.docs.isNotEmpty;
+
+  return querySnapshot.docs.isEmpty;
+}
+
+Future<String> checkPhoneExists(String fieldValue) async {
+  final querySnapshot = await FirebaseFirestore.instance
+      .collection('users')
+      .where("phone", isEqualTo: fieldValue)
+      .limit(1)
+      .get();
+
+  if (querySnapshot.docs.isEmpty) {
+    return "";
+  }
+
+  return querySnapshot.docs.first["uid"];
 }
 
 Future<dynamic> updateProgressItem(id) async {
@@ -47,7 +62,6 @@ Future<dynamic> updateProgressItem(id) async {
       final getDate = await getAccurateTime().then((time) => time);
 
       for (int i = 0; i < 12; i++) {
-
         print("job done ya index number $i");
 
         if (i == 11) {
@@ -60,7 +74,6 @@ Future<dynamic> updateProgressItem(id) async {
           progress[i]["date"] = getDate;
           break;
         }
-
       }
 
       String documentID = querySnapshot.docs[indexMatch].id;
@@ -98,6 +111,15 @@ Future<QueryDocumentSnapshot<Map<String, dynamic>>?> getDocumentByUid(
   } catch (e) {
     return null;
   }
+}
+
+Future<bool> registerUser(
+    String uid, String name, String phone, String email) async {
+  await FirebaseFirestore.instance
+      .collection("users")
+      .add({"uid": uid, "phone": phone, "name": name, "email": email});
+
+  return true;
 }
 
 Future<bool> addNewScheme(

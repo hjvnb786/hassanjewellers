@@ -1,26 +1,28 @@
 import 'dart:async';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:hassanjewellers/Components/snack_bar.dart';
+import 'package:hassanjewellers/Utils/Helpers/handle_OTP.dart';
 import 'package:hassanjewellers/Utils/Services/authentication.dart';
+import 'package:hassanjewellers/Utils/Services/firebase_service.dart';
 import 'package:hassanjewellers/Utils/UI/styles.dart';
 import 'package:hassanjewellers/main.dart';
 
 class OtpScreen extends StatefulWidget {
   final String phoneNumber;
   final bool isRegister;
-  final String verifyId;
-  final String? name;
-  final String? email;
+  //final String verifyId;
+  final String name;
+  final String email;
+  final String uid;
 
   const OtpScreen(
       {super.key,
       required this.phoneNumber,
       required this.isRegister,
-      required this.verifyId,
-      this.name,
-      this.email});
+      //required this.verifyId,
+      required this.name,
+      required this.email,
+      required this.uid});
 
   @override
   State<OtpScreen> createState() => _OtpScreenState();
@@ -53,7 +55,6 @@ class _OtpScreenState extends State<OtpScreen> {
           print(counter);
           counter--;
         } else {
-          print("bro its time $counter");
           resendOtpEnabled = true;
           timer.cancel();
         }
@@ -110,40 +111,47 @@ class _OtpScreenState extends State<OtpScreen> {
                             child: ElevatedButton(
                               style: elevatedButtonStyle(),
                               onPressed: () {
-
-                                print("otp button pressed");
+                                print("OTP button pressed");
                                 toggleLoading();
 
-                                verifyOTP(widget.verifyId, otpController.text)
-                                    .then((validOTP) {
-                                  if (validOTP) {
+                                print("phone: ${widget.phoneNumber}");
+                                print("otp: ${otpController.text}");
+
+                                Future<String> authStatus = handleOTP(
+                                  mobileNumber: widget.phoneNumber,
+                                  otp: otpController.text,
+                                  uid: widget.uid,
+                                );
+
+                                authStatus.then((value) {
+                                  print("Authentication status: $value");
+                                  if (value == "SUCCESS") {
                                     if (widget.isRegister) {
-                                      FirebaseFirestore.instance
-                                          .collection("users")
-                                          .add({
-                                        "uid": FirebaseAuth
-                                            .instance.currentUser?.uid,
-                                        "phone": widget.phoneNumber,
-                                        "email": widget.email,
-                                        "name": widget.name
-                                      });
+                                      registerUser(
+                                          FirebaseAuth
+                                              .instance.currentUser!.uid,
+                                          widget.name,
+                                          widget.phoneNumber,
+                                          widget.email);
                                     }
 
                                     Navigator.pushAndRemoveUntil(
                                       context,
                                       MaterialPageRoute(
                                           builder: (context) => MyApp()),
-                                      (Route<dynamic> route) =>
-                                          false, // This predicate ensures all routes are removed
+                                      (Route<dynamic> route) => false,
                                     );
                                   } else {
-                                    displaySnackBar(context,
-                                        "Invalid OTP"); // Added semicolon
+                                    // Handle other outcomes if necessary
+                                    print("Authentication failed");
                                   }
                                 }).catchError((error) {
-                                  displaySnackBar(
-                                      context, "Something went wrong");
-                                }).whenComplete(() => toggleLoading());
+                                  // Handle any errors that might occur during the future's execution
+                                  print("An error occurred: $error");
+                                }).whenComplete(() {
+                                  // Toggle loading off after the future completes
+                                  toggleLoading();
+                                });
                               },
                               child: const Text('Submit OTP'),
                             ),

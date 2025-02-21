@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:hassanjewellers/Components/show_custom_dialog.dart';
 import 'package:hassanjewellers/Screens/login.dart';
 import 'package:hassanjewellers/Screens/otp_screen.dart';
+import 'package:hassanjewellers/Utils/Helpers/animated_route.dart';
+import 'package:hassanjewellers/Utils/Helpers/handle_OTP.dart';
 import 'package:hassanjewellers/Utils/Services/authentication.dart';
 import 'package:hassanjewellers/Utils/Services/firebase_service.dart';
 import 'package:hassanjewellers/Utils/UI/styles.dart';
@@ -20,6 +22,7 @@ class _RegisterState extends State<Register> {
 
   final _formKey = GlobalKey<FormState>();
   bool isLoading = false;
+  bool prefixEnabledState = false;
 
   void toggleLoading() {
     setState(() {
@@ -27,65 +30,71 @@ class _RegisterState extends State<Register> {
     });
   }
 
-  void handleRegister() {
-    if (_formKey.currentState!.validate()) {
-      toggleLoading();
-      String phoneNumber = "+91${phone.text}";
+  Future<void> handleRegister() async {
+    String phoneNumber = "+91${phone.text}";
 
-      //check phone number exists
-      checkPhoneExists(phoneNumber).then((phoneExists) {
-        if (phoneExists) {
-          showCustomDialog(context, "The user is already registered",
-              "The phone number you entered is already registered. Please log in to your account.");
-          toggleLoading();
-        }
-        // if phone number doesn't exist
-        else {
-          String verifyId = "";
-          generateOTP(phoneNumber).then((value) {
-            verifyId = value!;
-          }).whenComplete(() {
-            toggleLoading();
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => OtpScreen(
-                  phoneNumber: phoneNumber,
-                  isRegister: true,
-                  verifyId: verifyId,
-                  name: name.text,
-                  email: email.text,
-                ),
-              ),
-            );
-          });
-        }
-      });
+    // Validate form
+    if (!_formKey.currentState!.validate()) {
+      return;
     }
-  }
 
-  Route createRoute() {
-    return PageRouteBuilder(
-      pageBuilder: (context, animation, secondaryAnimation) => const Login(),
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        const begin = Offset(1.0, 0.0);
-        const end = Offset.zero;
-        const curve = Curves.easeInOut;
+    // Start Loading
+    toggleLoading();
 
-        var tween =
-            Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+    // Check if phone number exists
+    bool phoneExists = await checkPhoneExist(phoneNumber);
 
-        return SlideTransition(
-          position: animation.drive(tween),
-          child: child,
-        );
-      },
+    if (!phoneExists) {
+      toggleLoading(); // Stop loading if user already registered
+
+      if (!mounted) {
+        return;
+      }
+
+      showCustomDialog(
+        context,
+        "The user is already registered",
+        "The phone number you entered is already registered.",
+      );
+      return;
+    }
+
+    // Send OTP
+    String otpStatus = await handleOTP(mobileNumber: phoneNumber);
+
+    if (otpStatus == "FAILURE") {
+      toggleLoading(); // Stop loading on failure
+      return;
+    }
+
+    if (!mounted) return;
+
+    // Navigate to OTP Screen
+    Navigator.of(context).push(
+      animatedRoute(
+        OtpScreen(
+          phoneNumber: phoneNumber,
+          isRegister: true,
+          uid: "",
+          name: name.text,
+          email: email.text,
+        ),
+        context,
+      ),
     );
+
+    toggleLoading(); // Optionally stop loading after navigation if needed
+
+    return;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(onPressed: () {}, icon: const Icon(Icons.menu)),
+        title: const Text("Create Your Account"),
+      ),
       body: Form(
         key: _formKey,
         child: Padding(
@@ -94,25 +103,7 @@ class _RegisterState extends State<Register> {
             padding: const EdgeInsets.only(top: 50),
             child: ListView(
               children: [
-                const Text(
-                  "Create account",
-                  style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold),
-                ),
-                const Text(
-                  "Please enter your details",
-                  style: TextStyle(fontSize: 18),
-                ),
                 const SizedBox(height: 20),
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 10),
-                  child: Text(
-                    'Name',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18.0,
-                    ),
-                  ),
-                ),
                 TextFormField(
                     keyboardType: TextInputType.name,
                     controller: name,
@@ -125,19 +116,17 @@ class _RegisterState extends State<Register> {
                       return null;
                     },
                     decoration: textFieldDecoration("name", Icons.face)),
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 10),
-                  child: Text(
-                    'Phone',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18.0,
-                    ),
-                  ),
+                const SizedBox(
+                  height: 15,
                 ),
                 TextFormField(
                     controller: phone,
                     keyboardType: TextInputType.phone,
+                    onTap: () {
+                      setState(() {
+                        prefixEnabledState = true;
+                      });
+                    },
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Enter your phone please!';
@@ -146,16 +135,10 @@ class _RegisterState extends State<Register> {
                       }
                       return null;
                     },
-                    decoration: textFieldDecoration("phone", Icons.phone)),
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 10),
-                  child: Text(
-                    'Email',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18.0,
-                    ),
-                  ),
+                    decoration: textFieldDecoration("phone", Icons.phone,
+                        prefixEnabled: prefixEnabledState, context: context)),
+                const SizedBox(
+                  height: 15,
                 ),
                 TextFormField(
                     controller: email,
@@ -191,7 +174,8 @@ class _RegisterState extends State<Register> {
                 ),
                 TextButton(
                   onPressed: () {
-                    Navigator.of(context).push(createRoute());
+                    Navigator.of(context)
+                        .push(animatedRoute(const Login(), context));
                   },
                   child: const Text("Already a customer? Log in."),
                 ),

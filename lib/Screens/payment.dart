@@ -1,9 +1,15 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:hassanjewellers/Utils/Services/firebase_service.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
+import '../main.dart';
+
 class Payment extends StatefulWidget {
-  const Payment({super.key});
+  const Payment({super.key, required this.id});
+
+  final String id;
 
   @override
   State<Payment> createState() => _PaymentState();
@@ -36,7 +42,17 @@ class _PaymentState extends State<Payment> {
             }
 
             if (request.url ==
+                'https://spt.uvm.mybluehostin.me/api/payment/success.html') {
+              updateProgressItem(widget.id).then((value) => {
+                    print(value),
+                    Navigator.of(context).pop(),
+                    Navigator.of(context).pop()
+                  });
+            }
+
+            if (request.url ==
                 'https://spt.uvm.mybluehostin.me/api/payment/close_browser.html') {
+              Navigator.of(context).pop();
               Navigator.of(context).pop();
             }
           },
@@ -54,8 +70,7 @@ class _PaymentState extends State<Payment> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.brown,
-          title: const Text('Hassan Jewellers'),
+          title: const Text('Payment'),
         ),
         body: PopScope(
           canPop: cancelState,
@@ -81,8 +96,12 @@ class _PaymentState extends State<Payment> {
                           onPressed: () {
                             setState(() {
                               cancelState = true;
-                              Navigator.of(context).pop();
-                              Navigator.of(context).pop();
+                              Navigator.pushAndRemoveUntil(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => MyApp()),
+                                    (Route<dynamic> route) => false,
+                              );
                             });
                           },
                         ),

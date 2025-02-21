@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hassanjewellers/Screens/otp_screen.dart';
+import 'package:hassanjewellers/Utils/Helpers/constants.dart';
+import 'package:hassanjewellers/Utils/Helpers/handle_OTP.dart';
 import 'package:hassanjewellers/Utils/Services/authentication.dart';
 import 'package:hassanjewellers/Utils/Services/firebase_service.dart';
 import 'package:hassanjewellers/Utils/UI/styles.dart';
@@ -23,13 +25,14 @@ class _LoginState extends State<Login> {
     });
   }
 
-  Route createRoute(verifyId) {
+  Route createRoute(verifyId, uid) {
     return PageRouteBuilder(
       pageBuilder: (context, animation, secondaryAnimation) => OtpScreen(
-        phoneNumber: "+91${phone.text.toString()}",
-        isRegister: false,
-        verifyId: verifyId,
-      ),
+          phoneNumber: "+91${phone.text.toString()}",
+          isRegister: false,
+          email: "",
+          name: "",
+          uid: uid),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         const begin = Offset(1.0, 0.0);
         const end = Offset.zero;
@@ -87,45 +90,33 @@ class _LoginState extends State<Login> {
                                     toggleLoading();
                                     String verifyId = "";
 
-                                    checkPhoneExists(phoneNumber)
-                                        .then((value) => {
-                                              if (!value)
-                                                {
-                                                  showCustomDialog(
-                                                      context,
-                                                      "The user is not registered",
-                                                      "The phone number you entered is not registered. Please create an account."),
-                                                  toggleLoading()
-                                                }
-                                              else
-                                                {
-                                                  generateOTP(phoneNumber)
-                                                      .then((value) {
-                                                    if (value ==
-                                                        "too-many-requests") {
-                                                      ScaffoldMessenger.of(
-                                                              context)
-                                                          .showSnackBar(
-                                                        SnackBar(
-                                                          content: Text(
-                                                              value.toString()),
-                                                          backgroundColor:
-                                                              Colors.red,
-                                                        ),
-                                                      );
-                                                      return;
-                                                    }
-                                                    verifyId = value!;
-                                                  }).whenComplete(() {
-                                                    toggleLoading();
-                                                    if (verifyId != "") {
-                                                      Navigator.of(context)
-                                                          .push(createRoute(
-                                                              verifyId));
-                                                    }
-                                                  })
-                                                }
-                                            });
+                                    checkPhoneExists(phoneNumber).then((uid) =>
+                                        {
+                                          if (uid == "")
+                                            {
+                                              showCustomDialog(
+                                                  context,
+                                                  "$phoneNumber is not registered",
+                                                  "The phone number you have entered is not registered. Please create an account."),
+                                              toggleLoading()
+                                            }
+                                          else
+                                            {
+                                              handleOTP(
+                                                      mobileNumber: phoneNumber,
+                                                      context: context)
+                                                  .then((value) {
+                                                // Success: Navigate to verification screen
+
+                                                Navigator.of(context).push(
+                                                    createRoute(verifyId, uid));
+                                              }).catchError((error) {
+                                                // Handle error: Show a message or log
+                                                print(
+                                                    "Failed to send OTP: $error");
+                                              })
+                                            }
+                                        });
                                   }
                                 }
                               : () {},
