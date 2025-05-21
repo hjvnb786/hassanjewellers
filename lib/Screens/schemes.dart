@@ -70,12 +70,16 @@ class _SchemesState extends State<Schemes> with TickerProviderStateMixin {
                           height: 20,
                         ),
                         ...schemes
-                            .map((data) => SchemeItem(
+                            .map((data)  {
+
+                              print("progress data ${data['progress']}");
+
+                              return SchemeItem(
                                   id: data.id,
                                   name: data["name"],
                                   amount: data["installmentAmount"],
                                   progress: data["progress"],
-                                ))
+                                );})
                             .toList(),
                         const SizedBox(
                           height: 10,

@@ -6,8 +6,15 @@ import 'package:hassanjewellers/Utils/Services/firebase_service.dart';
 class SchemeProgress extends StatefulWidget {
   final String id;
   final List<dynamic> progress;
+  final String amount;
+  final String name;
 
-  const SchemeProgress({super.key, required this.progress, required this.id});
+  const SchemeProgress(
+      {super.key,
+      required this.progress,
+      required this.id,
+      required this.amount,
+      required this.name});
 
   @override
   State<SchemeProgress> createState() => _SchemeProgressState();
@@ -29,7 +36,12 @@ class _SchemeProgressState extends State<SchemeProgress> {
   void handlePay() {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => Payment(id: widget.id)),
+      MaterialPageRoute(
+          builder: (context) => Payment(
+                id: widget.id,
+                amount: widget.amount,
+                name: widget.name,
+              )),
     );
   }
 
@@ -50,9 +62,13 @@ class _SchemeProgressState extends State<SchemeProgress> {
 
   @override
   void initState() {
+
     super.initState();
     print("It is doc Id I think: ${widget.id}");
     progressList = getProgressList(widget.progress);
+
+    print("progressList in scheme_progress $progressList");
+
   }
 
   @override
@@ -63,6 +79,9 @@ class _SchemeProgressState extends State<SchemeProgress> {
         break;
       }
     }
+
+    print("progress list");
+    print(progressList);
 
     return Scaffold(
       appBar: AppBar(
@@ -76,7 +95,6 @@ class _SchemeProgressState extends State<SchemeProgress> {
             currentStep = value;
           });
         },
-
         steps: progressList
             .map(
               (item) => Step(
@@ -88,7 +106,15 @@ class _SchemeProgressState extends State<SchemeProgress> {
                   child: Row(
                     children: [
                       item['paid'] == true
-                          ? Text("Paid on ${(item["date"])}")
+                          ? Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Text("Paid on ${(item["date"])}"),
+                                const Text("Paid by UPI"),
+                                Text("Reference ID: ${(item["referenceId"])}")
+                              ],
+                            )
                           : enableButton
                               ? ElevatedButton(
                                   onPressed: item["payButton"] == true

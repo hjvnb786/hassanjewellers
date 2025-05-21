@@ -4,6 +4,7 @@ import 'package:hassanjewellers/Screens/account.dart';
 import 'package:hassanjewellers/Screens/schemes.dart';
 import 'package:hassanjewellers/Screens/new_scheme.dart';
 import 'package:hassanjewellers/Utils/Services/firebase_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -15,7 +16,7 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   int currentPageIndex = 0;
   final String? uid = FirebaseAuth.instance.currentUser?.uid;
-  late Future<dynamic> userAccountDetails;
+  late Future<QueryDocumentSnapshot<Map<String, dynamic>>?> userAccountDetails;
   String customerName = "";
   String customerPhone = "";
   String customerEmail = "";
@@ -24,13 +25,16 @@ class _HomeState extends State<Home> {
   void initState() {
     super.initState();
     userAccountDetails = getDocumentByUid(uid, "users");
-    userAccountDetails.then((value) => {
-          setState(() {
-            customerName = value["name"];
-            customerPhone = value["phone"];
-            customerEmail = value["email"];
-          })
+    userAccountDetails.then((doc) {
+      if (doc != null) {
+        final data = doc.data();
+        setState(() {
+          customerName = data["name"] ?? "";
+          customerPhone = data["phone"] ?? "";
+          customerEmail = data["email"] ?? "";
         });
+      }
+    });
   }
 
   @override

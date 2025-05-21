@@ -16,8 +16,12 @@ class SchemeItem extends StatelessWidget {
 
   Route createRoute() {
     return PageRouteBuilder(
-      pageBuilder: (context, animation, secondaryAnimation) =>
-          SchemeProgress(id: id, progress: progress),
+      pageBuilder: (context, animation, secondaryAnimation) => SchemeProgress(
+        id: id,
+        progress: progress,
+        amount: amount,
+        name: name,
+      ),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         const begin = Offset(1.0, 0.0);
         const end = Offset.zero;
@@ -43,6 +47,8 @@ class SchemeItem extends StatelessWidget {
         progressNumber++;
       }
     }
+
+    print("progress in scheme_item $progress");
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),

@@ -27,7 +27,7 @@ Future<String> checkPhoneExists(String fieldValue) async {
   return querySnapshot.docs.first["uid"];
 }
 
-Future<dynamic> updateProgressItem(id) async {
+Future<dynamic> updateProgressItem(id, referenceId) async {
   try {
     // Get the unique identifier (uid) of the currently authenticated user
     final uid = FirebaseAuth.instance.currentUser?.uid;
@@ -72,15 +72,19 @@ Future<dynamic> updateProgressItem(id) async {
         if (progress[i]["paid"] == false) {
           progress[i]["paid"] = true;
           progress[i]["date"] = getDate;
+          progress[i]["referenceId"] = referenceId;
           break;
         }
       }
 
+      print("updated progress: $progress");
+
       String documentID = querySnapshot.docs[indexMatch].id;
 
-      await collectionRef
-          .doc(documentID)
-          .update({'progress': progress, 'status': schemeStatus});
+      await collectionRef.doc(documentID).update({
+        'progress': progress,
+        'status': schemeStatus,
+      });
 
       return await collectionRef
           .doc(documentID)

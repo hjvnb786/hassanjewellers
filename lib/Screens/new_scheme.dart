@@ -8,6 +8,7 @@ import 'package:hassanjewellers/Utils/Helpers/animated_route.dart';
 import 'package:hassanjewellers/Utils/Helpers/validate_fields.dart';
 import 'package:hassanjewellers/Utils/Services/firebase_service.dart';
 import 'package:hassanjewellers/Utils/UI/styles.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 class NewScheme extends StatefulWidget {
   const NewScheme({super.key});
@@ -61,6 +62,8 @@ class _NewSchemeState extends State<NewScheme> {
   String monthlySelectedAmount = "500 ₹";
   String selectedOccupation = "Business";
   String selectedNominee = "Father";
+
+  late WebViewController webViewController;
 
   void setSelectedDropDownOption(String label, String value) {
     setState(() {
@@ -155,19 +158,57 @@ class _NewSchemeState extends State<NewScheme> {
                           // User confirmed, you can now proceed with submitting the data
                           // submitData();
 
-                          addNewScheme(
-                                  nameController.text,
-                                  monthlySelectedAmount,
-                                  fatherMotherHusbandController.text,
-                                  selectedOccupation,
-                                  nomineeNameController.text,
-                                  selectedNominee,
-                                  addressController.text,
-                                  ageController.text)
-                              .then((value) {})
-                              .whenComplete(() => Navigator.of(context).push(
-                                  animatedRoute(
-                                      const PaymentSuccessfull(), context)));
+                          //Display Terms and conditions page.
+
+                          webViewController = WebViewController()
+                            ..loadRequest(Uri.parse(
+                                "http://spt.uvm.mybluehostin.me/pages/terms/"));
+
+                          showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  //actionsPadding: EdgeInsets.all(0),
+                                  contentPadding:
+                                      EdgeInsets.fromLTRB(0, 40, 0, 10),
+
+                                  content: WebViewWidget(
+                                      controller: webViewController),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                      child: const Text("Cancel"),
+                                    ),
+                                    TextButton(
+                                      onPressed: () {
+                                        // Call the function to submit the data or perform further actions
+                                        addNewScheme(
+                                                nameController.text,
+                                                monthlySelectedAmount,
+                                                fatherMotherHusbandController
+                                                    .text,
+                                                selectedOccupation,
+                                                nomineeNameController.text,
+                                                selectedNominee,
+                                                addressController.text,
+                                                ageController.text)
+                                            .then((value) {})
+                                            .whenComplete(() => Navigator.of(
+                                                    context)
+                                                .push(animatedRoute(
+                                                    const PaymentSuccessfull(),
+                                                    context)));
+
+                                        //submitData();
+                                      },
+                                      child: const Text("I Agree"),
+                                    ),
+                                  ],
+                                );
+                              });
+
                           print('Data submitted');
                         } else {
                           // User canceled, handle accordingly

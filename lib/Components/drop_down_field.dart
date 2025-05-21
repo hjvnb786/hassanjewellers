@@ -32,7 +32,13 @@ class UserDropDownField extends StatelessWidget {
                     const TextStyle(fontSize: 18, fontWeight: FontWeight.w300),
               ),
               DropdownButton<String>(
-                borderRadius: BorderRadius.circular(5.5),
+
+                underline: Container(
+                  color: Colors.grey[700],
+                  height: 1,
+                ),
+
+                borderRadius: BorderRadius.circular(15.5),
                 value: selectedItem,
                 items: selectionList
                     .map(

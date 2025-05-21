@@ -2,8 +2,8 @@
 String? validateName(String? value) {
   if (value == null || value.isEmpty) {
     return "Name cannot be empty. Please enter a valid name.";
-  } else if (value.length < 5) {
-    return "Name should be at least 5 characters long. Please enter a valid name.";
+  } else if (value.length < 3) {
+    return "Name should be at least 3 characters long. Please enter a valid name.";
   } else if (!RegExp(r"^[a-zA-Z\s]+$").hasMatch(value)) {
     return "Invalid characters in the name. Please use only letters.";
   } else if (value.length > 50) {

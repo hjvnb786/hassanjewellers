@@ -1,15 +1,19 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:hassanjewellers/Utils/Helpers/gen_order_id.dart';
+import 'package:hassanjewellers/Utils/Helpers/payment_status.dart';
 import 'package:hassanjewellers/Utils/Services/firebase_service.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-
 import '../main.dart';
 
 class Payment extends StatefulWidget {
-  const Payment({super.key, required this.id});
-
   final String id;
+  final String amount;
+  final String name;
+
+  const Payment(
+      {super.key, required this.id, required this.amount, required this.name});
 
   @override
   State<Payment> createState() => _PaymentState();
@@ -18,14 +22,30 @@ class Payment extends StatefulWidget {
 class _PaymentState extends State<Payment> {
   late final WebViewController webViewController;
   LoadRequestMethod postMethod = LoadRequestMethod.post;
-  String jsonPayload = '{"age": "John Doe"}';
+
   int loadingValue = 0;
   bool cancelState = false;
+
+  String orderId = "";
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+
+    orderId = generateOrderId(widget.id);
+
+    // Prepare the JSON data as a Map
+    Map<String, dynamic> payload = {
+      "name": widget.name,
+      "amount": widget.amount.substring(0, widget.amount.length - 2),
+      "order_no": orderId
+    };
+
+    // Convert the Map to a JSON string
+    String jsonString = jsonEncode(payload);
+
+    print("jsonString: $jsonString");
 
     webViewController = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
@@ -43,11 +63,12 @@ class _PaymentState extends State<Payment> {
 
             if (request.url ==
                 'https://spt.uvm.mybluehostin.me/api/payment/success.html') {
-              updateProgressItem(widget.id).then((value) => {
-                    print(value),
-                    Navigator.of(context).pop(),
-                    Navigator.of(context).pop()
-                  });
+              print("success success success");
+
+              fetchPaymentStatus(orderId, widget.id).then((value) {
+                Navigator.of(context).pop();
+                Navigator.of(context).pop();
+              });
             }
 
             if (request.url ==
@@ -63,7 +84,9 @@ class _PaymentState extends State<Payment> {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: Uint8List.fromList(jsonPayload.codeUnits));
+
+          //body: Uint8List.fromList(jsonPayload.codeUnits));
+          body: Uint8List.fromList(jsonString.codeUnits));
   }
 
   @override
@@ -100,7 +123,7 @@ class _PaymentState extends State<Payment> {
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) => MyApp()),
-                                    (Route<dynamic> route) => false,
+                                (Route<dynamic> route) => false,
                               );
                             });
                           },

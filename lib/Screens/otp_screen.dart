@@ -1,28 +1,27 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hassanjewellers/Utils/Helpers/handle_OTP.dart';
 import 'package:hassanjewellers/Utils/Services/authentication.dart';
 import 'package:hassanjewellers/Utils/Services/firebase_service.dart';
-import 'package:hassanjewellers/Utils/UI/styles.dart';
 import 'package:hassanjewellers/main.dart';
 
 class OtpScreen extends StatefulWidget {
   final String phoneNumber;
   final bool isRegister;
-  //final String verifyId;
   final String name;
   final String email;
   final String uid;
 
-  const OtpScreen(
-      {super.key,
-      required this.phoneNumber,
-      required this.isRegister,
-      //required this.verifyId,
-      required this.name,
-      required this.email,
-      required this.uid});
+  const OtpScreen({
+    super.key,
+    required this.phoneNumber,
+    required this.isRegister,
+    required this.name,
+    required this.email,
+    required this.uid,
+  });
 
   @override
   State<OtpScreen> createState() => _OtpScreenState();
@@ -52,7 +51,6 @@ class _OtpScreenState extends State<OtpScreen> {
     timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       setState(() {
         if (counter >= 1) {
-          print(counter);
           counter--;
         } else {
           resendOtpEnabled = true;
@@ -65,161 +63,339 @@ class _OtpScreenState extends State<OtpScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false, // Prevent the screen from resizing
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Back Button
+                  IconButton(
+                    onPressed: () => Navigator.pop(context),
+                    icon: const Icon(Icons.arrow_back_ios),
+                    padding: EdgeInsets.zero,
+                  ),
+                  const SizedBox(height: 32),
 
-      appBar: AppBar(
-        title: const Text("Enter Verification Code"),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 30),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              Expanded(
-                child: ListView(
-                  children: [
-                    const SizedBox(height: 100),
-                    Text(
-                      "We have sent the verification code to your phone number ${widget.phoneNumber}",
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.grey),
+                  // Header
+                  Text(
+                    "Verification Code",
+                    style: TextStyle(
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).primaryColor,
                     ),
-                    const SizedBox(height: 20),
-                    TextFormField(
-                        controller: otpController,
-                        keyboardType: TextInputType.number,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter your 6 digit otp!';
-                          } else if (value.length < 10) {
-                            return 'Your otp is only 6 digits';
-                          }
-                          return null;
-                        },
-                        decoration:
-                            textFieldDecoration("OTP", Icons.message_sharp)),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 10),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    "We've sent a verification code to",
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    widget.phoneNumber,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 40),
+
+                  // OTP Input Card
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.08),
+                          blurRadius: 12,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
                       child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton(
-                              style: elevatedButtonStyle(),
-                              onPressed: () {
-                                print("OTP button pressed");
-                                toggleLoading();
-
-                                print("phone: ${widget.phoneNumber}");
-                                print("otp: ${otpController.text}");
-
-                                Future<String> authStatus = handleOTP(
-                                  mobileNumber: widget.phoneNumber,
-                                  otp: otpController.text,
-                                  uid: widget.uid,
-                                );
-
-                                authStatus.then((value) {
-                                  print("Authentication status: $value");
-                                  if (value == "SUCCESS") {
-                                    if (widget.isRegister) {
-                                      registerUser(
-                                          FirebaseAuth
-                                              .instance.currentUser!.uid,
-                                          widget.name,
-                                          widget.phoneNumber,
-                                          widget.email);
-                                    }
-
-                                    Navigator.pushAndRemoveUntil(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => MyApp()),
-                                      (Route<dynamic> route) => false,
-                                    );
-                                  } else {
-                                    // Handle other outcomes if necessary
-                                    print("Authentication failed");
-                                  }
-                                }).catchError((error) {
-                                  // Handle any errors that might occur during the future's execution
-                                  print("An error occurred: $error");
-                                }).whenComplete(() {
-                                  // Toggle loading off after the future completes
-                                  toggleLoading();
-                                });
-                              },
-                              child: const Text('Submit OTP'),
+                          Text(
+                            "Enter OTP",
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey[600],
                             ),
                           ),
-                          Visibility(
-                            visible: isLoading,
-                            child: const Padding(
-                              padding: EdgeInsets.only(top: 10),
-                              child:
-                                  LinearProgressIndicator(color: Colors.white),
+                          const SizedBox(height: 16),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: List.generate(
+                              4,
+                              (index) => Container(
+                                margin:
+                                    const EdgeInsets.symmetric(horizontal: 8),
+                                width: 50,
+                                height: 50,
+                                child: TextFormField(
+                                  onChanged: (value) {
+                                    if (value.length == 1) {
+                                      otpController.text =
+                                          otpController.text + value;
+                                      if (index < 3) {
+                                        FocusScope.of(context).nextFocus();
+                                      }
+                                    }
+                                    if (value.isEmpty && index > 0) {
+                                      otpController.text = otpController.text
+                                          .substring(
+                                              0, otpController.text.length - 1);
+                                      FocusScope.of(context).previousFocus();
+                                    }
+                                  },
+                                  onSaved: (value) {
+                                    if (value != null && value.isNotEmpty) {
+                                      otpController.text =
+                                          otpController.text + value;
+                                    }
+                                  },
+                                  style: const TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.w600,
+                                    height: 1.5,
+                                  ),
+                                  keyboardType: TextInputType.number,
+                                  textAlign: TextAlign.center,
+                                  inputFormatters: [
+                                    LengthLimitingTextInputFormatter(1),
+                                    FilteringTextInputFormatter.digitsOnly,
+                                  ],
+                                  decoration: InputDecoration(
+                                    contentPadding: EdgeInsets.zero,
+                                    filled: true,
+                                    fillColor: Colors.grey[100],
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: BorderSide.none,
+                                    ),
+                                    counterText: "",
+                                  ),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return '';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                              ),
                             ),
                           ),
                         ],
                       ),
                     ),
-                    const SizedBox(height: 20),
-                  ],
-                ),
-              ),
-              Visibility(
-                visible: !resendOtpEnabled,
-                child: Text(
-                  "If you have not received the OTP, You can try again in $counter seconds.",
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.grey),
-                ),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    if (resendOtpEnabled) {
-                      generateOTP(widget.phoneNumber);
-                      setState(() {
-                        counter = 30;
-                        resendOtpEnabled = false;
-                        resendOTPTimer();
-                      });
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.grey,
-                    backgroundColor: resendOtpEnabled ? null : Colors.grey[100],
-                    padding: const EdgeInsets.symmetric(vertical: 15),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(
-                          10), // Adjust the radius as needed
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Verify Button
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: isLoading
+                          ? null
+                          : () {
+                              if (_formKey.currentState!.validate()) {
+                                toggleLoading();
+                                handleOTP(
+                                  mobileNumber: widget.phoneNumber,
+                                  otp: otpController.text,
+                                  uid: widget.uid,
+                                ).then((response) async {
+                                  print("otp_screen: handleOTP response: $response");
+                                  print("isRegister: ${widget.isRegister}");
+
+                                  if (response['status'] == "SUCCESS") {
+                                    if (response.containsKey('token')) {
+                                      print("Starting Firebase sign-in attempt...");
+                                      FirebaseAuth.instance
+                                          .signInWithCustomToken(response['token'])
+                                          .then((userCredential) {
+                                        if (userCredential.user == null) {
+                                          throw "Firebase sign-in completed but user is null";
+                                        }
+                                        
+                                        print("Firebase sign-in successful with user ID: ${userCredential.user?.uid}");
+                                        
+                                        if (widget.isRegister) {
+                                          // For registration, create the user in Firestore
+                                          final User? currentUser = FirebaseAuth.instance.currentUser;
+                                          if (currentUser == null) {
+                                            throw "Firebase user is not available. Please try again.";
+                                          }
+                                          
+                                          print("Attempting to register user with uid: ${currentUser.uid}");
+                                          return registerUser(
+                                            currentUser.uid,
+                                            widget.name,
+                                            widget.phoneNumber,
+                                            widget.email,
+                                          );
+                                        }
+                                        return Future.value(); // Return empty future for non-registration case
+                                      }).then((_) {
+                                        print("User registration successful");
+                                        // Navigate to main app for both login and register
+                                        Navigator.pushAndRemoveUntil(
+                                          context,
+                                          MaterialPageRoute(builder: (context) => MyApp()),
+                                          (Route<dynamic> route) => false,
+                                        );
+                                      }).catchError((error) {
+                                        print("Error during Firebase operations: $error");
+                                        toggleLoading();
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(
+                                            content: Text('Authentication failed: ${error.toString()}'),
+                                            backgroundColor: Colors.red,
+                                          ),
+                                        );
+                                      });
+                                    } else {
+                                      toggleLoading();
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(
+                                          content: Text('Invalid response from server'),
+                                          backgroundColor: Colors.red,
+                                        ),
+                                      );
+                                    }
+                                  } else {
+                                    toggleLoading();
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(response['error'] ?? 'Verification failed'),
+                                        backgroundColor: Colors.red,
+                                      ),
+                                    );
+                                  }
+                                }).catchError((error) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text('Error: $error'),
+                                      backgroundColor: Colors.red,
+                                    ),
+                                  );
+                                }).whenComplete(() => toggleLoading());
+                              }
+                            },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Theme.of(context).primaryColor,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: isLoading
+                          ? const SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor:
+                                    AlwaysStoppedAnimation<Color>(Colors.white),
+                              ),
+                            )
+                          : const Text(
+                              "Verify",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                     ),
                   ),
-                  child: Text(
-                    "Resend OTP",
-                    style: resendOtpEnabled
-                        ? const TextStyle(color: Colors.deepPurple)
-                        : const TextStyle(color: Colors.grey),
-                  ),
-                ),
+                  const SizedBox(height: 24),
+
+                  // Resend Timer/Button
+                  if (!resendOtpEnabled)
+                    Center(
+                      child: RichText(
+                        textAlign: TextAlign.center,
+                        text: TextSpan(
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[600],
+                          ),
+                          children: [
+                            const TextSpan(
+                                text: "Didn't receive the code? Try again in "),
+                            TextSpan(
+                              text: "$counter seconds",
+                              style: TextStyle(
+                                color: Theme.of(context).primaryColor,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                  else
+                    Center(
+                      child: TextButton(
+                        onPressed: () {
+                          if (resendOtpEnabled) {
+                            handleOTP(mobileNumber: widget.phoneNumber)
+                                .then((_) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('OTP sent successfully'),
+                                  backgroundColor: Colors.green,
+                                ),
+                              );
+                              setState(() {
+                                counter = 30;
+                                resendOtpEnabled = false;
+                                resendOTPTimer();
+                              });
+                            }).catchError((error) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Error: $error'),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            });
+                          }
+                        },
+                        child: Text(
+                          "Resend Code",
+                          style: TextStyle(
+                            color: Theme.of(context).primaryColor,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
               ),
-              const SizedBox(height: 20),
-            ],
+            ),
           ),
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    timer.cancel();
+    super.dispose();
   }
 }
