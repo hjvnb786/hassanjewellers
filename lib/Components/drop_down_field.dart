@@ -15,48 +15,83 @@ class UserDropDownField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      child: Card(
-        elevation: 0,
-        color: const Color(0xFFEEEEEE),
-        margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        child: Padding(
-          padding: const EdgeInsets.all(25.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style:
-                    const TextStyle(fontSize: 18, fontWeight: FontWeight.w300),
-              ),
-              DropdownButton<String>(
-
-                underline: Container(
-                  color: Colors.grey[700],
-                  height: 1,
-                ),
-
-                borderRadius: BorderRadius.circular(15.5),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: Colors.black87,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.grey[300]!),
+            ),
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<String>(
+                isExpanded: true,
+                borderRadius: BorderRadius.circular(12),
                 value: selectedItem,
-                items: selectionList
-                    .map(
-                      (item) => DropdownMenuItem<String>(
-                        value: item,
-                        child: Text(
-                          item,
-                          style: const TextStyle(
-                              fontWeight: FontWeight.w300, fontSize: 20),
+                selectedItemBuilder: (BuildContext context) {
+                  return selectionList.map<Widget>((String item) {
+                    return Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        item,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: Colors.black87,
                         ),
                       ),
-                    )
-                    .toList(),
+                    );
+                  }).toList();
+                },
+                items: selectionList.asMap().entries.map((entry) {
+                  final index = entry.key;
+                  final item = entry.value;
+                  return DropdownMenuItem<String>(
+                    value: item,
+                    child: Container(
+                      constraints: const BoxConstraints(minHeight: 40),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 4),
+                            child: Text(
+                              item,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                color: Colors.black87,
+                              ),
+                            ),
+                          ),
+                          if (index < selectionList.length - 1)
+                            Divider(
+                              height: 1,
+                              thickness: 1,
+                              color: Colors.grey[300],
+                            ),
+                        ],
+                      ),
+                    ),
+                  );
+                }).toList(),
                 onChanged: (String? value) => setSelectedItem(label, value),
               ),
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }

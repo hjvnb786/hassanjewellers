@@ -15,29 +15,47 @@ class UserTextInputField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 0,
-      color: const Color(0xFFEEEEEE),
-      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      child: Padding(
-        padding: const EdgeInsets.all(25.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              label,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w300),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: Colors.black87,
             ),
-            TextFormField(
-              autovalidateMode: AutovalidateMode.onUserInteraction,
-              validator: validationCriteria,
-              controller: textController,
-              style: const TextStyle(),
-              keyboardType: isNumber! ? TextInputType.phone : TextInputType.text,
-              decoration: const InputDecoration(hintText: "Your answer"),
+          ),
+          const SizedBox(height: 6),
+          TextFormField(
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            validator: validationCriteria,
+            controller: textController,
+            style: const TextStyle(fontSize: 16),
+            keyboardType: isNumber! ? TextInputType.phone : TextInputType.text,
+            decoration: InputDecoration(
+              hintText: "Your answer",
+              hintStyle: TextStyle(color: Colors.grey[400]),
+              filled: true,
+              fillColor: Colors.white,
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Colors.grey[300]!),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Colors.grey[300]!),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Theme.of(context).primaryColor),
+              ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

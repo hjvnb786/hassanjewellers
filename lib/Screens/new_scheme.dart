@@ -80,150 +80,289 @@ class _NewSchemeState extends State<NewScheme> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Join New Scheme"),
-      ),
-      body: Form(
-        key: _formKey,
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              UserDropDownField(
-                  key: const Key("Field1"),
-                  label: "Installment Amount",
-                  selectionList: monthlyInstallmentAmounts,
-                  selectedItem: monthlySelectedAmount,
-                  setSelectedItem: setSelectedDropDownOption),
-              UserTextInputField(
-                  label: "Name of the Applicant",
-                  textController: nameController,
-                  validationCriteria: validateName),
-              UserTextInputField(
-                  label: 'Guardian Name',
-                  textController: fatherMotherHusbandController,
-                  validationCriteria: validateGuardianName),
-              UserDropDownField(
-                  label: "Occupation",
-                  selectionList: occupationList,
-                  selectedItem: selectedOccupation,
-                  setSelectedItem: setSelectedDropDownOption),
-              UserTextInputField(
-                  label: 'Nominee Name',
-                  textController: nomineeNameController,
-                  validationCriteria: validateNomineeName),
-              UserDropDownField(
-                  label: "Relationship with nominee",
-                  selectionList: nomineeList,
-                  selectedItem: selectedNominee,
-                  setSelectedItem: setSelectedDropDownOption),
-              UserTextInputField(
-                  label: 'Address',
-                  textController: addressController,
-                  validationCriteria: validateAddress),
-              UserTextInputField(
-                label: 'Age',
-                textController: ageController,
-                validationCriteria: validateAge,
-                isNumber: true,
-              ),
-              UserTextInputField(
-                  label: 'Mobile Number',
-                  isNumber: true,
-                  textController: mobileNumber,
-                  validationCriteria: validateAlternativeMobile),
-              Padding(
-                padding: const EdgeInsets.only(
-                    bottom: 20, top: 10, right: 20, left: 20),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      FocusScope.of(context).unfocus();
-
-                      if (_formKey.currentState?.validate() ?? false) {
-                        final confirmed = await showConfirmationDialog(
-                          context,
-                          monthlySelectedAmount,
-                          nameController.text,
-                          fatherMotherHusbandController.text,
-                          selectedOccupation,
-                          nomineeNameController.text,
-                          selectedNominee,
-                          addressController.text,
-                          ageController.text,
-                          mobileNumber.text,
-                        );
-
-                        if (confirmed != null && confirmed) {
-                          // User confirmed, you can now proceed with submitting the data
-                          // submitData();
-
-                          //Display Terms and conditions page.
-
-                          webViewController = WebViewController()
-                            ..loadRequest(Uri.parse(
-                                "http://spt.uvm.mybluehostin.me/pages/terms/"));
-
-                          showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  //actionsPadding: EdgeInsets.all(0),
-                                  contentPadding:
-                                      EdgeInsets.fromLTRB(0, 40, 0, 10),
-
-                                  content: WebViewWidget(
-                                      controller: webViewController),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                      },
-                                      child: const Text("Cancel"),
-                                    ),
-                                    TextButton(
-                                      onPressed: () {
-                                        // Call the function to submit the data or perform further actions
-                                        addNewScheme(
-                                                nameController.text,
-                                                monthlySelectedAmount,
-                                                fatherMotherHusbandController
-                                                    .text,
-                                                selectedOccupation,
-                                                nomineeNameController.text,
-                                                selectedNominee,
-                                                addressController.text,
-                                                ageController.text)
-                                            .then((value) {})
-                                            .whenComplete(() => Navigator.of(
-                                                    context)
-                                                .push(animatedRoute(
-                                                    const PaymentSuccessfull(),
-                                                    context)));
-
-                                        //submitData();
-                                      },
-                                      child: const Text("I Agree"),
-                                    ),
-                                  ],
-                                );
-                              });
-
-                          print('Data submitted');
-                        } else {
-                          // User canceled, handle accordingly
-                          print('User canceled');
-                        }
-                      }
-                    },
-                    style: elevatedButtonStyle(),
-                    child: const Text('Submit'),
+      body: CustomScrollView(
+        slivers: [
+          // Custom App Bar
+          SliverAppBar(
+            expandedHeight: 200.0,
+            floating: false,
+            pinned: true,
+            flexibleSpace: FlexibleSpaceBar(
+              background: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Theme.of(context).primaryColor,
+                      Theme.of(context).primaryColor.withOpacity(0.8),
+                    ],
                   ),
                 ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const SizedBox(height: 40),
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.account_balance_wallet_outlined,
+                        size: 50,
+                        color: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    const Text(
+                      "Join New Scheme",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ],
+            ),
           ),
-        ),
+
+          // Form Content
+          SliverToBoxAdapter(
+            child: Form(
+              key: _formKey,
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.08),
+                            blurRadius: 12,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        children: [
+                          UserDropDownField(
+                            key: const Key("Field1"),
+                            label: "Installment Amount",
+                            selectionList: monthlyInstallmentAmounts,
+                            selectedItem: monthlySelectedAmount,
+                            setSelectedItem: setSelectedDropDownOption,
+                          ),
+                          UserTextInputField(
+                            label: "Name of the Applicant",
+                            textController: nameController,
+                            validationCriteria: validateName,
+                          ),
+                          UserTextInputField(
+                            label: 'Guardian Name',
+                            textController: fatherMotherHusbandController,
+                            validationCriteria: validateGuardianName,
+                          ),
+                          UserDropDownField(
+                            label: "Occupation",
+                            selectionList: occupationList,
+                            selectedItem: selectedOccupation,
+                            setSelectedItem: setSelectedDropDownOption,
+                          ),
+                          UserTextInputField(
+                            label: 'Nominee Name',
+                            textController: nomineeNameController,
+                            validationCriteria: validateNomineeName,
+                          ),
+                          UserDropDownField(
+                            label: "Relationship with nominee",
+                            selectionList: nomineeList,
+                            selectedItem: selectedNominee,
+                            setSelectedItem: setSelectedDropDownOption,
+                          ),
+                          UserTextInputField(
+                            label: 'Address',
+                            textController: addressController,
+                            validationCriteria: validateAddress,
+                          ),
+                          UserTextInputField(
+                            label: 'Age',
+                            textController: ageController,
+                            validationCriteria: validateAge,
+                            isNumber: true,
+                          ),
+                          UserTextInputField(
+                            label: 'Mobile Number',
+                            isNumber: true,
+                            textController: mobileNumber,
+                            validationCriteria: validateAlternativeMobile,
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                onPressed: () async {
+                                  FocusScope.of(context).unfocus();
+
+                                  if (_formKey.currentState?.validate() ?? false) {
+                                    final confirmed = await showConfirmationDialog(
+                                      context,
+                                      monthlySelectedAmount,
+                                      nameController.text,
+                                      fatherMotherHusbandController.text,
+                                      selectedOccupation,
+                                      nomineeNameController.text,
+                                      selectedNominee,
+                                      addressController.text,
+                                      ageController.text,
+                                      mobileNumber.text,
+                                    );
+
+                                    if (confirmed != null && confirmed) {
+                                      webViewController = WebViewController()
+                                        ..loadRequest(Uri.parse(
+                                            "http://spt.uvm.mybluehostin.me/pages/terms/"));
+
+                                      showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return Dialog(
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(20),
+                                            ),
+                                            child: Container(
+                                              padding: const EdgeInsets.all(24),
+                                              child: Column(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Container(
+                                                    padding: const EdgeInsets.all(16),
+                                                    decoration: BoxDecoration(
+                                                      color: Theme.of(context).primaryColor.withOpacity(0.1),
+                                                      shape: BoxShape.circle,
+                                                    ),
+                                                    child: Icon(
+                                                      Icons.description_outlined,
+                                                      size: 32,
+                                                      color: Theme.of(context).primaryColor,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 20),
+                                                  const Text(
+                                                    'Terms and Conditions',
+                                                    style: TextStyle(
+                                                      fontSize: 20,
+                                                      fontWeight: FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 16),
+                                                  Expanded(
+                                                    child: WebViewWidget(
+                                                      controller: webViewController,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 24),
+                                                  Row(
+                                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                    children: [
+                                                      TextButton(
+                                                        onPressed: () {
+                                                          Navigator.pop(context);
+                                                        },
+                                                        style: TextButton.styleFrom(
+                                                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                                                        ),
+                                                        child: Text(
+                                                          'Cancel',
+                                                          style: TextStyle(
+                                                            color: Colors.grey[600],
+                                                            fontSize: 16,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      ElevatedButton(
+                                                        onPressed: () {
+                                                          addNewScheme(
+                                                            nameController.text,
+                                                            monthlySelectedAmount,
+                                                            fatherMotherHusbandController.text,
+                                                            selectedOccupation,
+                                                            nomineeNameController.text,
+                                                            selectedNominee,
+                                                            addressController.text,
+                                                            ageController.text,
+                                                          ).then((value) {}).whenComplete(
+                                                            () => Navigator.of(context).push(
+                                                              animatedRoute(
+                                                                const PaymentSuccessfull(),
+                                                                context,
+                                                              ),
+                                                            ),
+                                                          );
+                                                        },
+                                                        style: ElevatedButton.styleFrom(
+                                                          backgroundColor: Theme.of(context).primaryColor,
+                                                          foregroundColor: Colors.white,
+                                                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                                                          shape: RoundedRectangleBorder(
+                                                            borderRadius: BorderRadius.circular(12),
+                                                          ),
+                                                        ),
+                                                        child: const Text(
+                                                          'I Agree',
+                                                          style: TextStyle(
+                                                            fontSize: 16,
+                                                            fontWeight: FontWeight.w500,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      );
+                                    }
+                                  }
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Theme.of(context).primaryColor,
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(vertical: 16),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  elevation: 0,
+                                ),
+                                child: const Text(
+                                  'Submit',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
