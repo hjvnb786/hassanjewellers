@@ -9,6 +9,7 @@ import 'package:hassanjewellers/Utils/Helpers/validate_fields.dart';
 import 'package:hassanjewellers/Utils/Services/firebase_service.dart';
 import 'package:hassanjewellers/Utils/UI/styles.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+import 'package:hassanjewellers/Utils/Constants/colors.dart';
 
 class NewScheme extends StatefulWidget {
   const NewScheme({super.key});
@@ -228,6 +229,8 @@ class _NewSchemeState extends State<NewScheme> {
 
                                     if (confirmed != null && confirmed) {
                                       webViewController = WebViewController()
+                                        ..setJavaScriptMode(JavaScriptMode.unrestricted)
+                                        ..setBackgroundColor(Colors.white)
                                         ..loadRequest(Uri.parse(
                                             "http://spt.uvm.mybluehostin.me/pages/terms/"));
 
@@ -240,6 +243,7 @@ class _NewSchemeState extends State<NewScheme> {
                                             ),
                                             child: Container(
                                               padding: const EdgeInsets.all(24),
+                                              height: MediaQuery.of(context).size.height * 0.8,
                                               child: Column(
                                                 mainAxisSize: MainAxisSize.min,
                                                 children: [

@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 Future<bool?> showTermsAndConditionsDialog(BuildContext context) async {
+  final WebViewController controller = WebViewController()
+    ..setJavaScriptMode(JavaScriptMode.unrestricted)
+    ..setBackgroundColor(Colors.white)
+    ..loadRequest(Uri.parse('https://spt.uvm.mybluehostin.me/pages/terms/'));
+
   return showDialog(
     context: context,
     builder: (BuildContext context) {
@@ -37,9 +42,8 @@ Future<bool?> showTermsAndConditionsDialog(BuildContext context) async {
                 ),
                 const Divider(),
                 Expanded(
-                  child: WebView(
-                    initialUrl: 'https://spt.uvm.mybluehostin.me/pages/terms/',
-                    javascriptMode: JavascriptMode.unrestricted,
+                  child: WebViewWidget(
+                    controller: controller,
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -77,4 +81,4 @@ Future<bool?> showTermsAndConditionsDialog(BuildContext context) async {
       );
     },
   );
-} 
+}

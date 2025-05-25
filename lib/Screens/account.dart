@@ -4,6 +4,7 @@ import 'package:hassanjewellers/Utils/UI/styles.dart';
 import 'package:hassanjewellers/main.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:hassanjewellers/Utils/Constants/colors.dart';
 
 class Account extends StatefulWidget {
   const Account({
@@ -63,7 +64,7 @@ class _AccountState extends State<Account> {
                     const SizedBox(height: 10),
                     Text(
                       widget.name,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: Colors.white,
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
