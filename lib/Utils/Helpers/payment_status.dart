@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:hassanjewellers/Utils/Services/firebase_service.dart';
+import 'package:hassanjewellers/Utils/Services/firebase_services/updateProgressItem.dart';
 import 'package:http/http.dart' as http;
 
 Future<void> fetchPaymentStatus(String orderNo, String uid) async {

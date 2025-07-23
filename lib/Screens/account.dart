@@ -1,10 +1,8 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:hassanjewellers/Utils/UI/styles.dart';
 import 'package:hassanjewellers/main.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:hassanjewellers/Utils/Constants/colors.dart';
+import 'package:hassanjewellers/Utils/Services/firebase_services/signOut.dart';
 
 class Account extends StatefulWidget {
   const Account({
@@ -363,7 +361,7 @@ class _AccountState extends State<Account> {
                   ),
                   ElevatedButton(
                     onPressed: () async {
-                      await FirebaseAuth.instance.signOut();
+                      await signOut();
                       if (mounted) {
                         Navigator.pushAndRemoveUntil(
                           context,

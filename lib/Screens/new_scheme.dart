@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hassanjewellers/Components/confirm_details.dart';
 import 'package:hassanjewellers/Components/drop_down_field.dart';
@@ -6,10 +5,8 @@ import 'package:hassanjewellers/Components/user_text_input_field.dart';
 import 'package:hassanjewellers/Screens/payment_successfull.dart';
 import 'package:hassanjewellers/Utils/Helpers/animated_route.dart';
 import 'package:hassanjewellers/Utils/Helpers/validate_fields.dart';
-import 'package:hassanjewellers/Utils/Services/firebase_service.dart';
-import 'package:hassanjewellers/Utils/UI/styles.dart';
+import 'package:hassanjewellers/Utils/Services/firebase_services/addNewScheme.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-import 'package:hassanjewellers/Utils/Constants/colors.dart';
 
 class NewScheme extends StatefulWidget {
   const NewScheme({super.key});

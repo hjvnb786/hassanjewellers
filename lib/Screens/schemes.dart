@@ -1,9 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hassanjewellers/Components/scheme_item.dart';
 import 'package:hassanjewellers/Screens/new_scheme.dart';
-import 'package:hassanjewellers/Utils/Constants/colors.dart';
+import 'package:hassanjewellers/Utils/Services/firebase_services/getCurrentUser.dart';
 
 class Schemes extends StatefulWidget {
   const Schemes({super.key});
@@ -15,7 +14,7 @@ class Schemes extends StatefulWidget {
 class _SchemesState extends State<Schemes> with TickerProviderStateMixin {
   final _firestore = FirebaseFirestore.instance;
   late final TabController _tabController;
-  final uid = FirebaseAuth.instance.currentUser?.uid;
+  final uid = getCurrentUser()?.uid;
   late Stream<QuerySnapshot<Map<String, dynamic>>> activeSchemeList;
   late Stream<QuerySnapshot<Map<String, dynamic>>> closedSchemeList;
 

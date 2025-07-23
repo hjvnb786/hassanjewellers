@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hassanjewellers/Utils/Helpers/gen_order_id.dart';
 import 'package:hassanjewellers/Utils/Helpers/payment_status.dart';
-import 'package:hassanjewellers/Utils/Services/firebase_service.dart';
+
 import 'package:webview_flutter/webview_flutter.dart';
 import '../main.dart';
 

@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hassanjewellers/Utils/Helpers/handle_OTP.dart';
-import 'package:hassanjewellers/Utils/Services/firebase_service.dart';
+import 'package:hassanjewellers/Utils/Services/firebase_services/registerUser.dart';
+import 'package:hassanjewellers/Utils/Services/firebase_services/signInWithCustomToken.dart';
+import 'package:hassanjewellers/Utils/Services/firebase_services/getCurrentUser.dart';
 import 'package:hassanjewellers/main.dart';
 
 class OtpScreen extends StatefulWidget {
@@ -220,8 +222,7 @@ class _OtpScreenState extends State<OtpScreen> {
                                   if (response['status'] == "SUCCESS") {
                                     if (response.containsKey('token')) {
                                       print("Starting Firebase sign-in attempt...");
-                                      FirebaseAuth.instance
-                                          .signInWithCustomToken(response['token'])
+                                      signInWithCustomToken(response['token'])
                                           .then((userCredential) {
                                         if (userCredential.user == null) {
                                           throw "Firebase sign-in completed but user is null";
@@ -231,7 +232,7 @@ class _OtpScreenState extends State<OtpScreen> {
                                         
                                         if (widget.isRegister) {
                                           // For registration, create the user in Firestore
-                                          final User? currentUser = FirebaseAuth.instance.currentUser;
+                                          final User? currentUser = getCurrentUser();
                                           if (currentUser == null) {
                                             throw "Firebase user is not available. Please try again.";
                                           }

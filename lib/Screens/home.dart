@@ -1,9 +1,9 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hassanjewellers/Screens/account.dart';
 import 'package:hassanjewellers/Screens/schemes.dart';
 import 'package:hassanjewellers/Screens/new_scheme.dart';
-import 'package:hassanjewellers/Utils/Services/firebase_service.dart';
+import 'package:hassanjewellers/Utils/Services/firebase_services/getDocumentByUid.dart';
+import 'package:hassanjewellers/Utils/Services/firebase_services/getCurrentUser.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Home extends StatefulWidget {
@@ -15,7 +15,7 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   int currentPageIndex = 0;
-  final String? uid = FirebaseAuth.instance.currentUser?.uid;
+  final String? uid = getCurrentUser()?.uid;
   late Future<QueryDocumentSnapshot<Map<String, dynamic>>?> userAccountDetails;
   String customerName = "";
   String customerPhone = "";

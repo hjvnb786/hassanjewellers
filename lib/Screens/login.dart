@@ -3,8 +3,8 @@ import 'package:hassanjewellers/Screens/register.dart';
 import 'package:hassanjewellers/Screens/otp_screen.dart';
 import 'package:hassanjewellers/Utils/Helpers/animated_route.dart';
 import 'package:hassanjewellers/Utils/Helpers/handle_OTP.dart';
-import 'package:hassanjewellers/Utils/Services/firebase_service.dart';
-import 'package:hassanjewellers/Utils/UI/styles.dart';
+import 'package:hassanjewellers/Utils/Services/firebase_services/checkPhoneExists.dart';
+
 
 
 class Login extends StatefulWidget {
