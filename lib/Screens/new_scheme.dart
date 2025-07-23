@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:hassanjewellers/Components/confirm_details.dart';
-import 'package:hassanjewellers/Components/drop_down_field.dart';
-import 'package:hassanjewellers/Components/user_text_input_field.dart';
+import 'package:hassanjewellers/Widgets/confirm_details.dart';
+import 'package:hassanjewellers/Widgets/drop_down_field.dart';
+import 'package:hassanjewellers/Widgets/user_text_input_field.dart';
 import 'package:hassanjewellers/Screens/payment_successfull.dart';
 import 'package:hassanjewellers/Helpers/animated_route.dart';
 import 'package:hassanjewellers/Helpers/validate_fields.dart';
