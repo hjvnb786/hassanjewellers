@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:hassanjewellers/Widgets/scheme_item.dart';
-import 'package:hassanjewellers/Screens/new_scheme.dart';
+import 'package:hassanjewellers/Screens/join_new_scheme.dart';
 import 'package:hassanjewellers/Services/firebase_services/getCurrentUser.dart';
 
 class Schemes extends StatefulWidget {
@@ -209,7 +209,7 @@ class _SchemesState extends State<Schemes> with TickerProviderStateMixin {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const NewScheme()),
+                        MaterialPageRoute(builder: (context) => const JoinNewScheme()),
                       );
                     },
                     icon: const Icon(Icons.add),

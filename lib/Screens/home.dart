@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hassanjewellers/Screens/account.dart';
 import 'package:hassanjewellers/Screens/schemes.dart';
-import 'package:hassanjewellers/Screens/new_scheme.dart';
+import 'package:hassanjewellers/Screens/join_new_scheme.dart';
 import 'package:hassanjewellers/Services/firebase_services/getDocumentByUid.dart';
 import 'package:hassanjewellers/Services/firebase_services/getCurrentUser.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -41,7 +41,7 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     List<Widget> screens = [
       const Schemes(),
-      const NewScheme(),
+      const JoinNewScheme(),
       Account(name: customerName, phone: customerPhone, email: customerEmail),
     ];
 
