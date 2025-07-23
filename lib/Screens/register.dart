@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hassanjewellers/Screens/login.dart';
 import 'package:hassanjewellers/Screens/otp_screen.dart';
-import 'package:hassanjewellers/Utils/Helpers/animated_route.dart';
-import 'package:hassanjewellers/Utils/Helpers/handle_OTP.dart';
+import 'package:hassanjewellers/Helpers/animated_route.dart';
+import 'package:hassanjewellers/Helpers/handle_OTP.dart';
 import 'package:hassanjewellers/Services/firebase_services/checkPhoneExists.dart';
 
 

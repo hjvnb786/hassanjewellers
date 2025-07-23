@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:hassanjewellers/Utils/Helpers/gen_order_id.dart';
+import 'package:hassanjewellers/Helpers/gen_order_id.dart';
 import 'package:hassanjewellers/Services/payment_services/payment_status.dart';
 
 import 'package:webview_flutter/webview_flutter.dart';

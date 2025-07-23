@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:hassanjewellers/Utils/Helpers/utils.dart';
+import 'package:hassanjewellers/Helpers/utils.dart';
 
 Future<bool> addNewScheme(
   String name,

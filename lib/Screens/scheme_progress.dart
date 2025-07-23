@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hassanjewellers/Screens/payment.dart';
-import 'package:hassanjewellers/Utils/Helpers/utils.dart';
+import 'package:hassanjewellers/Helpers/utils.dart';
 import 'package:hassanjewellers/Utils/Constants/colors.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
