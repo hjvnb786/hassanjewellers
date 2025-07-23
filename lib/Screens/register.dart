@@ -4,7 +4,7 @@ import 'package:hassanjewellers/Screens/otp_screen.dart';
 import 'package:hassanjewellers/Utils/Helpers/animated_route.dart';
 import 'package:hassanjewellers/Utils/Helpers/handle_OTP.dart';
 import 'package:hassanjewellers/Utils/Services/firebase_service.dart';
-import 'package:hassanjewellers/Components/show_custom_dialog.dart';
+
 
 class Register extends StatefulWidget {
   const Register({super.key});

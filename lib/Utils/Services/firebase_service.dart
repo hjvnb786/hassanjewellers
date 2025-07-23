@@ -3,16 +3,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hassanjewellers/Utils/Helpers/utils.dart';
 
-Future<bool> checkPhoneExist(String fieldValue) async {
-  final querySnapshot = await FirebaseFirestore.instance
-      .collection('users')
-      .where("phone", isEqualTo: fieldValue)
-      .limit(1)
-      .get();
-
-  return querySnapshot.docs.isEmpty;
-}
-
 Future<String> checkPhoneExists(String fieldValue) async {
   final querySnapshot = await FirebaseFirestore.instance
       .collection('users')

@@ -2,7 +2,7 @@
   "project_info": {
     "project_number": "374772324682",
     "project_id": "hassan-jewellers",
-    "storage_bucket": "hassan-jewellers.appspot.com"
+    "storage_bucket": "hassan-jewellers.firebasestorage.app"
   },
   "client": [
     {
@@ -12,7 +12,28 @@
           "package_name": "com.hassanjewellers.savingsapp"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "374772324682-g5evevncl6ufp7ipdil7er26ov0v9hmr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.hassanjewellers.savingsapp",
+            "certificate_hash": "b28f9a7ce0ba8d38fe349982c48bec7ad1f51dbb"
+          }
+        },
+        {
+          "client_id": "374772324682-sr3frcasoskt21stvont2hnq909l1v69.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.hassanjewellers.savingsapp",
+            "certificate_hash": "862532a9eb16b7b4247d3d381cde9b982da58770"
+          }
+        },
+        {
+          "client_id": "374772324682-vcioat4g65bpotsveicucr1oa3e1p1m6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCjs39nasLsKRoVyYfqWXFik61WTB8Jhgo"
@@ -20,7 +41,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "374772324682-vcioat4g65bpotsveicucr1oa3e1p1m6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
