@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:hassanjewellers/Screens/home.dart';
 import 'package:hassanjewellers/Screens/register.dart';
 import 'package:hassanjewellers/Utils/Constants/colors.dart';
-import 'package:hassanjewellers/Utils/Services/firebase_services/initializeApp.dart';
-import 'package:hassanjewellers/Utils/Services/firebase_services/getCurrentUser.dart';
+import 'package:hassanjewellers/Services/firebase_services/initializeApp.dart';
+import 'package:hassanjewellers/Services/firebase_services/getCurrentUser.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

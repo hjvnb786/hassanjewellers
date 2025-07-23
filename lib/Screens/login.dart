@@ -3,7 +3,7 @@ import 'package:hassanjewellers/Screens/register.dart';
 import 'package:hassanjewellers/Screens/otp_screen.dart';
 import 'package:hassanjewellers/Utils/Helpers/animated_route.dart';
 import 'package:hassanjewellers/Utils/Helpers/handle_OTP.dart';
-import 'package:hassanjewellers/Utils/Services/firebase_services/checkPhoneExists.dart';
+import 'package:hassanjewellers/Services/firebase_services/checkPhoneExists.dart';
 
 
 

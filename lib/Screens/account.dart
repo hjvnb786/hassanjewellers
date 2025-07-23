@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hassanjewellers/main.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:hassanjewellers/Utils/Services/firebase_services/signOut.dart';
+import 'package:hassanjewellers/Services/firebase_services/signOut.dart';
 
 class Account extends StatefulWidget {
   const Account({

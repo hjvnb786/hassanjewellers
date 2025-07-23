@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:hassanjewellers/Components/scheme_item.dart';
 import 'package:hassanjewellers/Screens/new_scheme.dart';
-import 'package:hassanjewellers/Utils/Services/firebase_services/getCurrentUser.dart';
+import 'package:hassanjewellers/Services/firebase_services/getCurrentUser.dart';
 
 class Schemes extends StatefulWidget {
   const Schemes({super.key});
