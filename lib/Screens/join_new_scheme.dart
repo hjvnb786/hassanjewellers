@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:hassanjewellers/Widgets/user_details_form.dart';
-import 'package:hassanjewellers/Widgets/scheme_details_form.dart';
-import 'package:hassanjewellers/Widgets/additional_details_form.dart';
-import 'package:hassanjewellers/Widgets/detail_summary.dart';
+import 'package:hassanjewellers/Widgets/join_scheme_widgets/user_details_form.dart';
+import 'package:hassanjewellers/Widgets/join_scheme_widgets/scheme_details_form.dart';
+import 'package:hassanjewellers/Widgets/join_scheme_widgets/additional_details_form.dart';
+import 'package:hassanjewellers/Widgets/join_scheme_widgets/detail_summary.dart';
 import 'package:hassanjewellers/Screens/payment.dart';
 
 class JoinNewScheme extends StatefulWidget {
