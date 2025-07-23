@@ -8,12 +8,18 @@ import 'package:webview_flutter/webview_flutter.dart';
 import '../main.dart';
 
 class Payment extends StatefulWidget {
-  final String id;
-  final String amount;
-  final String name;
+  final String? id;
+  final String? amount;
+  final String? name;
+  final Map<String, dynamic>? formData;
 
-  const Payment(
-      {super.key, required this.id, required this.amount, required this.name});
+  const Payment({
+    super.key, 
+    this.id, 
+    this.amount, 
+    this.name,
+    this.formData,
+  });
 
   @override
   State<Payment> createState() => _PaymentState();
@@ -30,63 +36,123 @@ class _PaymentState extends State<Payment> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
 
-    orderId = generateOrderId(widget.id);
-
-    // Prepare the JSON data as a Map
-    Map<String, dynamic> payload = {
-      "name": widget.name,
-      "amount": widget.amount.substring(0, widget.amount.length - 2),
-      "order_no": orderId
-    };
-
-    // Convert the Map to a JSON string
-    String jsonString = jsonEncode(payload);
-
-    print("jsonString: $jsonString");
-
-    webViewController = WebViewController()
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setNavigationDelegate(
-        NavigationDelegate(
-          onProgress: (int value) {
-            setState(() {
-              loadingValue = value;
-            });
-          },
-          onUrlChange: (UrlChange request) {
-            if (kDebugMode) {
-              print(request.url);
-            }
-
-            if (request.url ==
-                'https://spt.uvm.mybluehostin.me/api/payment/success.html') {
-              print("success success success");
-
-              fetchPaymentStatus(orderId, widget.id).then((value) {
-                Navigator.of(context).pop();
-                Navigator.of(context).pop();
+    // Use formData if available, otherwise use the old parameters
+    if (widget.formData != null) {
+      // Extract data from formData for payment
+      final schemeAmount = widget.formData!['schemeAmount'] ?? '₹5,000';
+      final firstName = widget.formData!['firstName'] ?? '';
+      final lastName = widget.formData!['lastName'] ?? '';
+      final fullName = '$firstName $lastName'.trim();
+      
+      orderId = generateOrderId('scheme_${DateTime.now().millisecondsSinceEpoch}');
+      
+      // Prepare the JSON data as a Map
+      Map<String, dynamic> payload = {
+        "name": fullName.isNotEmpty ? fullName : 'Scheme User',
+        "amount": schemeAmount.replaceAll('₹', '').replaceAll(',', ''),
+        "order_no": orderId
+      };
+      
+      // Convert the Map to a JSON string
+      String jsonString = jsonEncode(payload);
+      
+      print("jsonString: $jsonString");
+      
+      webViewController = WebViewController()
+        ..setJavaScriptMode(JavaScriptMode.unrestricted)
+        ..setNavigationDelegate(
+          NavigationDelegate(
+            onProgress: (int value) {
+              setState(() {
+                loadingValue = value;
               });
-            }
+            },
+            onUrlChange: (UrlChange request) {
+              if (kDebugMode) {
+                print(request.url);
+              }
 
-            if (request.url ==
-                'https://spt.uvm.mybluehostin.me/api/payment/close_browser.html') {
-              Navigator.of(context).pop();
-              Navigator.of(context).pop();
-            }
-          },
-        ),
-      )
-      ..loadRequest(Uri.parse("https://spt.uvm.mybluehostin.me/api/payment/"),
-          method: postMethod,
-          headers: {
-            'Content-Type': 'application/json',
-          },
+              if (request.url ==
+                  'https://spt.uvm.mybluehostin.me/api/payment/success.html') {
+                print("success success success");
 
-          //body: Uint8List.fromList(jsonPayload.codeUnits));
-          body: Uint8List.fromList(jsonString.codeUnits));
+                fetchPaymentStatus(orderId, 'scheme_${DateTime.now().millisecondsSinceEpoch}').then((value) {
+                  Navigator.of(context).pop();
+                  Navigator.of(context).pop();
+                });
+              }
+
+              if (request.url ==
+                  'https://spt.uvm.mybluehostin.me/api/payment/close_browser.html') {
+                Navigator.of(context).pop();
+                Navigator.of(context).pop();
+              }
+            },
+          ),
+        )
+        ..loadRequest(Uri.parse("https://spt.uvm.mybluehostin.me/api/payment/"),
+            method: postMethod,
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: Uint8List.fromList(jsonString.codeUnits));
+    } else {
+      // Use old parameters for backward compatibility
+      orderId = generateOrderId(widget.id ?? 'default');
+      
+      // Prepare the JSON data as a Map
+      Map<String, dynamic> payload = {
+        "name": widget.name ?? 'Default User',
+        "amount": (widget.amount ?? '5000').substring(0, (widget.amount ?? '5000').length - 2),
+        "order_no": orderId
+      };
+      
+      // Convert the Map to a JSON string
+      String jsonString = jsonEncode(payload);
+      
+      print("jsonString: $jsonString");
+      
+      webViewController = WebViewController()
+        ..setJavaScriptMode(JavaScriptMode.unrestricted)
+        ..setNavigationDelegate(
+          NavigationDelegate(
+            onProgress: (int value) {
+              setState(() {
+                loadingValue = value;
+              });
+            },
+            onUrlChange: (UrlChange request) {
+              if (kDebugMode) {
+                print(request.url);
+              }
+
+              if (request.url ==
+                  'https://spt.uvm.mybluehostin.me/api/payment/success.html') {
+                print("success success success");
+
+                fetchPaymentStatus(orderId, widget.id ?? 'default').then((value) {
+                  Navigator.of(context).pop();
+                  Navigator.of(context).pop();
+                });
+              }
+
+              if (request.url ==
+                  'https://spt.uvm.mybluehostin.me/api/payment/close_browser.html') {
+                Navigator.of(context).pop();
+                Navigator.of(context).pop();
+              }
+            },
+          ),
+        )
+        ..loadRequest(Uri.parse("https://spt.uvm.mybluehostin.me/api/payment/"),
+            method: postMethod,
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: Uint8List.fromList(jsonString.codeUnits));
+    }
   }
 
   @override
