@@ -205,86 +205,198 @@ class _JoinNewSchemeScreenState extends State<JoinNewSchemeScreen> {
               children: [
                 // Step 1: User Details
                 SingleChildScrollView(
-                  //padding: const EdgeInsets.all(10),
-                  child: UserDetailsForm(
-                    formData: _formData,
-                    onDataChanged: _updateFormData,
+                  child: Column(
+                    children: [
+                      UserDetailsForm(
+                        formData: _formData,
+                        onDataChanged: _updateFormData,
+                      ),
+                      // Navigation Buttons
+                      Container(
+                        padding: const EdgeInsets.all(20),
+                        child: Row(
+                          children: [
+                            if (_currentStep > 0)
+                              Expanded(
+                                child: OutlinedButton.icon(
+                                  onPressed: _previousStep,
+                                  icon: const Icon(Icons.arrow_back),
+                                  label: const Text('Previous'),
+                                  style: OutlinedButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(vertical: 16),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            if (_currentStep > 0) const SizedBox(width: 16),
+                            Expanded(
+                              child: ElevatedButton.icon(
+                                onPressed: _canProceedToNext() ? _nextStep : null,
+                                icon: Icon(_currentStep == 3 ? Icons.check : Icons.arrow_forward),
+                                label: Text(_currentStep == 3 ? 'Complete' : 'Next'),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Theme.of(context).primaryColor,
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(vertical: 16),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 
                 // Step 2: Scheme Details
                 SingleChildScrollView(
                   padding: const EdgeInsets.all(20),
-                  child: SchemeDetailsForm(
-                    formData: _formData,
-                    onDataChanged: _updateFormData,
+                  child: Column(
+                    children: [
+                      SchemeDetailsForm(
+                        formData: _formData,
+                        onDataChanged: _updateFormData,
+                      ),
+                      const SizedBox(height: 20),
+                      // Navigation Buttons
+                      Row(
+                        children: [
+                          if (_currentStep > 0)
+                            Expanded(
+                              child: OutlinedButton.icon(
+                                onPressed: _previousStep,
+                                icon: const Icon(Icons.arrow_back),
+                                label: const Text('Previous'),
+                                style: OutlinedButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(vertical: 16),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          if (_currentStep > 0) const SizedBox(width: 16),
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              onPressed: _canProceedToNext() ? _nextStep : null,
+                              icon: Icon(_currentStep == 3 ? Icons.check : Icons.arrow_forward),
+                              label: Text(_currentStep == 3 ? 'Complete' : 'Next'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Theme.of(context).primaryColor,
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(vertical: 16),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
                 
                 // Step 3: Additional Details
                 SingleChildScrollView(
                   padding: const EdgeInsets.all(20),
-                  child: AdditionalDetailsForm(
-                    formData: _formData,
-                    onDataChanged: _updateFormData,
+                  child: Column(
+                    children: [
+                      AdditionalDetailsForm(
+                        formData: _formData,
+                        onDataChanged: _updateFormData,
+                      ),
+                      const SizedBox(height: 20),
+                      // Navigation Buttons
+                      Row(
+                        children: [
+                          if (_currentStep > 0)
+                            Expanded(
+                              child: OutlinedButton.icon(
+                                onPressed: _previousStep,
+                                icon: const Icon(Icons.arrow_back),
+                                label: const Text('Previous'),
+                                style: OutlinedButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(vertical: 16),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          if (_currentStep > 0) const SizedBox(width: 16),
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              onPressed: _canProceedToNext() ? _nextStep : null,
+                              icon: Icon(_currentStep == 3 ? Icons.check : Icons.arrow_forward),
+                              label: Text(_currentStep == 3 ? 'Complete' : 'Next'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Theme.of(context).primaryColor,
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(vertical: 16),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
                 
                 // Step 4: Summary
                 SingleChildScrollView(
                   padding: const EdgeInsets.all(20),
-                  child: DetailSummary(
-                    formData: _formData,
-                    onConfirm: _onConfirm,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          
-          // Navigation Buttons
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  blurRadius: 4,
-                  offset: const Offset(0, -2),
-                ),
-              ],
-            ),
-            child: Row(
-              children: [
-                if (_currentStep > 0)
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: _previousStep,
-                      icon: const Icon(Icons.arrow_back),
-                      label: const Text('Previous'),
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
+                  child: Column(
+                    children: [
+                      DetailSummary(
+                        formData: _formData,
+                        onConfirm: _onConfirm,
                       ),
-                    ),
-                  ),
-                if (_currentStep > 0) const SizedBox(width: 16),
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: _canProceedToNext() ? _nextStep : null,
-                    icon: Icon(_currentStep == 3 ? Icons.check : Icons.arrow_forward),
-                    label: Text(_currentStep == 3 ? 'Complete' : 'Next'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Theme.of(context).primaryColor,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                      const SizedBox(height: 20),
+                      // Navigation Buttons
+                      Row(
+                        children: [
+                          if (_currentStep > 0)
+                            Expanded(
+                              child: OutlinedButton.icon(
+                                onPressed: _previousStep,
+                                icon: const Icon(Icons.arrow_back),
+                                label: const Text('Previous'),
+                                style: OutlinedButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(vertical: 16),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          if (_currentStep > 0) const SizedBox(width: 16),
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              onPressed: _canProceedToNext() ? _nextStep : null,
+                              icon: Icon(_currentStep == 3 ? Icons.check : Icons.arrow_forward),
+                              label: Text(_currentStep == 3 ? 'Complete' : 'Next'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Theme.of(context).primaryColor,
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(vertical: 16),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
+                    ],
                   ),
                 ),
               ],
