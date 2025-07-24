@@ -64,45 +64,39 @@ class _UserDetailsFormState extends State<UserDetailsForm> {
           ),
           const SizedBox(height: 20),
           
-          // First Name and Last Name Row
-          Row(
-            children: [
-              Expanded(
-                child: TextFormField(
-                  controller: _firstNameController,
-                  decoration: const InputDecoration(
-                    labelText: 'First Name *',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.person),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'First name is required';
-                    }
-                    return null;
-                  },
-                  onChanged: (value) => _updateFormData(),
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: TextFormField(
-                  controller: _lastNameController,
-                  decoration: const InputDecoration(
-                    labelText: 'Last Name *',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.person),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Last name is required';
-                    }
-                    return null;
-                  },
-                  onChanged: (value) => _updateFormData(),
-                ),
-              ),
-            ],
+          // First Name
+          TextFormField(
+            controller: _firstNameController,
+            decoration: const InputDecoration(
+              labelText: 'First Name *',
+              border: OutlineInputBorder(),
+              prefixIcon: Icon(Icons.person),
+            ),
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'First name is required';
+              }
+              return null;
+            },
+            onChanged: (value) => _updateFormData(),
+          ),
+          const SizedBox(height: 16),
+          
+          // Last Name
+          TextFormField(
+            controller: _lastNameController,
+            decoration: const InputDecoration(
+              labelText: 'Last Name *',
+              border: OutlineInputBorder(),
+              prefixIcon: Icon(Icons.person),
+            ),
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Last name is required';
+              }
+              return null;
+            },
+            onChanged: (value) => _updateFormData(),
           ),
           const SizedBox(height: 16),
           
@@ -113,6 +107,7 @@ class _UserDetailsFormState extends State<UserDetailsForm> {
               labelText: 'Mobile Number *',
               border: OutlineInputBorder(),
               prefixIcon: Icon(Icons.phone),
+              prefixText: '+91 ',
             ),
             keyboardType: TextInputType.phone,
             validator: (value) {

@@ -12,6 +12,7 @@ class Payment extends StatefulWidget {
   final String? amount;
   final String? name;
   final Map<String, dynamic>? formData;
+  final String operation;
 
   const Payment({
     super.key, 
@@ -19,6 +20,7 @@ class Payment extends StatefulWidget {
     this.amount, 
     this.name,
     this.formData,
+    required this.operation,
   });
 
   @override
@@ -78,7 +80,9 @@ class _PaymentState extends State<Payment> {
                   'https://spt.uvm.mybluehostin.me/api/payment/success.html') {
                 print("success success success");
 
-                fetchPaymentStatus(orderId, 'scheme_${DateTime.now().millisecondsSinceEpoch}').then((value) {
+                final schemeData = widget.formData ?? {};
+                
+                fetchPaymentStatus(orderId, 'scheme_${DateTime.now().millisecondsSinceEpoch}', widget.operation, schemeData).then((value) {
                   Navigator.of(context).pop();
                   Navigator.of(context).pop();
                 });
@@ -132,7 +136,9 @@ class _PaymentState extends State<Payment> {
                   'https://spt.uvm.mybluehostin.me/api/payment/success.html') {
                 print("success success success");
 
-                fetchPaymentStatus(orderId, widget.id ?? 'default').then((value) {
+                final schemeData = widget.formData ?? {};
+                
+                fetchPaymentStatus(orderId, widget.id ?? 'default', widget.operation, schemeData).then((value) {
                   Navigator.of(context).pop();
                   Navigator.of(context).pop();
                 });

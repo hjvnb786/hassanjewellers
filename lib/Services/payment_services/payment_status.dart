@@ -1,14 +1,16 @@
 import 'dart:convert';
 import 'package:hassanjewellers/Services/firebase_services/updateProgressItem.dart';
+import 'package:hassanjewellers/Services/firebase_services/addNewScheme.dart';
 import 'package:http/http.dart' as http;
 
-Future<void> fetchPaymentStatus(String orderNo, String uid) async {
+Future<void> fetchPaymentStatus(String orderNo, String uid, String operation, Map<String, dynamic> schemeData) async {
   print("Fetching payment status started...");
 
   const String url =
       'https://spt.uvm.mybluehostin.me/api/payment/payment_status.php';
 
   print("Order No: $orderNo");
+  print("Operation: $operation");
 
   try {
     final response = await http.post(
@@ -29,11 +31,38 @@ Future<void> fetchPaymentStatus(String orderNo, String uid) async {
         String referenceNo = data['reference_no'].toString();
         print("Reference Number: $referenceNo");
 
-        //update your firebase record
-        updateProgressItem(uid, referenceNo).then((value) => {
-              print("print final"),
-              print(value),
-            });
+        // Check order status to ensure payment was successful
+        if (data.containsKey('order_status')) {
+          String orderStatus = data['order_status'];
+          print("Order Status: $orderStatus");
+
+          if (orderStatus == "Successful") {
+            print("✅ Payment was successful!");
+            
+            // Call appropriate function based on operation
+            if (operation == 'add') {
+              print("🆕 Adding new scheme...");
+              final schemeId = await addNewScheme(schemeData);
+              if (schemeId != null) {
+                print("✅ New scheme added successfully with ID: $schemeId");
+              } else {
+                print("❌ Failed to add new scheme");
+              }
+            } else if (operation == 'update') {
+              print("📝 Updating existing scheme...");
+              updateProgressItem(uid, referenceNo).then((value) => {
+                    print("print final"),
+                    print(value),
+                  });
+            } else {
+              print("⚠️ Unknown operation: $operation");
+            }
+          } else {
+            print("❌ Payment was not successful.");
+          }
+        } else {
+          print("⚠️ 'order_status' not found in response.");
+        }
       } else {
         print("⚠️ 'reference_no' not found in response.");
       }
@@ -52,20 +81,6 @@ Future<void> fetchPaymentStatus(String orderNo, String uid) async {
         print("error_code Number: ${errorCode.toString()}");
       } else {
         print("⚠️ 'error_code' not found in response.");
-      }
-
-      // Check for order status
-      if (data.containsKey('order_status')) {
-        String orderStatus = data['order_status'];
-        print("Order Status: $orderStatus");
-
-        if (orderStatus == "Successful") {
-          print("✅ Payment was successful!");
-        } else {
-          print("❌ Payment was not successful.");
-        }
-      } else {
-        print("⚠️ 'order_status' not found in response.");
       }
     } else {
       print('❌ Error: ${response.statusCode} - ${response.body}');

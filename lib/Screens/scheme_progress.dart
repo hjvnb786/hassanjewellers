@@ -53,7 +53,7 @@ class _SchemeProgressState extends State<SchemeProgress> {
         builder: (context) => Payment(
           id: widget.id,
           amount: widget.amount,
-          name: widget.name,
+          name: widget.name, operation: 'update',
         ),
       ),
     );

@@ -103,10 +103,10 @@ class _JoinNewSchemeState extends State<JoinNewScheme> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => Payment(formData: _formData),
+        builder: (context) => Payment(formData: _formData, operation: 'add'),
       ),
     );
-  }
+  }  
 
   @override
   Widget build(BuildContext context) {
