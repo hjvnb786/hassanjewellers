@@ -262,26 +262,80 @@ class _AccountScreenState extends State<AccountScreen> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Row(
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        Icon(
-                                          Icons.location_on_outlined,
-                                          color: Colors.grey[600],
-                                          size: 24,
-                                        ),
-                                        const SizedBox(width: 16),
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
+                                        Row(
+                                          children: [
+                                            Container(
+                                              padding: const EdgeInsets.all(12),
+                                              decoration: BoxDecoration(
+                                                color: Theme.of(context).primaryColor.withOpacity(0.1),
+                                                borderRadius: BorderRadius.circular(12),
+                                              ),
+                                              child: Icon(
+                                                Icons.location_on_outlined,
+                                                color: Theme.of(context).primaryColor,
+                                                size: 24,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 16),
+                                            Expanded(
+                                              child: Text(
                                                 'Address',
                                                 style: TextStyle(
                                                   fontSize: 14,
                                                   color: Colors.grey[600],
                                                 ),
                                               ),
-                                              const SizedBox(height: 4),
+                                            ),
+                                            // Edit and Delete Icons at top right
+                                            Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                // Edit Icon
+                                                GestureDetector(
+                                                  onTap: () => _editAddress(address),
+                                                  child: Container(
+                                                    padding: const EdgeInsets.all(8),
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.blue.withOpacity(0.1),
+                                                      borderRadius: BorderRadius.circular(8),
+                                                    ),
+                                                    child: Icon(
+                                                      Icons.edit_outlined,
+                                                      size: 18,
+                                                      color: Colors.blue[600],
+                                                    ),
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 8),
+                                                // Delete Icon
+                                                GestureDetector(
+                                                  onTap: () => _deleteAddress(address['id']),
+                                                  child: Container(
+                                                    padding: const EdgeInsets.all(8),
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.red.withOpacity(0.1),
+                                                      borderRadius: BorderRadius.circular(8),
+                                                    ),
+                                                    child: Icon(
+                                                      Icons.delete_outline,
+                                                      size: 18,
+                                                      color: Colors.red[600],
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Padding(
+                                          padding: const EdgeInsets.only(left: 52.0),
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
                                               Text(
                                                 '${address['firstName']} ${address['lastName']}',
                                                 style: const TextStyle(
@@ -289,74 +343,35 @@ class _AccountScreenState extends State<AccountScreen> {
                                                   fontWeight: FontWeight.w500,
                                                 ),
                                               ),
+                                              const SizedBox(height: 8),
+                                              Text(
+                                                '${address['aptFloorDoorNumber']}, ${address['streetName']}',
+                                                style: TextStyle(
+                                                  fontSize: 14,
+                                                  color: Colors.grey[700],
+                                                ),
+                                              ),
+                                              const SizedBox(height: 4),
+                                              Text(
+                                                '${address['city']}, ${address['state']} - ${address['pincode']}',
+                                                style: TextStyle(
+                                                  fontSize: 14,
+                                                  color: Colors.grey[700],
+                                                ),
+                                              ),
+                                              const SizedBox(height: 4),
+                                              Text(
+                                                '${address['mobileNumber'] ?? ''}${address['alternativeMobileNumber'] != null && address['alternativeMobileNumber'].toString().isNotEmpty ? ' / ${address['alternativeMobileNumber']}' : ''}',
+                                                style: TextStyle(
+                                                  fontSize: 14,
+                                                  color: Colors.grey[700],
+                                                ),
+                                              ),
                                             ],
                                           ),
                                         ),
-                                        Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            // Edit Icon
-                                            GestureDetector(
-                                              onTap: () => _editAddress(address),
-                                              child: Container(
-                                                padding: const EdgeInsets.all(8),
-                                                decoration: BoxDecoration(
-                                                  color: Colors.blue.withOpacity(0.1),
-                                                  borderRadius: BorderRadius.circular(8),
-                                                ),
-                                                child: Icon(
-                                                  Icons.edit_outlined,
-                                                  size: 18,
-                                                  color: Colors.blue[600],
-                                                ),
-                                              ),
-                                            ),
-                                            const SizedBox(width: 8),
-                                            // Delete Icon
-                                            GestureDetector(
-                                              onTap: () => _deleteAddress(address['id']),
-                                              child: Container(
-                                                padding: const EdgeInsets.all(8),
-                                                decoration: BoxDecoration(
-                                                  color: Colors.red.withOpacity(0.1),
-                                                  borderRadius: BorderRadius.circular(8),
-                                                ),
-                                                child: Icon(
-                                                  Icons.delete_outline,
-                                                  size: 18,
-                                                  color: Colors.red[600],
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
                                       ],
                                     ),
-                                    const SizedBox(height: 8),
-                                    Padding(
-                                      padding: const EdgeInsets.fromLTRB(40.0, 0.0, 0.0, 0.0),
-                                      child: Text(
-                                        '${address['aptFloorDoorNumber']}, ${address['streetName']}',
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          color: Colors.grey[700],
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Padding(
-                                      padding: const EdgeInsets.fromLTRB(40.0, 0.0, 0.0, 0.0),
-                                      child: Text(
-                                        '${address['city']}, ${address['state']} - ${address['pincode']}',
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          color: Colors.grey[700],
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Padding(
-                                      padding: const EdgeInsets.fromLTRB(40.0, 0.0, 0.0, 0.0),
                                       child: Text(
                                         '${address['mobileNumber'] ?? ''}${address['alternativeMobileNumber'] != null && address['alternativeMobileNumber'].toString().isNotEmpty ? ' / ${address['alternativeMobileNumber']}' : ''}',
                                         style: TextStyle(
