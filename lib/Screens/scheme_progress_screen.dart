@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:hassanjewellers/Screens/payment.dart';
+import 'package:hassanjewellers/Screens/payment_screen.dart';
 import 'package:hassanjewellers/Helpers/utils.dart';
 import 'package:hassanjewellers/Utils/Constants/colors.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class SchemeProgress extends StatefulWidget {
+class SchemeProgressScreen extends StatefulWidget {
   final String id;
   final List<dynamic> progress;
   final String amount;
   final String name;
   final Map<String, dynamic> schemeDetails;
 
-  const SchemeProgress({
+  const SchemeProgressScreen({
     super.key,
     required this.progress,
     required this.id,
@@ -22,10 +22,10 @@ class SchemeProgress extends StatefulWidget {
   });
 
   @override
-  State<SchemeProgress> createState() => _SchemeProgressState();
+  State<SchemeProgressScreen> createState() => _SchemeProgressScreenState();
 }
 
-class _SchemeProgressState extends State<SchemeProgress> {
+class _SchemeProgressScreenState extends State<SchemeProgressScreen> {
   int currentStep = 0;
   late List<Map<String, dynamic>> progressList;
   bool enableButton = true;
@@ -50,7 +50,7 @@ class _SchemeProgressState extends State<SchemeProgress> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => Payment(
+        builder: (context) => PaymentScreen(
           id: widget.id,
           amount: widget.amount,
           name: widget.name, operation: 'update',
@@ -180,12 +180,12 @@ class _SchemeProgressState extends State<SchemeProgress> {
                           ),
                         ),
                         const SizedBox(height: 16),
-                        _buildDetailRow('Guardian Name', widget.schemeDetails['guardianName'] ?? 'N/A'),
-                        _buildDetailRow('Occupation', widget.schemeDetails['occupation'] ?? 'N/A'),
-                        _buildDetailRow('Nominee Name', widget.schemeDetails['nomineeName'] ?? 'N/A'),
-                        _buildDetailRow('Nominee Relation', widget.schemeDetails['nomineeRelation'] ?? 'N/A'),
-                        _buildDetailRow('Address', widget.schemeDetails['address'] ?? 'N/A'),
-                        _buildDetailRow('Age', widget.schemeDetails['age'] ?? 'N/A'),
+                        _buildDetailRow('Guardian Name', (widget.schemeDetails['guardianName'] ?? 'N/A').toString()),
+                        _buildDetailRow('Occupation', (widget.schemeDetails['occupation'] ?? 'N/A').toString()),
+                        _buildDetailRow('Nominee Name', (widget.schemeDetails['nomineeName'] ?? 'N/A').toString()),
+                        _buildDetailRow('Nominee Relation', (widget.schemeDetails['nomineeRelation'] ?? 'N/A').toString()),
+                        _buildDetailRow('Address', (widget.schemeDetails['address'] ?? 'N/A').toString()),
+                        _buildDetailRow('Age', (widget.schemeDetails['age'] ?? 'N/A').toString()),
                         _buildDetailRow('Start Date', _formatDate(widget.schemeDetails['date'])),
                       ],
                     ),

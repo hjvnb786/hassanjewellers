@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:hassanjewellers/Screens/account.dart';
-import 'package:hassanjewellers/Screens/schemes.dart';
-import 'package:hassanjewellers/Screens/join_new_scheme.dart';
+import 'package:hassanjewellers/Screens/account_screen.dart';
+import 'package:hassanjewellers/Screens/schemes_screen.dart';
+import 'package:hassanjewellers/Screens/join_new_scheme_screen.dart';
 import 'package:hassanjewellers/Services/firebase_services/getDocumentByUid.dart';
 import 'package:hassanjewellers/Services/firebase_services/getCurrentUser.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class Home extends StatefulWidget {
-  const Home({super.key});
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
 
   @override
-  State<Home> createState() => _HomeState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeState extends State<Home> {
+class _HomeScreenState extends State<HomeScreen> {
   int currentPageIndex = 0;
   final String? uid = getCurrentUser()?.uid;
   late Future<QueryDocumentSnapshot<Map<String, dynamic>>?> userAccountDetails;
@@ -40,9 +40,9 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     List<Widget> screens = [
-      const Schemes(),
-      const JoinNewScheme(),
-      Account(name: customerName, phone: customerPhone, email: customerEmail),
+      const SchemesScreen(),
+      const JoinNewSchemeScreen(),
+      AccountScreen(name: customerName, phone: customerPhone, email: customerEmail),
     ];
 
     return Scaffold(

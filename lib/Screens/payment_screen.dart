@@ -7,14 +7,14 @@ import 'package:hassanjewellers/Services/payment_services/payment_status.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import '../main.dart';
 
-class Payment extends StatefulWidget {
+class PaymentScreen extends StatefulWidget {
   final String? id;
   final String? amount;
   final String? name;
   final Map<String, dynamic>? formData;
   final String operation;
 
-  const Payment({
+  const PaymentScreen({
     super.key, 
     this.id, 
     this.amount, 
@@ -24,10 +24,10 @@ class Payment extends StatefulWidget {
   });
 
   @override
-  State<Payment> createState() => _PaymentState();
+  State<PaymentScreen> createState() => _PaymentScreenState();
 }
 
-class _PaymentState extends State<Payment> {
+class _PaymentScreenState extends State<PaymentScreen> {
   late final WebViewController webViewController;
   LoadRequestMethod postMethod = LoadRequestMethod.post;
 

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hassanjewellers/Screens/scheme_progress.dart';
+import 'package:hassanjewellers/Screens/scheme_progress_screen.dart';
 
 class SchemeItem extends StatelessWidget {
   final String id;
@@ -19,7 +19,7 @@ class SchemeItem extends StatelessWidget {
 
   Route createRoute() {
     return PageRouteBuilder(
-      pageBuilder: (context, animation, secondaryAnimation) => SchemeProgress(
+      pageBuilder: (context, animation, secondaryAnimation) => SchemeProgressScreen(
         id: id,
         progress: progress,
         amount: amount,

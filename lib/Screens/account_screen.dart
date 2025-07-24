@@ -3,9 +3,13 @@ import 'package:hassanjewellers/main.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:hassanjewellers/Services/firebase_services/signOut.dart';
+import 'package:hassanjewellers/Services/firebase_services/get_user_addresses.dart';
+import 'package:hassanjewellers/Services/firebase_services/delete_address.dart';
+import 'package:hassanjewellers/Screens/address_form_screen.dart';
+import 'package:hassanjewellers/Widgets/address_shimmer_loading.dart';
 
-class Account extends StatefulWidget {
-  const Account({
+class AccountScreen extends StatefulWidget {
+  const AccountScreen({
     super.key,
     required this.name,
     required this.phone,
@@ -17,10 +21,130 @@ class Account extends StatefulWidget {
   final String email;
 
   @override
-  State<Account> createState() => _AccountState();
+  State<AccountScreen> createState() => _AccountScreenState();
 }
 
-class _AccountState extends State<Account> {
+class _AccountScreenState extends State<AccountScreen> {
+  List<Map<String, dynamic>> _addresses = [];
+  bool _isLoadingAddresses = true;
+  int _refreshKey = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadAddresses();
+  }
+
+  Future<void> _loadAddresses() async {
+    if (!mounted) return;
+    
+    setState(() {
+      _isLoadingAddresses = true;
+    });
+    
+    final addresses = await getUserAddresses();
+    print('Loaded addresses: ${addresses.length}'); // Debug print
+    
+    if (mounted) {
+      setState(() {
+        _addresses = addresses;
+        _isLoadingAddresses = false;
+      });
+      print('State updated with ${_addresses.length} addresses'); // Debug print
+    }
+  }
+
+  Future<void> _forceReloadAddresses() async {
+    if (!mounted) return;
+    
+    setState(() {
+      _isLoadingAddresses = true;
+      _addresses = [];
+    });
+    
+    // Wait a bit longer to ensure Firebase cache is cleared
+    await Future.delayed(const Duration(milliseconds: 500));
+    
+    final addresses = await getUserAddresses();
+    print('Force reloaded addresses: ${addresses.length}'); // Debug print
+    
+    if (mounted) {
+      setState(() {
+        _addresses = addresses;
+        _isLoadingAddresses = false;
+        _refreshKey++; // Increment refresh key
+      });
+      print('Force reload state updated with ${_addresses.length} addresses'); // Debug print
+    }
+  }
+
+  void _editAddress(Map<String, dynamic> address) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AddressFormScreen(
+          addressData: address,
+          addressId: address['id'],
+        ),
+      ),
+    ).then((_) => _loadAddresses());
+  }
+
+  Future<void> _deleteAddress(String addressId) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Address'),
+        content: const Text('Are you sure you want to delete this address?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Delete'),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      final success = await deleteUserAddress(addressId);
+      
+      if (success) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text('Address deleted successfully!'),
+              backgroundColor: Colors.green[600],
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+          );
+        }
+        // Use force reload method
+        await _forceReloadAddresses();
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text('Failed to delete address. Please try again.'),
+              backgroundColor: Colors.red[600],
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+          );
+        }
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -119,6 +243,193 @@ class _AccountState extends State<Account> {
                           icon: Icons.email_outlined,
                           title: 'Email',
                           content: widget.email,
+                        ),
+                        // Display existing addresses within Account Information
+                        if (_isLoadingAddresses) ...[
+                          const Divider(height: 0, indent: 16, endIndent: 16),
+                          Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Column(
+                              children: List.generate(2, (index) => const AddressShimmerLoading()),
+                            ),
+                          ),
+                        ] else if (_addresses.isNotEmpty) ...[
+                          ..._addresses.map((address) => Column(
+                            children: [
+                              const Divider(height: 0, indent: 16, endIndent: 16),
+                              Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Icon(
+                                          Icons.location_on_outlined,
+                                          color: Colors.grey[600],
+                                          size: 24,
+                                        ),
+                                        const SizedBox(width: 16),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                'Address',
+                                                style: TextStyle(
+                                                  fontSize: 14,
+                                                  color: Colors.grey[600],
+                                                ),
+                                              ),
+                                              const SizedBox(height: 4),
+                                              Text(
+                                                '${address['firstName']} ${address['lastName']}',
+                                                style: const TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            // Edit Icon
+                                            GestureDetector(
+                                              onTap: () => _editAddress(address),
+                                              child: Container(
+                                                padding: const EdgeInsets.all(8),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.blue.withOpacity(0.1),
+                                                  borderRadius: BorderRadius.circular(8),
+                                                ),
+                                                child: Icon(
+                                                  Icons.edit_outlined,
+                                                  size: 18,
+                                                  color: Colors.blue[600],
+                                                ),
+                                              ),
+                                            ),
+                                            const SizedBox(width: 8),
+                                            // Delete Icon
+                                            GestureDetector(
+                                              onTap: () => _deleteAddress(address['id']),
+                                              child: Container(
+                                                padding: const EdgeInsets.all(8),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.red.withOpacity(0.1),
+                                                  borderRadius: BorderRadius.circular(8),
+                                                ),
+                                                child: Icon(
+                                                  Icons.delete_outline,
+                                                  size: 18,
+                                                  color: Colors.red[600],
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Padding(
+                                      padding: const EdgeInsets.fromLTRB(40.0, 0.0, 0.0, 0.0),
+                                      child: Text(
+                                        '${address['aptFloorDoorNumber']}, ${address['streetName']}',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.grey[700],
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Padding(
+                                      padding: const EdgeInsets.fromLTRB(40.0, 0.0, 0.0, 0.0),
+                                      child: Text(
+                                        '${address['city']}, ${address['state']} - ${address['pincode']}',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.grey[700],
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Padding(
+                                      padding: const EdgeInsets.fromLTRB(40.0, 0.0, 0.0, 0.0),
+                                      child: Text(
+                                        '${address['mobileNumber'] ?? ''}${address['alternativeMobileNumber'] != null && address['alternativeMobileNumber'].toString().isNotEmpty ? ' / ${address['alternativeMobileNumber']}' : ''}',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.grey[700],
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          )).toList(),
+                        ],
+                        // Add Address Button (always shown, below existing addresses)
+                        const Divider(height: 0, indent: 16, endIndent: 16),
+                        Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.add_location_outlined,
+                                color: Colors.grey[600],
+                                size: 24,
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Add Address',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.grey[600],
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    const Text(
+                                      'Add your delivery address',
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: () async {
+                                  await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => const AddressFormScreen(),
+                                    ),
+                                  );
+                                  _loadAddresses();
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: Theme.of(context).primaryColor.withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Icon(
+                                    Icons.add,
+                                    size: 20,
+                                    color: Theme.of(context).primaryColor,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),

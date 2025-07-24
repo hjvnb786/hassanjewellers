@@ -3,16 +3,16 @@ import 'package:hassanjewellers/Widgets/join_scheme_widgets/user_details_form.da
 import 'package:hassanjewellers/Widgets/join_scheme_widgets/scheme_details_form.dart';
 import 'package:hassanjewellers/Widgets/join_scheme_widgets/additional_details_form.dart';
 import 'package:hassanjewellers/Widgets/join_scheme_widgets/detail_summary.dart';
-import 'package:hassanjewellers/Screens/payment.dart';
+import 'package:hassanjewellers/Screens/payment_screen.dart';
 
-class JoinNewScheme extends StatefulWidget {
-  const JoinNewScheme({super.key});
+class JoinNewSchemeScreen extends StatefulWidget {
+  const JoinNewSchemeScreen({super.key});
 
   @override
-  State<JoinNewScheme> createState() => _JoinNewSchemeState();
+  State<JoinNewSchemeScreen> createState() => _JoinNewSchemeScreenState();
 }
 
-class _JoinNewSchemeState extends State<JoinNewScheme> {
+class _JoinNewSchemeScreenState extends State<JoinNewSchemeScreen> {
   int _currentStep = 0;
   final Map<String, dynamic> _formData = {};
   final PageController _pageController = PageController();
@@ -103,7 +103,7 @@ class _JoinNewSchemeState extends State<JoinNewScheme> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => Payment(formData: _formData, operation: 'add'),
+        builder: (context) => PaymentScreen(formData: _formData, operation: 'add'),
       ),
     );
   }  

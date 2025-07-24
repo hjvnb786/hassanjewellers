@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hassanjewellers/Screens/home.dart';
+import 'package:hassanjewellers/Screens/home_screen.dart';
 
 class PaymentSuccessfull extends StatelessWidget {
   const PaymentSuccessfull({super.key});
@@ -19,7 +19,7 @@ class PaymentSuccessfull extends StatelessWidget {
               onPressed: () {
                 Navigator.pushAndRemoveUntil(
                   context,
-                  MaterialPageRoute(builder: (context) => const Home()),
+                  MaterialPageRoute(builder: (context) => const HomeScreen()),
                   (Route<dynamic> route) =>
                       false, // This predicate ensures all routes are removed
                 );

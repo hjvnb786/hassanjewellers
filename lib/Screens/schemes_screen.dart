@@ -1,17 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:hassanjewellers/Widgets/scheme_item.dart';
-import 'package:hassanjewellers/Screens/join_new_scheme.dart';
+import 'package:hassanjewellers/Screens/join_new_scheme_screen.dart';
 import 'package:hassanjewellers/Services/firebase_services/getCurrentUser.dart';
 
-class Schemes extends StatefulWidget {
-  const Schemes({super.key});
+class SchemesScreen extends StatefulWidget {
+  const SchemesScreen({super.key});
 
   @override
-  State<Schemes> createState() => _SchemesState();
+  State<SchemesScreen> createState() => _SchemesScreenState();
 }
 
-class _SchemesState extends State<Schemes> with TickerProviderStateMixin {
+class _SchemesScreenState extends State<SchemesScreen> with TickerProviderStateMixin {
   final _firestore = FirebaseFirestore.instance;
   late final TabController _tabController;
   final uid = getCurrentUser()?.uid;
@@ -209,7 +209,7 @@ class _SchemesState extends State<Schemes> with TickerProviderStateMixin {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const JoinNewScheme()),
+                        MaterialPageRoute(builder: (context) => const JoinNewSchemeScreen()),
                       );
                     },
                     icon: const Icon(Icons.add),
