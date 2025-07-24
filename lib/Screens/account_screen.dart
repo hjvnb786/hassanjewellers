@@ -266,6 +266,7 @@ class _AccountScreenState extends State<AccountScreen> {
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Row(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
                                             Container(
                                               padding: const EdgeInsets.all(12),
