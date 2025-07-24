@@ -107,267 +107,425 @@ class _UserDetailsFormState extends State<UserDetailsForm> {
     await _loadUserAddresses();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Form(
-      key: _formKey,
+  // Simple text field widget inspired by address_form_screen
+  Widget _buildSimpleTextField({
+    required TextEditingController controller,
+    required String label,
+    required String hint,
+    required IconData icon,
+    required Color iconColor,
+    required Color backgroundColor,
+    TextInputType? keyboardType,
+    String? Function(String?)? validator,
+    bool isRequired = true,
+    String? prefixText,
+  }) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'User Details',
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: Theme.of(context).primaryColor,
-            ),
-          ),
-          const SizedBox(height: 20),
-          
-          // First Name
-          TextFormField(
-            controller: _firstNameController,
-            decoration: const InputDecoration(
-              labelText: 'First Name *',
-              border: OutlineInputBorder(),
-              prefixIcon: Icon(Icons.person),
-            ),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'First name is required';
-              }
-              return null;
-            },
-            onChanged: (value) => _updateFormData(),
-          ),
-          const SizedBox(height: 16),
-          
-          // Last Name
-          TextFormField(
-            controller: _lastNameController,
-            decoration: const InputDecoration(
-              labelText: 'Last Name *',
-              border: OutlineInputBorder(),
-              prefixIcon: Icon(Icons.person),
-            ),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Last name is required';
-              }
-              return null;
-            },
-            onChanged: (value) => _updateFormData(),
-          ),
-          const SizedBox(height: 16),
-          
-          // Mobile Number
-          TextFormField(
-            controller: _mobileController,
-            decoration: const InputDecoration(
-              labelText: 'Mobile Number *',
-              border: OutlineInputBorder(),
-              prefixIcon: Icon(Icons.phone),
-              prefixText: '+91 ',
-            ),
-            keyboardType: TextInputType.phone,
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Mobile number is required';
-              }
-              if (!validateMobile(value)) {
-                return 'Please enter a valid mobile number';
-              }
-              return null;
-            },
-            onChanged: (value) => _updateFormData(),
-          ),
-          const SizedBox(height: 16),
-          
-          // Email Address
-          TextFormField(
-            controller: _emailController,
-            decoration: const InputDecoration(
-              labelText: 'Email Address *',
-              border: OutlineInputBorder(),
-              prefixIcon: Icon(Icons.email),
-            ),
-            keyboardType: TextInputType.emailAddress,
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Email address is required';
-              }
-              if (!validateEmail(value)) {
-                return 'Please enter a valid email address';
-              }
-              return null;
-            },
-            onChanged: (value) => _updateFormData(),
-          ),
-          const SizedBox(height: 16),
-          
-          // Delivery Address Selection
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          // Label with icon
+          Row(
             children: [
+              Icon(
+                icon,
+                color: iconColor,
+                size: 20,
+              ),
+              const SizedBox(width: 12),
               Text(
-                'Delivery Address *',
+                label,
                 style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.grey[700],
+                  fontSize: 14,
+                  color: Colors.grey[600],
                 ),
               ),
-              const SizedBox(height: 8),
-              if (_isLoadingAddresses)
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey[300]!),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: const Row(
-                    children: [
-                      SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      ),
-                      SizedBox(width: 12),
-                      Text('Loading addresses...'),
-                    ],
-                  ),
-                )
-              else if (_userAddresses.isEmpty)
-                Column(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey[300]!),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(Icons.info_outline, color: Colors.orange[600], size: 20),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Text(
-                              'No addresses found. Add a new address to continue.',
-                              style: TextStyle(color: Colors.orange[600]),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton.icon(
-                        onPressed: _addNewAddress,
-                        icon: const Icon(Icons.add_location),
-                        label: const Text('Add New Address'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Theme.of(context).primaryColor,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                )
-                              else
-                Column(
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey[300]!),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: DropdownButtonFormField<String>(
-                        value: _selectedAddressId,
-                        decoration: const InputDecoration(
-                          border: InputBorder.none,
-                          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                          prefixIcon: Icon(Icons.location_on),
-                        ),
-                        hint: const Text('Select a delivery address'),
-                        items: [
-                          const DropdownMenuItem<String>(
-                            value: null,
-                            child: Text('Select a delivery address'),
-                          ),
-                          ..._userAddresses.map((address) {
-                            final addressText = '${address['firstName']} ${address['lastName']} - ${address['city']}, ${address['state']}';
-                            return DropdownMenuItem<String>(
-                              value: address['id'],
-                              child: Text(addressText),
-                            );
-                          }).toList(),
-                        ],
-                        onChanged: (value) {
-                          _selectAddress(value);
-                        },
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please select a delivery address';
-                          }
-                          return null;
-                        },
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    SizedBox(
-                      width: double.infinity,
-                      child: OutlinedButton.icon(
-                        onPressed: _addNewAddress,
-                        icon: const Icon(Icons.add_location),
-                        label: const Text('Add New Address'),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: Theme.of(context).primaryColor,
-                          side: BorderSide(color: Theme.of(context).primaryColor),
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              if (_selectedAddressText.isNotEmpty) ...[
-                const SizedBox(height: 12),
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[50],
-                    border: Border.all(color: Colors.grey[200]!),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Selected Address:',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        _selectedAddressText,
-                        style: const TextStyle(fontSize: 14),
-                      ),
-                    ],
+              if (isRequired) ...[
+                const SizedBox(width: 4),
+                Text(
+                  '*',
+                  style: TextStyle(
+                    color: Colors.red[400],
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ],
             ],
           ),
+          const SizedBox(height: 8),
+          // Text field
+          TextFormField(
+            controller: controller,
+            keyboardType: keyboardType,
+            validator: validator,
+            style: const TextStyle(
+              fontSize: 16,
+              color: Colors.black87,
+            ),
+            decoration: InputDecoration(
+              hintText: hint,
+              hintStyle: TextStyle(
+                color: Colors.grey[500],
+                fontSize: 16,
+              ),
+              filled: true,
+              fillColor: Colors.grey[50],
+              prefixText: prefixText,
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 16,
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Colors.grey[200]!),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(
+                  color: iconColor,
+                  width: 2,
+                ),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Colors.grey[200]!),
+              ),
+              errorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Colors.red[300]!),
+              ),
+              focusedErrorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Colors.red[500]!, width: 2),
+              ),
+            ),
+            onChanged: (value) => _updateFormData(),
+          ),
         ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Form(
+      key: _formKey,
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            // Form Container similar to address_form_screen
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.08),
+                      blurRadius: 12,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    children: [
+                      // First Name
+                      _buildSimpleTextField(
+                        controller: _firstNameController,
+                        label: 'First Name',
+                        hint: 'Enter your first name',
+                        icon: Icons.person_outline,
+                        iconColor: const Color(0xFF1976D2),
+                        backgroundColor: const Color(0xFFE3F2FD),
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return 'Please enter your first name';
+                          }
+                          return null;
+                        },
+                      ),
+
+                      // Last Name
+                      _buildSimpleTextField(
+                        controller: _lastNameController,
+                        label: 'Last Name',
+                        hint: 'Enter your last name',
+                        icon: Icons.person_outline,
+                        iconColor: const Color(0xFF7B1FA2),
+                        backgroundColor: const Color(0xFFF3E5F5),
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return 'Please enter your last name';
+                          }
+                          return null;
+                        },
+                      ),
+
+                      // Mobile Number
+                      _buildSimpleTextField(
+                        controller: _mobileController,
+                        label: 'Mobile Number',
+                        hint: 'Enter your mobile number',
+                        icon: Icons.phone_outlined,
+                        iconColor: const Color(0xFFF57C00),
+                        backgroundColor: const Color(0xFFFFF3E0),
+                        keyboardType: TextInputType.phone,
+                        prefixText: '+91 ',
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return 'Please enter your mobile number';
+                          }
+                          if (!validateMobile(value)) {
+                            return 'Please enter a valid mobile number';
+                          }
+                          return null;
+                        },
+                      ),
+
+                      // Email Address
+                      _buildSimpleTextField(
+                        controller: _emailController,
+                        label: 'Email Address',
+                        hint: 'Enter your email address',
+                        icon: Icons.email_outlined,
+                        iconColor: const Color(0xFF388E3C),
+                        backgroundColor: const Color(0xFFE8F5E8),
+                        keyboardType: TextInputType.emailAddress,
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return 'Please enter your email address';
+                          }
+                          if (!validateEmail(value)) {
+                            return 'Please enter a valid email address';
+                          }
+                          return null;
+                        },
+                      ),
+
+                      // Delivery Address Section
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.location_on_outlined,
+                                color: const Color(0xFF1976D2),
+                                size: 20,
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  'Delivery Address',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.grey[600],
+                                  ),
+                                ),
+                              ),
+                              Text(
+                                '*',
+                                style: TextStyle(
+                                  color: Colors.red[400],
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+
+                          if (_isLoadingAddresses)
+                            Container(
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: Colors.grey[50],
+                                border: Border.all(color: Colors.grey[200]!),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Row(
+                                children: [
+                                  const SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(strokeWidth: 2),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Text(
+                                      'Loading addresses...',
+                                      style: TextStyle(color: Colors.grey[600]),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                          else if (_userAddresses.isEmpty)
+                            Column(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(16),
+                                  decoration: BoxDecoration(
+                                    color: Colors.orange[50],
+                                    border: Border.all(color: Colors.orange[200]!),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.info_outline, color: Colors.orange[600], size: 20),
+                                      const SizedBox(width: 12),
+                                      Expanded(
+                                        child: Text(
+                                          'No addresses found. Add a new address to continue.',
+                                          style: TextStyle(color: Colors.orange[600]),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(height: 12),
+                                SizedBox(
+                                  width: double.infinity,
+                                  child: ElevatedButton.icon(
+                                    onPressed: _addNewAddress,
+                                    icon: const Icon(Icons.add_location),
+                                    label: const Text('Add New Address'),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Theme.of(context).primaryColor,
+                                      foregroundColor: Colors.white,
+                                      padding: const EdgeInsets.symmetric(vertical: 16),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            )
+                          else
+                            Column(
+                              children: [
+                                DropdownButtonFormField<String>(
+                                  value: _selectedAddressId,
+                                  decoration: InputDecoration(
+                                    hintText: 'Choose a delivery address',
+                                    filled: true,
+                                    fillColor: Colors.grey[50],
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                      vertical: 16,
+                                    ),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: BorderSide(color: Colors.grey[200]!),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: BorderSide(
+                                        color: const Color(0xFF1976D2),
+                                        width: 2,
+                                      ),
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: BorderSide(color: Colors.grey[200]!),
+                                    ),
+                                  ),
+                                  items: [
+                                    const DropdownMenuItem<String>(
+                                      value: null,
+                                      child: Text('Select a delivery address'),
+                                    ),
+                                    ..._userAddresses.map((address) {
+                                      final addressText = '${address['firstName']} ${address['lastName']} - ${address['city']}, ${address['state']}';
+                                      return DropdownMenuItem<String>(
+                                        value: address['id'],
+                                        child: Text(addressText),
+                                      );
+                                    }).toList(),
+                                  ],
+                                  onChanged: (value) {
+                                    _selectAddress(value);
+                                  },
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please select a delivery address';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                                const SizedBox(height: 12),
+                                SizedBox(
+                                  width: double.infinity,
+                                  child: OutlinedButton.icon(
+                                    onPressed: _addNewAddress,
+                                    icon: const Icon(Icons.add_location),
+                                    label: const Text('Add New Address'),
+                                    style: OutlinedButton.styleFrom(
+                                      foregroundColor: Theme.of(context).primaryColor,
+                                      side: BorderSide(color: Theme.of(context).primaryColor),
+                                      padding: const EdgeInsets.symmetric(vertical: 16),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+
+                          if (_selectedAddressText.isNotEmpty) ...[
+                            const SizedBox(height: 16),
+                            Container(
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: Colors.green[50],
+                                border: Border.all(color: Colors.green[200]!),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Icon(Icons.check_circle, color: Colors.green[600], size: 20),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: Text(
+                                          'Selected Address:',
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.grey[700],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    _selectedAddressText,
+                                    style: const TextStyle(fontSize: 14),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+          ],
+        ),
       ),
     );
   }

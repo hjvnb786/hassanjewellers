@@ -205,7 +205,7 @@ class _JoinNewSchemeScreenState extends State<JoinNewSchemeScreen> {
               children: [
                 // Step 1: User Details
                 SingleChildScrollView(
-                  padding: const EdgeInsets.all(20),
+                  //padding: const EdgeInsets.all(10),
                   child: UserDetailsForm(
                     formData: _formData,
                     onDataChanged: _updateFormData,
