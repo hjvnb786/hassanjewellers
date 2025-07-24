@@ -64,25 +64,115 @@ class _AddressFormScreenState extends State<AddressFormScreen> {
     super.dispose();
   }
 
+  // Simple text field widget inspired by account_screen
+  Widget _buildSimpleTextField({
+    required TextEditingController controller,
+    required String label,
+    required String hint,
+    required IconData icon,
+    required Color iconColor,
+    required Color backgroundColor,
+    TextInputType? keyboardType,
+    String? Function(String?)? validator,
+    bool isRequired = true,
+  }) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Label with icon
+          Row(
+            children: [
+              Icon(
+                icon,
+                color: iconColor,
+                size: 20,
+              ),
+              const SizedBox(width: 12),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey[600],
+                ),
+              ),
+              if (isRequired) ...[
+                const SizedBox(width: 4),
+                Text(
+                  '*',
+                  style: TextStyle(
+                    color: Colors.red[400],
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ],
+          ),
+          const SizedBox(height: 8),
+          // Text field
+          TextFormField(
+            controller: controller,
+            keyboardType: keyboardType,
+            validator: validator,
+            style: const TextStyle(
+              fontSize: 16,
+              color: Colors.black87,
+            ),
+            decoration: InputDecoration(
+              hintText: hint,
+              hintStyle: TextStyle(
+                color: Colors.grey[500],
+                fontSize: 16,
+              ),
+              filled: true,
+              fillColor: Colors.grey[50],
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 16,
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Colors.grey[200]!),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(
+                  color: iconColor,
+                  width: 2,
+                ),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Colors.grey[200]!),
+              ),
+              errorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Colors.red[300]!),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(_isEditMode ? 'Edit Address' : 'Add Address'),
-        elevation: 0,
-        backgroundColor: Theme.of(context).primaryColor,
-        foregroundColor: Colors.white,
-      ),
+      backgroundColor: Colors.grey[100],
+      appBar: null,
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.zero,
         child: Form(
           key: _formKey,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header
+              // Combined Header with App Bar
               Container(
-                padding: const EdgeInsets.all(20),
+                width: double.infinity,
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
@@ -92,240 +182,97 @@ class _AddressFormScreenState extends State<AddressFormScreen> {
                       Theme.of(context).primaryColor.withOpacity(0.8),
                     ],
                   ),
-                  borderRadius: BorderRadius.circular(16),
                 ),
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Icon(
-                        Icons.location_on_outlined,
-                        color: Colors.white,
-                        size: 24,
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            _isEditMode ? 'Edit Address' : 'Add New Address',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            _isEditMode 
-                                ? 'Update your delivery address details'
-                                : 'Enter your delivery address details',
-                            style: const TextStyle(
-                              color: Colors.white70,
-                              fontSize: 14,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
-
-              // Address Form
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.08),
-                      blurRadius: 12,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(20),
+                child: SafeArea(
                   child: Column(
                     children: [
-                      // First Name
-                      TextFormField(
-                        controller: _firstNameController,
-                        decoration: const InputDecoration(
-                          labelText: 'First Name *',
-                          hintText: 'Enter your first name',
-                          prefixIcon: Icon(Icons.person_outlined),
-                          border: OutlineInputBorder(),
+                      // App Bar Section
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        child: Row(
+                          children: [
+                            IconButton(
+                              icon: Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: const Icon(Icons.arrow_back_ios, color: Colors.white, size: 20),
+                              ),
+                              onPressed: () => Navigator.of(context).pop(),
+                            ),
+                            Expanded(
+                              child: Text(
+                                _isEditMode ? 'Edit Address' : 'Add Address',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 20,
+                                  color: Colors.white,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: const Icon(
+                                Icons.location_on_outlined,
+                                color: Colors.white,
+                                size: 20,
+                              ),
+                            ),
+                          ],
                         ),
-                        validator: (value) {
-                          if (value == null || value.trim().isEmpty) {
-                            return 'Please enter your first name';
-                          }
-                          return null;
-                        },
                       ),
-                      const SizedBox(height: 16),
-
-                      // Last Name
-                      TextFormField(
-                        controller: _lastNameController,
-                        decoration: const InputDecoration(
-                          labelText: 'Last Name *',
-                          hintText: 'Enter your last name',
-                          prefixIcon: Icon(Icons.person_outlined),
-                          border: OutlineInputBorder(),
+                      // Header Content Section
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: const Icon(
+                                Icons.location_on_outlined,
+                                color: Colors.white,
+                                size: 24,
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    _isEditMode ? 'Edit Address' : 'Add New Address',
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    _isEditMode 
+                                        ? 'Update your delivery address details'
+                                        : 'Enter your delivery address details',
+                                    style: const TextStyle(
+                                      color: Colors.white70,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
-                        validator: (value) {
-                          if (value == null || value.trim().isEmpty) {
-                            return 'Please enter your last name';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 16),
-
-                      // Apt/Floor/Door Number
-                      TextFormField(
-                        controller: _aptFloorDoorController,
-                        decoration: const InputDecoration(
-                          labelText: 'Apt/Floor/Door Number *',
-                          hintText: 'Enter apartment, floor, or door number',
-                          prefixIcon: Icon(Icons.home_outlined),
-                          border: OutlineInputBorder(),
-                        ),
-                        validator: (value) {
-                          if (value == null || value.trim().isEmpty) {
-                            return 'Please enter apartment/floor/door number';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 16),
-
-                      // Street Name
-                      TextFormField(
-                        controller: _streetNameController,
-                        decoration: const InputDecoration(
-                          labelText: 'Street Name *',
-                          hintText: 'Enter your street name',
-                          prefixIcon: Icon(Icons.streetview_outlined),
-                          border: OutlineInputBorder(),
-                        ),
-                        validator: (value) {
-                          if (value == null || value.trim().isEmpty) {
-                            return 'Please enter your street name';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 16),
-
-                      // City
-                      TextFormField(
-                        controller: _cityController,
-                        decoration: const InputDecoration(
-                          labelText: 'City *',
-                          hintText: 'Enter your city',
-                          prefixIcon: Icon(Icons.location_city_outlined),
-                          border: OutlineInputBorder(),
-                        ),
-                        validator: (value) {
-                          if (value == null || value.trim().isEmpty) {
-                            return 'Please enter your city';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 16),
-
-                      // State
-                      TextFormField(
-                        controller: _stateController,
-                        decoration: const InputDecoration(
-                          labelText: 'State *',
-                          hintText: 'Enter your state',
-                          prefixIcon: Icon(Icons.map_outlined),
-                          border: OutlineInputBorder(),
-                        ),
-                        validator: (value) {
-                          if (value == null || value.trim().isEmpty) {
-                            return 'Please enter your state';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 16),
-
-                      // Pincode
-                      TextFormField(
-                        controller: _pincodeController,
-                        decoration: const InputDecoration(
-                          labelText: 'Pincode *',
-                          hintText: 'Enter your pincode',
-                          prefixIcon: Icon(Icons.pin_drop_outlined),
-                          border: OutlineInputBorder(),
-                        ),
-                        keyboardType: TextInputType.number,
-                        validator: (value) {
-                          if (value == null || value.trim().isEmpty) {
-                            return 'Please enter your pincode';
-                          }
-                          if (value.length != 6) {
-                            return 'Pincode must be 6 digits';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 16),
-
-                      // Mobile Number
-                      TextFormField(
-                        controller: _mobileController,
-                        decoration: const InputDecoration(
-                          labelText: 'Mobile Number *',
-                          hintText: 'Enter your mobile number',
-                          prefixIcon: Icon(Icons.phone_outlined),
-                          border: OutlineInputBorder(),
-                        ),
-                        keyboardType: TextInputType.phone,
-                        validator: (value) {
-                          if (value == null || value.trim().isEmpty) {
-                            return 'Please enter your mobile number';
-                          }
-                          if (value.length != 10) {
-                            return 'Mobile number must be 10 digits';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 16),
-
-                      // Alternative Mobile Number
-                      TextFormField(
-                        controller: _alternativeMobileController,
-                        decoration: const InputDecoration(
-                          labelText: 'Alternative Mobile Number (Optional)',
-                          hintText: 'Enter alternative mobile number',
-                          prefixIcon: Icon(Icons.phone_outlined),
-                          border: OutlineInputBorder(),
-                        ),
-                        keyboardType: TextInputType.phone,
-                        validator: (value) {
-                          if (value != null && value.trim().isNotEmpty) {
-                            if (value.length != 10) {
-                              return 'Mobile number must be 10 digits';
-                            }
-                          }
-                          return null;
-                        },
                       ),
                     ],
                   ),
@@ -333,38 +280,234 @@ class _AddressFormScreenState extends State<AddressFormScreen> {
               ),
               const SizedBox(height: 24),
 
-              // Save Button
-              SizedBox(
-                width: double.infinity,
-                height: 56,
-                child: ElevatedButton(
-                  onPressed: _isLoading ? null : _saveAddress,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).primaryColor,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    elevation: 0,
+              // Form Container similar to account_screen
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.08),
+                        blurRadius: 12,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
                   ),
-                  child: _isLoading
-                      ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                          ),
-                        )
-                      : Text(
-                          _isEditMode ? 'Update Address' : 'Save Address',
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                          ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      children: [
+                        // First Name
+                        _buildSimpleTextField(
+                          controller: _firstNameController,
+                          label: 'First Name',
+                          hint: 'Enter your first name',
+                          icon: Icons.person_outline,
+                          iconColor: const Color(0xFF1976D2),
+                          backgroundColor: const Color(0xFFE3F2FD),
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return 'Please enter your first name';
+                            }
+                            return null;
+                          },
                         ),
+
+                        // Last Name
+                        _buildSimpleTextField(
+                          controller: _lastNameController,
+                          label: 'Last Name',
+                          hint: 'Enter your last name',
+                          icon: Icons.person_outline,
+                          iconColor: const Color(0xFF7B1FA2),
+                          backgroundColor: const Color(0xFFF3E5F5),
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return 'Please enter your last name';
+                            }
+                            return null;
+                          },
+                        ),
+
+                        // Apt/Floor/Door Number
+                        _buildSimpleTextField(
+                          controller: _aptFloorDoorController,
+                          label: 'Apt/Floor/Door Number',
+                          hint: 'Enter apartment, floor, or door number',
+                          icon: Icons.home_outlined,
+                          iconColor: const Color(0xFFF57C00),
+                          backgroundColor: const Color(0xFFFFF3E0),
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return 'Please enter apartment/floor/door number';
+                            }
+                            return null;
+                          },
+                        ),
+
+                        // Street Name
+                        _buildSimpleTextField(
+                          controller: _streetNameController,
+                          label: 'Street Name',
+                          hint: 'Enter your street name',
+                          icon: Icons.streetview_outlined,
+                          iconColor: const Color(0xFF388E3C),
+                          backgroundColor: const Color(0xFFE8F5E8),
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return 'Please enter your street name';
+                            }
+                            return null;
+                          },
+                        ),
+
+                        // City
+                        _buildSimpleTextField(
+                          controller: _cityController,
+                          label: 'City',
+                          hint: 'Enter your city',
+                          icon: Icons.location_city_outlined,
+                          iconColor: const Color(0xFF0097A7),
+                          backgroundColor: const Color(0xFFE1F5FE),
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return 'Please enter your city';
+                            }
+                            return null;
+                          },
+                        ),
+
+                        // State
+                        _buildSimpleTextField(
+                          controller: _stateController,
+                          label: 'State',
+                          hint: 'Enter your state',
+                          icon: Icons.map_outlined,
+                          iconColor: const Color(0xFFD32F2F),
+                          backgroundColor: const Color(0xFFFFEBEE),
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return 'Please enter your state';
+                            }
+                            return null;
+                          },
+                        ),
+
+                        // Pincode
+                        _buildSimpleTextField(
+                          controller: _pincodeController,
+                          label: 'Pincode',
+                          hint: 'Enter your pincode',
+                          icon: Icons.pin_drop_outlined,
+                          iconColor: const Color(0xFF8E24AA),
+                          backgroundColor: const Color(0xFFF3E5F5),
+                          keyboardType: TextInputType.number,
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return 'Please enter your pincode';
+                            }
+                            if (value.length != 6) {
+                              return 'Pincode must be 6 digits';
+                            }
+                            return null;
+                          },
+                        ),
+
+                        // Mobile Number
+                        _buildSimpleTextField(
+                          controller: _mobileController,
+                          label: 'Mobile Number',
+                          hint: 'Enter your mobile number',
+                          icon: Icons.phone_outlined,
+                          iconColor: const Color(0xFF2E7D32),
+                          backgroundColor: const Color(0xFFE8F5E8),
+                          keyboardType: TextInputType.phone,
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return 'Please enter your mobile number';
+                            }
+                            if (value.length != 10) {
+                              return 'Mobile number must be 10 digits';
+                            }
+                            return null;
+                          },
+                        ),
+
+                        // Alternative Mobile Number
+                        _buildSimpleTextField(
+                          controller: _alternativeMobileController,
+                          label: 'Alternative Mobile Number',
+                          hint: 'Enter alternative mobile number (optional)',
+                          icon: Icons.phone_outlined,
+                          iconColor: const Color(0xFF1565C0),
+                          backgroundColor: const Color(0xFFE3F2FD),
+                          keyboardType: TextInputType.phone,
+                          isRequired: false,
+                          validator: (value) {
+                            if (value != null && value.trim().isNotEmpty) {
+                              if (value.length != 10) {
+                                return 'Mobile number must be 10 digits';
+                              }
+                            }
+                            return null;
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
+              const SizedBox(height: 24),
+
+              // Save Button similar to account_screen style
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 56,
+                  child: ElevatedButton(
+                    onPressed: _isLoading ? null : _saveAddress,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Theme.of(context).primaryColor,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: _isLoading
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                            ),
+                          )
+                        : Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                _isEditMode ? Icons.update : Icons.save,
+                                color: Colors.white,
+                                size: 20,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                _isEditMode ? 'Update Address' : 'Save Address',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
             ],
           ),
         ),
