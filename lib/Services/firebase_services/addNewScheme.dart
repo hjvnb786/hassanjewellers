@@ -40,7 +40,7 @@ Future<String?> addNewScheme(Map<String, dynamic> schemeData) async {
       "installmentAmount": schemeAmount,
       ...schemeData,
       "progress": generateProgress(),
-      "isActive": true,
+      "status": true,
       "createdAt": FieldValue.serverTimestamp()
     });
     
@@ -52,4 +52,4 @@ Future<String?> addNewScheme(Map<String, dynamic> schemeData) async {
     print('❌ Error adding new scheme: $e');
     return null; // Return null to indicate failure
   }
-} 
+}
