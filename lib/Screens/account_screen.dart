@@ -267,12 +267,12 @@ class _AccountScreenState extends State<AccountScreen> {
                                         Container(
                                           padding: const EdgeInsets.all(12),
                                           decoration: BoxDecoration(
-                                            color: Theme.of(context).primaryColor.withOpacity(0.1),
+                                            color: const Color(0xFFFFF3E0), // Light orange
                                             borderRadius: BorderRadius.circular(12),
                                           ),
                                           child: Icon(
                                             Icons.point_of_sale,
-                                            color: Theme.of(context).primaryColor,
+                                            color: const Color(0xFFF57C00), // Orange
                                             size: 24,
                                           ),
                                         ),
@@ -402,12 +402,12 @@ class _AccountScreenState extends State<AccountScreen> {
                                 Container(
                                   padding: const EdgeInsets.all(12),
                                   decoration: BoxDecoration(
-                                    color: Theme.of(context).primaryColor.withOpacity(0.1),
+                                    color: const Color(0xFFE1F5FE), // Light cyan
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: Icon(
                                     Icons.add_location_outlined,
-                                    color: Theme.of(context).primaryColor,
+                                    color: const Color(0xFF0097A7), // Cyan
                                     size: 24,
                                   ),
                                 ),
@@ -513,22 +513,49 @@ class _AccountScreenState extends State<AccountScreen> {
     required String title,
     required String content,
   }) {
+    // Define different light colors for each icon based on title
+    Color getIconColor(String title) {
+      switch (title.toLowerCase()) {
+        case 'name':
+          return const Color(0xFFE3F2FD); // Light blue
+        case 'phone':
+          return const Color(0xFFF3E5F5); // Light purple
+        case 'email':
+          return const Color(0xFFE8F5E8); // Light green
+        default:
+          return Theme.of(context).primaryColor.withOpacity(0.1);
+      }
+    }
+
+    Color getIconTintColor(String title) {
+      switch (title.toLowerCase()) {
+        case 'name':
+          return const Color(0xFF1976D2); // Blue
+        case 'phone':
+          return const Color(0xFF7B1FA2); // Purple
+        case 'email':
+          return const Color(0xFF388E3C); // Green
+        default:
+          return Theme.of(context).primaryColor;
+      }
+    }
+
     return Container(
       padding: const EdgeInsets.all(16),
       child: Row(
         children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Theme.of(context).primaryColor.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12),
+                      Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: getIconColor(title),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(
+                icon,
+                color: getIconTintColor(title),
+                size: 24,
+              ),
             ),
-            child: Icon(
-              icon,
-              color: Theme.of(context).primaryColor,
-              size: 24,
-            ),
-          ),
           const SizedBox(width: 16),
           Expanded(
             child: Column(
@@ -564,6 +591,37 @@ class _AccountScreenState extends State<AccountScreen> {
     required VoidCallback onTap,
     bool isLogout = false,
   }) {
+    // Define different light colors for action icons based on title
+    Color getActionIconColor(String title) {
+      switch (title.toLowerCase()) {
+        case 'share app':
+          return const Color(0xFFE8F5E8); // Light green
+        case 'visit our store':
+          return const Color(0xFFE3F2FD); // Light blue
+        case 'request help':
+          return const Color(0xFFFFF3E0); // Light orange
+        case 'log out':
+          return const Color(0xFFFFEBEE); // Light red
+        default:
+          return Theme.of(context).primaryColor.withOpacity(0.1);
+      }
+    }
+
+    Color getActionIconTintColor(String title) {
+      switch (title.toLowerCase()) {
+        case 'share app':
+          return const Color(0xFF388E3C); // Green
+        case 'visit our store':
+          return const Color(0xFF1976D2); // Blue
+        case 'request help':
+          return const Color(0xFFF57C00); // Orange
+        case 'log out':
+          return const Color(0xFFD32F2F); // Red
+        default:
+          return Theme.of(context).primaryColor;
+      }
+    }
+
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
@@ -574,14 +632,12 @@ class _AccountScreenState extends State<AccountScreen> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: isLogout 
-                    ? Colors.red.withOpacity(0.1)
-                    : Theme.of(context).primaryColor.withOpacity(0.1),
+                color: getActionIconColor(title),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(
                 icon,
-                color: isLogout ? Colors.red[400] : Theme.of(context).primaryColor,
+                color: getActionIconTintColor(title),
                 size: 24,
               ),
             ),
@@ -595,7 +651,7 @@ class _AccountScreenState extends State<AccountScreen> {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
-                      color: isLogout ? Colors.red[400] : null,
+                      color: isLogout ? getActionIconTintColor(title) : null,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -741,13 +797,13 @@ class _AccountScreenState extends State<AccountScreen> {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).primaryColor.withOpacity(0.1),
+                  color: const Color(0xFFFFF3E0), // Light orange
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
                   Icons.help_outline,
                   size: 32,
-                  color: Theme.of(context).primaryColor,
+                  color: const Color(0xFFF57C00), // Orange
                 ),
               ),
               const SizedBox(height: 20),
@@ -790,7 +846,7 @@ class _AccountScreenState extends State<AccountScreen> {
                       child: Container(
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         decoration: BoxDecoration(
-                          color: Theme.of(context).primaryColor.withOpacity(0.1),
+                          color: const Color(0xFFF3E5F5), // Light purple
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Column(
@@ -798,7 +854,7 @@ class _AccountScreenState extends State<AccountScreen> {
                             Icon(
                               Icons.phone,
                               size: 32,
-                              color: Theme.of(context).primaryColor,
+                              color: const Color(0xFF7B1FA2), // Purple
                             ),
                             const SizedBox(height: 8),
                             const Text(
@@ -841,7 +897,7 @@ class _AccountScreenState extends State<AccountScreen> {
                       child: Container(
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         decoration: BoxDecoration(
-                          color: Colors.green.withOpacity(0.1),
+                          color: const Color(0xFFE8F5E8), // Light green
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Column(
@@ -849,7 +905,7 @@ class _AccountScreenState extends State<AccountScreen> {
                             Icon(
                               Icons.message,
                               size: 32,
-                              color: Colors.green[600],
+                              color: const Color(0xFF388E3C), // Green
                             ),
                             const SizedBox(height: 8),
                             const Text(
