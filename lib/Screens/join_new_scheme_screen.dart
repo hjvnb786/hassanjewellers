@@ -227,13 +227,15 @@ class _JoinNewSchemeScreenState extends State<JoinNewSchemeScreen> {
                                 ),
                                 const SizedBox(height: 16),
                                 // Progress Bar
-                                LinearProgressIndicator(
-                                  value: (_currentStep + 1) / 4,
-                                  backgroundColor: Colors.grey[200],
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                    _currentStep < 3 
-                                        ? getStepColor(_currentStep + 1)
-                                        : getStepColor(_currentStep),
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: LinearProgressIndicator(
+                                    value: (_currentStep + 1) / 4,
+                                    backgroundColor: Colors.grey[200],
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      getStepColor(_currentStep),
+                                    ),
+                                    minHeight: 10,
                                   ),
                                 ),
                               ],
@@ -368,13 +370,15 @@ class _JoinNewSchemeScreenState extends State<JoinNewSchemeScreen> {
                                 ),
                                 const SizedBox(height: 16),
                                 // Progress Bar
-                                LinearProgressIndicator(
-                                  value: (_currentStep + 1) / 4,
-                                  backgroundColor: Colors.grey[200],
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                    _currentStep < 3 
-                                        ? getStepColor(_currentStep + 1)
-                                        : getStepColor(_currentStep),
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: LinearProgressIndicator(
+                                    value: (_currentStep + 1) / 4,
+                                    backgroundColor: Colors.grey[200],
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      getStepColor(_currentStep),
+                                    ),
+                                    minHeight: 10,
                                   ),
                                 ),
                               ],
@@ -509,13 +513,15 @@ class _JoinNewSchemeScreenState extends State<JoinNewSchemeScreen> {
                                 ),
                                 const SizedBox(height: 16),
                                 // Progress Bar
-                                LinearProgressIndicator(
-                                  value: (_currentStep + 1) / 4,
-                                  backgroundColor: Colors.grey[200],
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                    _currentStep < 3 
-                                        ? getStepColor(_currentStep + 1)
-                                        : getStepColor(_currentStep),
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: LinearProgressIndicator(
+                                    value: (_currentStep + 1) / 4,
+                                    backgroundColor: Colors.grey[200],
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      getStepColor(_currentStep),
+                                    ),
+                                    minHeight: 10,
                                   ),
                                 ),
                               ],
@@ -650,13 +656,15 @@ class _JoinNewSchemeScreenState extends State<JoinNewSchemeScreen> {
                                 ),
                                 const SizedBox(height: 16),
                                 // Progress Bar
-                                LinearProgressIndicator(
-                                  value: (_currentStep + 1) / 4,
-                                  backgroundColor: Colors.grey[200],
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                    _currentStep < 3 
-                                        ? getStepColor(_currentStep + 1)
-                                        : getStepColor(_currentStep),
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: LinearProgressIndicator(
+                                    value: (_currentStep + 1) / 4,
+                                    backgroundColor: Colors.grey[200],
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      getStepColor(_currentStep),
+                                    ),
+                                    minHeight: 10,
                                   ),
                                 ),
                               ],
