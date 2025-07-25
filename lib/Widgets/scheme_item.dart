@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hassanjewellers/Screens/scheme_progress_screen.dart';
+import 'package:hassanjewellers/Utils/Constants/colors.dart';
 
 class SchemeItem extends StatelessWidget {
   final String id;
@@ -43,7 +44,7 @@ class SchemeItem extends StatelessWidget {
 
   // Get color based on progress
   Color getProgressColor(double progressPercentage) {
-    return const Color(0xFFD4AF37); // App's primary gold color
+    return AppColors.primary; // Use app's primary color
   }
 
   // Get icon based on progress
@@ -124,10 +125,10 @@ class SchemeItem extends StatelessWidget {
                       children: [
                         Text(
                           name,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color: Colors.black87,
+                            color: AppColors.text,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -137,7 +138,7 @@ class SchemeItem extends StatelessWidget {
                           amount,
                           style: TextStyle(
                             fontSize: 16,
-                            color: Colors.grey[600],
+                            color: AppColors.textSecondary,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -164,7 +165,7 @@ class SchemeItem extends StatelessWidget {
                   // Clickable indicator
                   Icon(
                     Icons.chevron_right,
-                    color: Colors.grey[400],
+                    color: AppColors.textSecondary,
                     size: 20,
                   ),
                 ],
@@ -177,7 +178,7 @@ class SchemeItem extends StatelessWidget {
                 child: LinearProgressIndicator(
                   value: progressPercentage,
                   minHeight: 8,
-                  backgroundColor: Colors.grey[200],
+                  backgroundColor: AppColors.progressBackground,
                   valueColor: AlwaysStoppedAnimation<Color>(progressColor),
                 ),
               ),
@@ -199,7 +200,7 @@ class SchemeItem extends StatelessWidget {
                         '$progressNumber of 12 installments paid',
                         style: TextStyle(
                           fontSize: 14,
-                          color: Colors.grey[600],
+                          color: AppColors.textSecondary,
                         ),
                       ),
                     ],
