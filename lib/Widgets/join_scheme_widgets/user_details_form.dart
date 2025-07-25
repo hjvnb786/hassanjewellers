@@ -319,15 +319,14 @@ class _UserDetailsFormState extends State<UserDetailsForm> {
                                 size: 20,
                               ),
                               const SizedBox(width: 12),
-                              Expanded(
-                                child: Text(
-                                  'Delivery Address',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.grey[600],
-                                  ),
+                              Text(
+                                'Delivery Address',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey[600],
                                 ),
                               ),
+                              const SizedBox(width: 4),
                               Text(
                                 '*',
                                 style: TextStyle(
@@ -412,40 +411,76 @@ class _UserDetailsFormState extends State<UserDetailsForm> {
                               children: [
                                 DropdownButtonFormField<String>(
                                   value: _selectedAddressId,
+                                  isExpanded: true,
                                   decoration: InputDecoration(
                                     hintText: 'Choose a delivery address',
+                                    hintStyle: TextStyle(
+                                      color: Colors.grey[500],
+                                      fontSize: 16,
+                                    ),
                                     filled: true,
-                                    fillColor: Colors.grey[50],
+                                    fillColor: Colors.white,
                                     contentPadding: const EdgeInsets.symmetric(
                                       horizontal: 16,
                                       vertical: 16,
                                     ),
                                     border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                      borderSide: BorderSide(color: Colors.grey[200]!),
+                                      borderRadius: BorderRadius.circular(16),
+                                      borderSide: BorderSide(color: Colors.grey[300]!),
                                     ),
                                     focusedBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12),
+                                      borderRadius: BorderRadius.circular(16),
                                       borderSide: BorderSide(
                                         color: const Color(0xFF1976D2),
                                         width: 2,
                                       ),
                                     ),
                                     enabledBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                      borderSide: BorderSide(color: Colors.grey[200]!),
+                                      borderRadius: BorderRadius.circular(16),
+                                      borderSide: BorderSide(color: Colors.grey[300]!),
+                                    ),
+                                    errorBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                      borderSide: BorderSide(color: Colors.red[300]!),
+                                    ),
+                                    focusedErrorBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                      borderSide: BorderSide(color: Colors.red[500]!, width: 2),
+                                    ),
+                                    suffixIcon: Container(
+                                      margin: const EdgeInsets.only(right: 8),
+                                      child: Icon(
+                                        Icons.keyboard_arrow_down,
+                                        color: Colors.grey[600],
+                                        size: 24,
+                                      ),
                                     ),
                                   ),
+                                  dropdownColor: Colors.white,
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.black87,
+                                  ),
+                                  icon: const SizedBox.shrink(), // Hide default icon
+                                  menuMaxHeight: 200,
+                                  elevation: 8,
+                                  borderRadius: BorderRadius.circular(16),
                                   items: [
-                                    const DropdownMenuItem<String>(
+                                    DropdownMenuItem<String>(
                                       value: null,
-                                      child: Text('Select a delivery address'),
+                                      child: Text(
+                                        'Select a delivery address',
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
                                     ),
                                     ..._userAddresses.map((address) {
-                                      final addressText = '${address['firstName']} ${address['lastName']} - ${address['city']}, ${address['state']}';
+                                      final addressText = '${address['firstName']} ${address['lastName']} - ${address['city']}';
                                       return DropdownMenuItem<String>(
                                         value: address['id'],
-                                        child: Text(addressText),
+                                        child: Text(
+                                          addressText,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
                                       );
                                     }).toList(),
                                   ],
@@ -459,6 +494,45 @@ class _UserDetailsFormState extends State<UserDetailsForm> {
                                     return null;
                                   },
                                 ),
+                                
+                                if (_selectedAddressText.isNotEmpty) ...[
+                                  const SizedBox(height: 16),
+                                  Container(
+                                    padding: const EdgeInsets.all(16),
+                                    decoration: BoxDecoration(
+                                      color: Colors.green[50],
+                                      border: Border.all(color: Colors.green[200]!),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Icon(Icons.check_circle, color: Colors.green[600], size: 20),
+                                            const SizedBox(width: 8),
+                                            Expanded(
+                                              child: Text(
+                                                'Selected Address:',
+                                                style: TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w600,
+                                                  color: Colors.grey[700],
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 8),
+                                        Text(
+                                          _selectedAddressText,
+                                          style: const TextStyle(fontSize: 14),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                                
                                 const SizedBox(height: 12),
                                 SizedBox(
                                   width: double.infinity,
@@ -478,44 +552,6 @@ class _UserDetailsFormState extends State<UserDetailsForm> {
                                 ),
                               ],
                             ),
-
-                          if (_selectedAddressText.isNotEmpty) ...[
-                            const SizedBox(height: 16),
-                            Container(
-                              padding: const EdgeInsets.all(16),
-                              decoration: BoxDecoration(
-                                color: Colors.green[50],
-                                border: Border.all(color: Colors.green[200]!),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Icon(Icons.check_circle, color: Colors.green[600], size: 20),
-                                      const SizedBox(width: 8),
-                                      Expanded(
-                                        child: Text(
-                                          'Selected Address:',
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w600,
-                                            color: Colors.grey[700],
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    _selectedAddressText,
-                                    style: const TextStyle(fontSize: 14),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
                         ],
                       ),
                     ],
