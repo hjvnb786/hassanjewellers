@@ -31,6 +31,27 @@ class _JoinNewSchemeScreenState extends State<JoinNewSchemeScreen> {
     Icons.summarize,
   ];
 
+  // Define unique light-toned colors for each step
+  Color getStepColor(int stepIndex) {
+    switch (stepIndex) {
+      case 0: return const Color(0xFF1976D2); // Blue
+      case 1: return const Color(0xFF7B1FA2); // Purple
+      case 2: return const Color(0xFFF57C00); // Orange
+      case 3: return const Color(0xFF388E3C); // Green
+      default: return const Color(0xFF1976D2);
+    }
+  }
+  
+  Color getStepBackgroundColor(int stepIndex) {
+    switch (stepIndex) {
+      case 0: return const Color(0xFFE3F2FD); // Light Blue
+      case 1: return const Color(0xFFF3E5F5); // Light Purple
+      case 2: return const Color(0xFFFFF3E0); // Light Orange
+      case 3: return const Color(0xFFE8F5E8); // Light Green
+      default: return const Color(0xFFE3F2FD);
+    }
+  }
+
   @override
   void dispose() {
     _pageController.dispose();
@@ -119,84 +140,6 @@ class _JoinNewSchemeScreenState extends State<JoinNewSchemeScreen> {
       ),
       body: Column(
         children: [
-          // Progress Indicator
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: Theme.of(context).primaryColor,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  blurRadius: 4,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Column(
-              children: [
-                // Step Indicators
-                Row(
-                  children: List.generate(4, (index) {
-                    final isActive = index == _currentStep;
-                    final isCompleted = index < _currentStep;
-                    
-                    return Expanded(
-                      child: Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 4),
-                        child: Column(
-                          children: [
-                            Container(
-                              width: 40,
-                              height: 40,
-                              decoration: BoxDecoration(
-                                color: isCompleted
-                                    ? Colors.white
-                                    : isActive
-                                        ? Colors.white
-                                        : Colors.white.withOpacity(0.3),
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: Colors.white,
-                                  width: 2,
-                                ),
-                              ),
-                              child: Icon(
-                                _stepIcons[index],
-                                color: isCompleted || isActive
-                                    ? Theme.of(context).primaryColor
-                                    : Colors.white.withOpacity(0.5),
-                                size: 20,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              _stepTitles[index],
-                              style: TextStyle(
-                                color: isCompleted || isActive
-                                    ? Colors.white
-                                    : Colors.white.withOpacity(0.7),
-                                fontSize: 12,
-                                fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  }),
-                ),
-                const SizedBox(height: 16),
-                // Progress Bar
-                LinearProgressIndicator(
-                  value: (_currentStep + 1) / 4,
-                  backgroundColor: Colors.white.withOpacity(0.3),
-                  valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
-                ),
-              ],
-            ),
-          ),
-          
           // Form Content
           Expanded(
             child: PageView(
@@ -207,6 +150,97 @@ class _JoinNewSchemeScreenState extends State<JoinNewSchemeScreen> {
                 SingleChildScrollView(
                   child: Column(
                     children: [
+                      // Progress Indicator
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.08),
+                                blurRadius: 12,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(20),
+                            child: Column(
+                              children: [
+                                // Step Indicators - Made scrollable
+                                SingleChildScrollView(
+                                  scrollDirection: Axis.horizontal,
+                                  child: Row(
+                                    children: List.generate(4, (index) {
+                                      final isActive = index == _currentStep;
+                                      final isCompleted = index < _currentStep;
+                                      
+                                      return Container(
+                                        width: 80, // Fixed width for each step
+                                        margin: const EdgeInsets.symmetric(horizontal: 4),
+                                        child: Column(
+                                          children: [
+                                            Container(
+                                              width: 40,
+                                              height: 40,
+                                              decoration: BoxDecoration(
+                                                color: isCompleted || isActive
+                                                    ? getStepBackgroundColor(index)
+                                                    : Colors.grey[100],
+                                                shape: BoxShape.circle,
+                                                border: Border.all(
+                                                  color: isCompleted || isActive
+                                                      ? getStepColor(index)
+                                                      : Colors.grey[300]!,
+                                                  width: 2,
+                                                ),
+                                              ),
+                                              child: Icon(
+                                                _stepIcons[index],
+                                                color: isCompleted || isActive
+                                                    ? getStepColor(index)
+                                                    : Colors.grey[400],
+                                                size: 20,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 8),
+                                            Text(
+                                              _stepTitles[index],
+                                              style: TextStyle(
+                                                color: isCompleted || isActive
+                                                    ? getStepColor(index)
+                                                    : Colors.grey[600],
+                                                fontSize: 12,
+                                                fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+                                              ),
+                                              textAlign: TextAlign.center,
+                                              overflow: TextOverflow.ellipsis,
+                                              maxLines: 2,
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    }),
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                                // Progress Bar
+                                LinearProgressIndicator(
+                                  value: (_currentStep + 1) / 4,
+                                  backgroundColor: Colors.grey[200],
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    _currentStep < 3 
+                                        ? getStepColor(_currentStep + 1)
+                                        : getStepColor(_currentStep),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
                       UserDetailsForm(
                         formData: _formData,
                         onDataChanged: _updateFormData,
@@ -255,9 +289,99 @@ class _JoinNewSchemeScreenState extends State<JoinNewSchemeScreen> {
                 
                 // Step 2: Scheme Details
                 SingleChildScrollView(
-                  padding: const EdgeInsets.all(20),
                   child: Column(
                     children: [
+                      // Progress Indicator
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.08),
+                                blurRadius: 12,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(20),
+                            child: Column(
+                              children: [
+                                // Step Indicators - Made scrollable
+                                SingleChildScrollView(
+                                  scrollDirection: Axis.horizontal,
+                                  child: Row(
+                                    children: List.generate(4, (index) {
+                                      final isActive = index == _currentStep;
+                                      final isCompleted = index < _currentStep;
+                                      
+                                      return Container(
+                                        width: 80, // Fixed width for each step
+                                        margin: const EdgeInsets.symmetric(horizontal: 4),
+                                        child: Column(
+                                          children: [
+                                            Container(
+                                              width: 40,
+                                              height: 40,
+                                              decoration: BoxDecoration(
+                                                color: isCompleted || isActive
+                                                    ? getStepBackgroundColor(index)
+                                                    : Colors.grey[100],
+                                                shape: BoxShape.circle,
+                                                border: Border.all(
+                                                  color: isCompleted || isActive
+                                                      ? getStepColor(index)
+                                                      : Colors.grey[300]!,
+                                                  width: 2,
+                                                ),
+                                              ),
+                                              child: Icon(
+                                                _stepIcons[index],
+                                                color: isCompleted || isActive
+                                                    ? getStepColor(index)
+                                                    : Colors.grey[400],
+                                                size: 20,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 8),
+                                            Text(
+                                              _stepTitles[index],
+                                              style: TextStyle(
+                                                color: isCompleted || isActive
+                                                    ? getStepColor(index)
+                                                    : Colors.grey[600],
+                                                fontSize: 12,
+                                                fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+                                              ),
+                                              textAlign: TextAlign.center,
+                                              overflow: TextOverflow.ellipsis,
+                                              maxLines: 2,
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    }),
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                                // Progress Bar
+                                LinearProgressIndicator(
+                                  value: (_currentStep + 1) / 4,
+                                  backgroundColor: Colors.grey[200],
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    _currentStep < 3 
+                                        ? getStepColor(_currentStep + 1)
+                                        : getStepColor(_currentStep),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
                       SchemeDetailsForm(
                         formData: _formData,
                         onDataChanged: _updateFormData,
@@ -304,9 +428,99 @@ class _JoinNewSchemeScreenState extends State<JoinNewSchemeScreen> {
                 
                 // Step 3: Additional Details
                 SingleChildScrollView(
-                  padding: const EdgeInsets.all(20),
                   child: Column(
                     children: [
+                      // Progress Indicator
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.08),
+                                blurRadius: 12,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(20),
+                            child: Column(
+                              children: [
+                                // Step Indicators - Made scrollable
+                                SingleChildScrollView(
+                                  scrollDirection: Axis.horizontal,
+                                  child: Row(
+                                    children: List.generate(4, (index) {
+                                      final isActive = index == _currentStep;
+                                      final isCompleted = index < _currentStep;
+                                      
+                                      return Container(
+                                        width: 80, // Fixed width for each step
+                                        margin: const EdgeInsets.symmetric(horizontal: 4),
+                                        child: Column(
+                                          children: [
+                                            Container(
+                                              width: 40,
+                                              height: 40,
+                                              decoration: BoxDecoration(
+                                                color: isCompleted || isActive
+                                                    ? getStepBackgroundColor(index)
+                                                    : Colors.grey[100],
+                                                shape: BoxShape.circle,
+                                                border: Border.all(
+                                                  color: isCompleted || isActive
+                                                      ? getStepColor(index)
+                                                      : Colors.grey[300]!,
+                                                  width: 2,
+                                                ),
+                                              ),
+                                              child: Icon(
+                                                _stepIcons[index],
+                                                color: isCompleted || isActive
+                                                    ? getStepColor(index)
+                                                    : Colors.grey[400],
+                                                size: 20,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 8),
+                                            Text(
+                                              _stepTitles[index],
+                                              style: TextStyle(
+                                                color: isCompleted || isActive
+                                                    ? getStepColor(index)
+                                                    : Colors.grey[600],
+                                                fontSize: 12,
+                                                fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+                                              ),
+                                              textAlign: TextAlign.center,
+                                              overflow: TextOverflow.ellipsis,
+                                              maxLines: 2,
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    }),
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                                // Progress Bar
+                                LinearProgressIndicator(
+                                  value: (_currentStep + 1) / 4,
+                                  backgroundColor: Colors.grey[200],
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    _currentStep < 3 
+                                        ? getStepColor(_currentStep + 1)
+                                        : getStepColor(_currentStep),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
                       AdditionalDetailsForm(
                         formData: _formData,
                         onDataChanged: _updateFormData,
@@ -353,9 +567,99 @@ class _JoinNewSchemeScreenState extends State<JoinNewSchemeScreen> {
                 
                 // Step 4: Summary
                 SingleChildScrollView(
-                  padding: const EdgeInsets.all(20),
                   child: Column(
                     children: [
+                      // Progress Indicator
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.08),
+                                blurRadius: 12,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(20),
+                            child: Column(
+                              children: [
+                                // Step Indicators - Made scrollable
+                                SingleChildScrollView(
+                                  scrollDirection: Axis.horizontal,
+                                  child: Row(
+                                    children: List.generate(4, (index) {
+                                      final isActive = index == _currentStep;
+                                      final isCompleted = index < _currentStep;
+                                      
+                                      return Container(
+                                        width: 80, // Fixed width for each step
+                                        margin: const EdgeInsets.symmetric(horizontal: 4),
+                                        child: Column(
+                                          children: [
+                                            Container(
+                                              width: 40,
+                                              height: 40,
+                                              decoration: BoxDecoration(
+                                                color: isCompleted || isActive
+                                                    ? getStepBackgroundColor(index)
+                                                    : Colors.grey[100],
+                                                shape: BoxShape.circle,
+                                                border: Border.all(
+                                                  color: isCompleted || isActive
+                                                      ? getStepColor(index)
+                                                      : Colors.grey[300]!,
+                                                  width: 2,
+                                                ),
+                                              ),
+                                              child: Icon(
+                                                _stepIcons[index],
+                                                color: isCompleted || isActive
+                                                    ? getStepColor(index)
+                                                    : Colors.grey[400],
+                                                size: 20,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 8),
+                                            Text(
+                                              _stepTitles[index],
+                                              style: TextStyle(
+                                                color: isCompleted || isActive
+                                                    ? getStepColor(index)
+                                                    : Colors.grey[600],
+                                                fontSize: 12,
+                                                fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+                                              ),
+                                              textAlign: TextAlign.center,
+                                              overflow: TextOverflow.ellipsis,
+                                              maxLines: 2,
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    }),
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                                // Progress Bar
+                                LinearProgressIndicator(
+                                  value: (_currentStep + 1) / 4,
+                                  backgroundColor: Colors.grey[200],
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    _currentStep < 3 
+                                        ? getStepColor(_currentStep + 1)
+                                        : getStepColor(_currentStep),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
                       DetailSummary(
                         formData: _formData,
                         onConfirm: _onConfirm,
