@@ -43,15 +43,7 @@ class SchemeItem extends StatelessWidget {
 
   // Get color based on progress
   Color getProgressColor(double progressPercentage) {
-    if (progressPercentage == 1) {
-      return const Color(0xFF81C784); // Light Green
-    } else if (progressPercentage >= 0.7) {
-      return const Color(0xFF64B5F6); // Light Blue
-    } else if (progressPercentage >= 0.4) {
-      return const Color(0xFFFFB74D); // Light Orange
-    } else {
-      return const Color(0xFFA1887F); // Light Brown
-    }
+    return const Color(0xFFD4AF37); // App's primary gold color
   }
 
   // Get icon based on progress
