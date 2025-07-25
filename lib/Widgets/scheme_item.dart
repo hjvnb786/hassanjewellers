@@ -41,6 +41,32 @@ class SchemeItem extends StatelessWidget {
     );
   }
 
+  // Get color based on progress
+  Color getProgressColor(double progressPercentage) {
+    if (progressPercentage == 1) {
+      return const Color(0xFF81C784); // Light Green
+    } else if (progressPercentage >= 0.7) {
+      return const Color(0xFF64B5F6); // Light Blue
+    } else if (progressPercentage >= 0.4) {
+      return const Color(0xFFFFB74D); // Light Orange
+    } else {
+      return const Color(0xFFA1887F); // Light Brown
+    }
+  }
+
+  // Get icon based on progress
+  IconData getProgressIcon(double progressPercentage) {
+    if (progressPercentage == 1) {
+      return Icons.check_circle;
+    } else if (progressPercentage >= 0.7) {
+      return Icons.trending_up;
+    } else if (progressPercentage >= 0.4) {
+      return Icons.schedule;
+    } else {
+      return Icons.pending;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     int progressNumber = 0;
@@ -52,12 +78,25 @@ class SchemeItem extends StatelessWidget {
 
     final progressPercentage = progressNumber / 12;
     final remainingAmount = (12 - progressNumber) * int.parse(amount.replaceAll(RegExp(r'[^0-9]'), ''));
+    final progressColor = getProgressColor(progressPercentage);
+    final progressIcon = getProgressIcon(progressPercentage);
 
-    return Card(
-      elevation: 2,
-      color: Colors.white,
-      shape: RoundedRectangleBorder(
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      decoration: BoxDecoration(
+        color: Colors.white,
         borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+        border: Border.all(
+          color: progressColor.withOpacity(0.2),
+          width: 1,
+        ),
       ),
       child: InkWell(
         onTap: () {
@@ -65,13 +104,28 @@ class SchemeItem extends StatelessWidget {
         },
         borderRadius: BorderRadius.circular(16),
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Header
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
+                  // Icon
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: progressColor.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(
+                      progressIcon,
+                      color: progressColor,
+                      size: 20,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  // Scheme Info
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -81,6 +135,7 @@ class SchemeItem extends StatelessWidget {
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
+                            color: Colors.black87,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -91,80 +146,78 @@ class SchemeItem extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 16,
                             color: Colors.grey[600],
+                            fontWeight: FontWeight.w500,
                           ),
                         ),
                       ],
                     ),
                   ),
+                  // Progress Percentage
                   Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 6,
-                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
-                      color: progressPercentage == 1
-                          ? Colors.green[100]
-                          : Theme.of(context).primaryColor.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(20),
+                      color: progressColor.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
                       '${(progressPercentage * 100).toInt()}%',
                       style: TextStyle(
-                        color: progressPercentage == 1
-                            ? Colors.green[700]
-                            : Theme.of(context).primaryColor,
+                        color: progressColor,
                         fontWeight: FontWeight.bold,
+                        fontSize: 14,
                       ),
                     ),
                   ),
+                  const SizedBox(width: 8),
+                  // Clickable indicator
+                  Icon(
+                    Icons.chevron_right,
+                    color: Colors.grey[400],
+                    size: 20,
+                  ),
                 ],
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
+              
+              // Progress Bar
               ClipRRect(
                 borderRadius: BorderRadius.circular(8),
                 child: LinearProgressIndicator(
                   value: progressPercentage,
                   minHeight: 8,
                   backgroundColor: Colors.grey[200],
-                  valueColor: AlwaysStoppedAnimation<Color>(
-                    progressPercentage == 1
-                        ? Colors.green
-                        : Theme.of(context).primaryColor,
-                  ),
+                  valueColor: AlwaysStoppedAnimation<Color>(progressColor),
                 ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 16),
+              
+              // Progress Stats
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    '$progressNumber of 12 installments paid',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey[600],
-                    ),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.check_circle_outline,
+                        color: progressColor,
+                        size: 16,
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        '$progressNumber of 12 installments paid',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                    ],
                   ),
                   Text(
                     '₹$remainingAmount remaining',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton.icon(
-                    onPressed: () {
-                      Navigator.of(context).push(createRoute());
-                    },
-                    icon: const Icon(Icons.arrow_forward),
-                    label: const Text('View Details'),
-                    style: TextButton.styleFrom(
-                      foregroundColor: Theme.of(context).primaryColor,
+                      fontWeight: FontWeight.bold,
+                      color: progressColor,
                     ),
                   ),
                 ],
