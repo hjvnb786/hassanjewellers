@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../Services/firebase_services/getPlans.dart';
+import '../scheme_details_shimmer_loading.dart';
 
 class SchemeDetailsForm extends StatefulWidget {
   final Map<String, dynamic> formData;
@@ -264,12 +265,7 @@ class _SchemeDetailsFormState extends State<SchemeDetailsForm> {
                   child: Column(
                     children: [
                       if (_isLoading)
-                        const Center(
-                          child: Padding(
-                            padding: EdgeInsets.all(32.0),
-                            child: CircularProgressIndicator(),
-                          ),
-                        )
+                        const SchemeDetailsShimmerLoading()
                       else if (_errorMessage != null)
                         Container(
                           padding: const EdgeInsets.all(16),
