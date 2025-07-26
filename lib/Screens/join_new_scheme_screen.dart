@@ -16,6 +16,7 @@ class _JoinNewSchemeScreenState extends State<JoinNewSchemeScreen> {
   int _currentStep = 0;
   final Map<String, dynamic> _formData = {};
   final PageController _pageController = PageController();
+  bool _additionalDetailsValid = true; // Track Additional Details validation
 
   final List<String> _stepTitles = [
     'User Details',
@@ -61,6 +62,12 @@ class _JoinNewSchemeScreenState extends State<JoinNewSchemeScreen> {
   void _updateFormData(Map<String, dynamic> newData) {
     setState(() {
       _formData.addAll(newData);
+    });
+  }
+
+  void _onAdditionalDetailsValidationChanged(bool isValid) {
+    setState(() {
+      _additionalDetailsValid = isValid;
     });
   }
 
@@ -110,8 +117,8 @@ class _JoinNewSchemeScreenState extends State<JoinNewSchemeScreen> {
       case 1: // Scheme Details
         return _formData['schemeName']?.isNotEmpty == true &&
                _formData['schemeAmount']?.isNotEmpty == true;
-      case 2: // Additional Details (Optional)
-        return true;
+      case 2: // Additional Details
+        return _additionalDetailsValid;
       case 3: // Summary
         return true;
       default:
@@ -532,6 +539,7 @@ class _JoinNewSchemeScreenState extends State<JoinNewSchemeScreen> {
                       AdditionalDetailsForm(
                         formData: _formData,
                         onDataChanged: _updateFormData,
+                        onValidationChanged: _onAdditionalDetailsValidationChanged,
                       ),
                       // Navigation Buttons
                       Container(

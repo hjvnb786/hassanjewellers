@@ -207,4 +207,114 @@ class DetailSummary extends StatelessWidget {
       ),
     );
   }
+
+  Widget _buildAdditionalDetailsCard() {
+    // Get all fields from formData that are not standard fields
+    final standardFields = ['firstName', 'lastName', 'mobile', 'email', 'address', 'schemeName', 'schemeAmount'];
+    final additionalFields = <String, String>{};
+    
+    // Dynamically get all additional fields from formData
+    formData.forEach((key, value) {
+      if (!standardFields.contains(key) && 
+          value != null && 
+          value.toString().isNotEmpty) {
+        additionalFields[key] = value.toString();
+      }
+    });
+
+    // If no additional fields, don't show the card
+    if (additionalFields.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF3E5F5), // Light purple background
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: const Color(0xFF7B1FA2).withOpacity(0.3), // Purple border
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.edit_note_outlined,
+                color: const Color(0xFF7B1FA2), // Purple icon
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'Additional Details',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: const Color(0xFF7B1FA2), // Purple text
+                  fontSize: 16,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          // Dynamically build rows for each additional field
+          ...additionalFields.entries.map((entry) => 
+            _buildModernDetailRow(
+              Icons.edit, 
+              _formatFieldName(entry.key), 
+              entry.value
+            )
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildModernDetailRow(IconData icon, String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            icon,
+            color: Colors.grey[600],
+            size: 20,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              '$label: $value',
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey[800],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _formatFieldName(String key) {
+    switch (key) {
+      case 'firstName':
+        return 'First Name';
+      case 'lastName':
+        return 'Last Name';
+      case 'mobile':
+        return 'Mobile Number';
+      case 'email':
+        return 'Email Address';
+      case 'address':
+        return 'Address';
+      case 'schemeName':
+        return 'Scheme Name';
+      case 'schemeAmount':
+        return 'Scheme Amount';
+      default:
+        return key.replaceAll('_', ' ').toUpperCase();
+    }
+  }
 } 

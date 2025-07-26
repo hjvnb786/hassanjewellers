@@ -9,11 +9,13 @@ import '../additional_details_shimmer_loading.dart';
 class AdditionalDetailsForm extends StatefulWidget {
   final Map<String, dynamic> formData;
   final Function(Map<String, dynamic>) onDataChanged;
+  final Function(bool)? onValidationChanged; // Add validation callback
 
   const AdditionalDetailsForm({
     super.key,
     required this.formData,
     required this.onDataChanged,
+    this.onValidationChanged,
   });
 
   @override
@@ -31,17 +33,13 @@ class _AdditionalDetailsFormState extends State<AdditionalDetailsForm> {
   @override
   void initState() {
     super.initState();
-    _loadExistingData();
     _fetchAdditionalFields();
   }
 
-  void _loadExistingData() {
-    // Load existing data for all fields
-    for (final field in _fields) {
-      final controller = TextEditingController();
-      controller.text = widget.formData[field.name] ?? '';
-      _controllers[field.name] = controller;
-    }
+  @override
+  void dispose() {
+    _controllers.values.forEach((controller) => controller.dispose());
+    super.dispose();
   }
 
   Future<void> _fetchAdditionalFields() async {
@@ -52,24 +50,21 @@ class _AdditionalDetailsFormState extends State<AdditionalDetailsForm> {
       });
 
       print('Fetching additional fields in form...');
+      
+      // Print raw data first
+      await printRawData();
+      
       final fields = await getAdditionalFields();
       print('Received ${fields.length} additional fields in form');
-      print('Fields details: ${fields.map((f) => '${f.name}: ${f.label}').toList()}');
       
       setState(() {
         _fields = fields;
         _isLoading = false;
       });
 
-      print('State updated - _fields length: ${_fields.length}');
-      print('State updated - _isLoading: $_isLoading');
+      // Initialize controllers for all fields (including nested ones)
+      _initializeControllers(fields);
 
-      // Initialize controllers for all fields
-      for (final field in _fields) {
-        final controller = TextEditingController();
-        controller.text = widget.formData[field.name] ?? '';
-        _controllers[field.name] = controller;
-      }
     } catch (e) {
       print('Error in _fetchAdditionalFields: $e');
       setState(() {
@@ -79,24 +74,112 @@ class _AdditionalDetailsFormState extends State<AdditionalDetailsForm> {
     }
   }
 
-  void _updateFormData() {
-    final Map<String, dynamic> formData = {};
-    for (final field in _fields) {
-      final controller = _controllers[field.name];
-      if (controller != null) {
-        String value = controller.text;
-        
-        // Apply formatting based on field type
-        if (field.name == 'ifscCode') {
-          value = formatIFSC(value);
-        } else if (field.name == 'panNumber') {
-          value = formatPAN(value);
-        }
-        
-        formData[field.name] = value;
+  void _initializeControllers(List<AdditionalField> fields) {
+    for (final field in fields) {
+      if (field.type == 'group' && field.fields != null) {
+        // Initialize controllers for group fields
+        field.fields!.forEach((subFieldName, subField) {
+          final controller = TextEditingController();
+          controller.text = widget.formData[subField.name] ?? '';
+          _controllers[subField.name] = controller;
+        });
+      } else {
+        // Initialize controller for regular field
+        final controller = TextEditingController();
+        controller.text = widget.formData[field.name] ?? '';
+        _controllers[field.name] = controller;
       }
     }
+    
+    // Check initial validation state
+    _checkValidation();
+  }
+
+  void _updateFormData() {
+    final Map<String, dynamic> formData = {};
+    
+    for (final field in _fields) {
+      if (field.type == 'group' && field.fields != null) {
+        // Handle group fields
+        field.fields!.forEach((subFieldName, subField) {
+          final controller = _controllers[subField.name];
+          if (controller != null) {
+            String value = controller.text;
+            
+            // Apply formatting based on field type
+            if (subField.name == 'ifscCode') {
+              value = formatIFSC(value);
+            } else if (subField.name == 'panNumber') {
+              value = formatPAN(value);
+            }
+            
+            formData[subField.name] = value;
+          }
+        });
+      } else {
+        // Handle regular fields
+        final controller = _controllers[field.name];
+        if (controller != null) {
+          String value = controller.text;
+          
+          // Apply formatting based on field type
+          if (field.name == 'ifscCode') {
+            value = formatIFSC(value);
+          } else if (field.name == 'panNumber') {
+            value = formatPAN(value);
+          }
+          
+          formData[field.name] = value;
+        }
+      }
+    }
+    
     widget.onDataChanged(formData);
+    
+    // Check validation and notify parent
+    _checkValidation();
+  }
+
+  void _checkValidation() {
+    bool isValid = true;
+    
+    for (final field in _fields) {
+      if (field.type == 'group' && field.fields != null) {
+        // Check group fields
+        field.fields!.forEach((subFieldName, subField) {
+          if (subField.isRequired) {
+            final controller = _controllers[subField.name];
+            if (controller == null || controller.text.trim().isEmpty) {
+              isValid = false;
+            } else if (controller.text.trim().length < 3) {
+              isValid = false;
+            }
+          }
+        });
+      } else {
+        // Check regular fields
+        if (field.isRequired) {
+          final controller = _controllers[field.name];
+          if (controller == null || controller.text.trim().isEmpty) {
+            isValid = false;
+          } else if (controller.text.trim().length < 3) {
+            isValid = false;
+          }
+        }
+      }
+    }
+    
+    widget.onValidationChanged?.call(isValid);
+  }
+
+  bool _shouldShowField(AdditionalField field) {
+    if (field.dependsOn == null) return true;
+    
+    // For nested fields, the dependsOn should reference the field name within the group
+    final dependsOnController = _controllers[field.dependsOn];
+    if (dependsOnController == null) return true;
+    
+    return dependsOnController.text.isNotEmpty;
   }
 
   Future<void> _selectDate(BuildContext context, TextEditingController controller) async {
@@ -142,50 +225,25 @@ class _AdditionalDetailsFormState extends State<AdditionalDetailsForm> {
   Color _getIconColorForField(String? iconName) {
     switch (iconName) {
       case 'cake':
-        return const Color(0xFFE91E63);
+        return Colors.pink;
       case 'favorite':
-        return const Color(0xFFF44336);
+        return Colors.red;
       case 'account_balance':
-        return const Color(0xFF4CAF50);
+        return Colors.green;
       case 'business':
-        return const Color(0xFF2196F3);
+        return Colors.blue;
       case 'code':
-        return const Color(0xFF9C27B0);
+        return Colors.orange;
       case 'credit_card':
-        return const Color(0xFFFF9800);
+        return Colors.purple;
       case 'email':
-        return const Color(0xFF607D8B);
+        return Colors.blue;
       case 'phone':
-        return const Color(0xFF795548);
+        return Colors.green;
       case 'person':
-        return const Color(0xFF1976D2);
+        return Colors.blue;
       default:
-        return const Color(0xFF1976D2);
-    }
-  }
-
-  Color _getBackgroundColorForField(String? iconName) {
-    switch (iconName) {
-      case 'cake':
-        return const Color(0xFFFCE4EC);
-      case 'favorite':
-        return const Color(0xFFFFEBEE);
-      case 'account_balance':
-        return const Color(0xFFE8F5E8);
-      case 'business':
-        return const Color(0xFFE3F2FD);
-      case 'code':
-        return const Color(0xFFF3E5F5);
-      case 'credit_card':
-        return const Color(0xFFFFF3E0);
-      case 'email':
-        return const Color(0xFFECEFF1);
-      case 'phone':
-        return const Color(0xFFEFEBE9);
-      case 'person':
-        return const Color(0xFFE3F2FD);
-      default:
-        return const Color(0xFFE3F2FD);
+        return Colors.grey;
     }
   }
 
@@ -196,6 +254,11 @@ class _AdditionalDetailsFormState extends State<AdditionalDetailsForm> {
       }
       
       if (value != null && value.isNotEmpty) {
+        // Check minimum length for all text fields in additional details
+        if (value.trim().length < 3) {
+          return 'This field must be at least 3 characters long';
+        }
+        
         switch (field.validation) {
           case 'ifsc':
             if (!validateIFSC(value)) {
@@ -223,42 +286,159 @@ class _AdditionalDetailsFormState extends State<AdditionalDetailsForm> {
     };
   }
 
-  Widget _buildDynamicField(AdditionalField field) {
+  TextInputType _getKeyboardTypeForField(String type) {
+    switch (type) {
+      case 'number':
+        return TextInputType.number;
+      case 'email':
+        return TextInputType.emailAddress;
+      case 'phone':
+        return TextInputType.phone;
+      default:
+        return TextInputType.text;
+    }
+  }
+
+  TextCapitalization _getTextCapitalizationForField(String type) {
+    switch (type) {
+      case 'ifsc':
+      case 'pan':
+        return TextCapitalization.characters;
+      default:
+        return TextCapitalization.none;
+    }
+  }
+
+  Widget _buildField(AdditionalField field) {
+    if (!_shouldShowField(field)) {
+      return const SizedBox.shrink();
+    }
+
+    if (field.type == 'group' && field.fields != null) {
+      return _buildGroupField(field);
+    } else {
+      return _buildSingleField(field);
+    }
+  }
+
+  Widget _buildGroupField(AdditionalField groupField) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 20),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.grey[50],
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey[200]!),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Group header
+          Row(
+            children: [
+              Icon(
+                _getIconForField(groupField.icon),
+                color: _getIconColorForField(groupField.icon),
+                size: 20,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Row(
+                  children: [
+                    Text(
+                      groupField.label,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey[800],
+                      ),
+                    ),
+                    if (groupField.isRequired) ...[
+                      const SizedBox(width: 4),
+                      Text(
+                        '*',
+                        style: TextStyle(
+                          color: Colors.red[400],
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ],
+          ),
+          if (groupField.description != null) ...[
+            const SizedBox(height: 4),
+            Text(
+              groupField.description!,
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.grey[600],
+              ),
+            ),
+          ],
+          const SizedBox(height: 16),
+          
+          // Group fields - check dependencies for each subfield
+          ...groupField.fields!.entries.map((entry) {
+            final subField = entry.value;
+            // Check if this subfield should be shown based on its dependencies
+            if (!_shouldShowField(subField)) {
+              return const SizedBox.shrink();
+            }
+            return _buildSingleField(subField, isInGroup: true);
+          }),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSingleField(AdditionalField field, {bool isInGroup = false}) {
     final controller = _controllers[field.name];
     if (controller == null) return const SizedBox.shrink();
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
+      margin: EdgeInsets.only(bottom: isInGroup ? 12 : 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Label with icon
           Row(
             children: [
-              Icon(
-                _getIconForField(field.icon),
-                color: _getIconColorForField(field.icon),
-                size: 20,
-              ),
-              const SizedBox(width: 12),
-              Text(
-                field.label,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey[600],
+              if (!isInGroup) ...[
+                Icon(
+                  _getIconForField(field.icon),
+                  color: _getIconColorForField(field.icon),
+                  size: 20,
                 ),
-              ),
-              if (field.isRequired) ...[
-                const SizedBox(width: 4),
-                Text(
-                  '*',
-                  style: TextStyle(
-                    color: Colors.red[400],
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                const SizedBox(width: 12),
               ],
+              Expanded(
+                child: Row(
+                  children: [
+                    Text(
+                      field.label,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                    if (field.isRequired) ...[
+                      const SizedBox(width: 4),
+                      Text(
+                        '*',
+                        style: TextStyle(
+                          color: Colors.red[400],
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 8),
@@ -274,7 +454,7 @@ class _AdditionalDetailsFormState extends State<AdditionalDetailsForm> {
                   fontSize: 16,
                 ),
                 filled: true,
-                fillColor: Colors.grey[50],
+                fillColor: Colors.white,
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: 16,
                   vertical: 16,
@@ -324,6 +504,7 @@ class _AdditionalDetailsFormState extends State<AdditionalDetailsForm> {
               onChanged: (String? newValue) {
                 controller.text = newValue ?? '';
                 _updateFormData();
+                setState(() {}); // Trigger rebuild for dependencies
               },
               dropdownColor: Colors.white,
               icon: const SizedBox.shrink(),
@@ -349,7 +530,7 @@ class _AdditionalDetailsFormState extends State<AdditionalDetailsForm> {
                   fontSize: 16,
                 ),
                 filled: true,
-                fillColor: Colors.grey[50],
+                fillColor: Colors.white,
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: 16,
                   vertical: 16,
@@ -384,46 +565,24 @@ class _AdditionalDetailsFormState extends State<AdditionalDetailsForm> {
               onTap: field.type == 'date' 
                   ? () => _selectDate(context, controller)
                   : null,
-              onChanged: (value) => _updateFormData(),
+              onChanged: (value) {
+                _updateFormData();
+                setState(() {}); // Trigger rebuild for dependencies
+              },
             ),
         ],
       ),
     );
   }
 
-  TextInputType _getKeyboardTypeForField(String type) {
-    switch (type) {
-      case 'number':
-        return TextInputType.number;
-      case 'email':
-        return TextInputType.emailAddress;
-      case 'phone':
-        return TextInputType.phone;
-      default:
-        return TextInputType.text;
-    }
-  }
-
-  TextCapitalization _getTextCapitalizationForField(String type) {
-    switch (type) {
-      case 'ifsc':
-      case 'pan':
-        return TextCapitalization.characters;
-      default:
-        return TextCapitalization.none;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    print('Building AdditionalDetailsForm - _isLoading: $_isLoading, _fields length: ${_fields.length}, _errorMessage: $_errorMessage');
-    
     return Form(
       key: _formKey,
       child: SingleChildScrollView(
         child: Column(
           children: [
-            // Form Container similar to other forms
+            // Form Container
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Container(
@@ -472,7 +631,7 @@ class _AdditionalDetailsFormState extends State<AdditionalDetailsForm> {
                       else ...[
                         // Header
                         Text(
-                          'Additional Details (Optional)',
+                          'Additional Details',
                           style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                             fontWeight: FontWeight.bold,
                             color: Theme.of(context).primaryColor,
@@ -490,55 +649,58 @@ class _AdditionalDetailsFormState extends State<AdditionalDetailsForm> {
                         
                         // Dynamic fields
                         if (_fields.isNotEmpty) ...[
-                          Text('Rendering ${_fields.length} dynamic fields'),
-                          ..._fields.map((field) => _buildDynamicField(field)),
+                          ..._fields.map((field) => _buildField(field)),
                         ] else ...[
-                          Text('No fields to render - _fields is empty'),
+                          Container(
+                            padding: const EdgeInsets.all(20),
+                            decoration: BoxDecoration(
+                              color: Colors.grey[50],
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(Icons.info_outline, color: Colors.grey[600]),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Text(
+                                    'No additional fields configured',
+                                    style: TextStyle(
+                                      color: Colors.grey[600],
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ],
                         
                         const SizedBox(height: 20),
                         
                         // Information Card
                         Container(
+                          margin: const EdgeInsets.only(top: 20),
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
-                            color: Colors.blue.withOpacity(0.1),
+                            color: Colors.blue[50],
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: Colors.blue.withOpacity(0.3),
-                            ),
+                            border: Border.all(color: Colors.blue[200]!),
                           ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                          child: Row(
                             children: [
-                              Row(
-                                children: [
-                                  Icon(
-                                    Icons.info_outline,
-                                    color: Colors.blue,
-                                    size: 20,
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    'Why Additional Details?',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.blue,
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                ],
+                              Icon(
+                                Icons.info_outline,
+                                color: Colors.blue[600],
+                                size: 20,
                               ),
-                              const SizedBox(height: 12),
-                              Text(
-                                '• Personalized birthday offers\n'
-                                '• Anniversary celebration discounts\n'
-                                '• Secure payment processing\n'
-                                '• Faster scheme completion',
-                                style: TextStyle(
-                                  color: Colors.grey[700],
-                                  height: 1.5,
-                                  fontSize: 14,
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  'All fields marked with * are required.',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.blue[700],
+                                  ),
                                 ),
                               ),
                             ],
@@ -554,13 +716,5 @@ class _AdditionalDetailsFormState extends State<AdditionalDetailsForm> {
         ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    for (final controller in _controllers.values) {
-      controller.dispose();
-    }
-    super.dispose();
   }
 } 
