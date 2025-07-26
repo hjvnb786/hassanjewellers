@@ -104,11 +104,14 @@ class _SchemeProgressScreenState extends State<SchemeProgressScreen> {
             ),
             flexibleSpace: FlexibleSpaceBar(
               background: Container(
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: AppColors.primaryGradient,
+                decoration: BoxDecoration(
+                  gradient: RadialGradient(
+                    center: Alignment.center,
+                    radius: 0.8,
+                    colors: [
+                      AppColors.primaryLight, // Bright Blue from app colors
+                      AppColors.primary, // Royal Blue from app colors
+                    ],
                   ),
                 ),
                 child: Column(
