@@ -136,51 +136,67 @@ class _SchemesScreenState extends State<SchemesScreen> with TickerProviderStateM
                   child: SafeArea(
                     child: Column(
                       children: [
-                        const SizedBox(height: 20),
-                        // Welcome Section
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child: Row(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(12),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.2),
-                                  borderRadius: BorderRadius.circular(16),
+                        const SizedBox(height: 10),
+                        // Logo Header
+                        Center(
+                          child: Container(
+                            width: 100,
+                            height: 100,
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: Colors.white.withOpacity(0.4),
+                                width: 2,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.1),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 3),
                                 ),
-                                child: const Icon(
-                                  Icons.account_balance_wallet_outlined,
-                                  size: 28,
-                                  color: Colors.white,
+                              ],
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(20),
+                              child: Padding(
+                                padding: const EdgeInsets.all(12),
+                                child: Image.asset(
+                                  'assets/logo.png',
+                                  fit: BoxFit.contain,
                                 ),
                               ),
-                              const SizedBox(width: 16),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      "Welcome back${customerName.isNotEmpty ? ', $customerName' : ''}!",
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                    const Text(
-                                      "Manage your savings schemes",
-                                      style: TextStyle(
-                                        color: Colors.white70,
-                                        fontSize: 14,
-                                      ),
-                                    ),
-                                  ],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        // Welcome Message
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: Column(
+                            children: [
+                              Text(
+                                "Welcome back${customerName.isNotEmpty ? ', $customerName' : ''}!",
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
                                 ),
+                                textAlign: TextAlign.center,
+                              ),
+                              const SizedBox(height: 2),
+                              const Text(
+                                "Manage your savings schemes",
+                                style: TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 13,
+                                ),
+                                textAlign: TextAlign.center,
                               ),
                             ],
                           ),
                         ),
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 16),
                         // Stats Cards
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -191,7 +207,7 @@ class _SchemesScreenState extends State<SchemesScreen> with TickerProviderStateM
                                   icon: Icons.account_balance_wallet,
                                   title: "Total Saved",
                                   value: "₹${totalSavings.toStringAsFixed(0)}",
-                                  subtitle: "Current Savings",
+                                  subtitle: "",
                                   color: AppColors.success,
                                 ),
                               ),
@@ -201,7 +217,7 @@ class _SchemesScreenState extends State<SchemesScreen> with TickerProviderStateM
                                   icon: Icons.trending_up,
                                   title: "Total Target",
                                   value: "₹${totalTargetAmount.toStringAsFixed(0)}",
-                                  subtitle: "Goal Amount",
+                                  subtitle: "",
                                   color: AppColors.primaryLight,
                                 ),
                               ),
@@ -308,14 +324,6 @@ class _SchemesScreenState extends State<SchemesScreen> with TickerProviderStateM
           const SizedBox(height: 4),
           Text(
             title,
-            style: const TextStyle(
-              color: Colors.white70,
-              fontSize: 11,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          Text(
-            subtitle,
             style: const TextStyle(
               color: Colors.white70,
               fontSize: 11,
