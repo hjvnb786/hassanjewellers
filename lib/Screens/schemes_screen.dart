@@ -116,7 +116,7 @@ class _SchemesScreenState extends State<SchemesScreen> with TickerProviderStateM
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
           return <Widget>[
             SliverAppBar(
-              expandedHeight: 320.0,
+              expandedHeight: 240.0, // Increased to accommodate additional spacing
               floating: false,
               pinned: true,
               backgroundColor: AppColors.primary,
@@ -137,61 +137,70 @@ class _SchemesScreenState extends State<SchemesScreen> with TickerProviderStateM
                     child: Column(
                       children: [
                         const SizedBox(height: 10),
-                        // Logo Header
-                        Center(
-                          child: Container(
-                            width: 100,
-                            height: 100,
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.2),
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(
-                                color: Colors.white.withOpacity(0.4),
-                                width: 2,
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.1),
-                                  blurRadius: 8,
-                                  offset: const Offset(0, 3),
-                                ),
-                              ],
-                            ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(20),
-                              child: Padding(
-                                padding: const EdgeInsets.all(12),
-                                child: Image.asset(
-                                  'assets/logo.png',
-                                  fit: BoxFit.contain,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        // Welcome Message
+                        // Logo and Welcome Message Row
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child: Column(
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              Text(
-                                "Welcome back${customerName.isNotEmpty ? ', $customerName' : ''}!",
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
+                              // Logo
+                              Expanded(
+                                child: Container(
+                                  width: 150,
+                                  height: 80,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white, // Solid white background
+                                    borderRadius: BorderRadius.circular(16),
+                                    border: Border.all(
+                                      color: Colors.white.withOpacity(0.4),
+                                      width: 2,
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.1),
+                                        blurRadius: 8,
+                                        offset: const Offset(0, 3),
+                                      ),
+                                    ],
+                                  ),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(16),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(10),
+                                      child: Image.asset(
+                                        'assets/logo.png',
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                  ),
                                 ),
-                                textAlign: TextAlign.center,
                               ),
-                              const SizedBox(height: 2),
-                              const Text(
-                                "Manage your savings schemes",
-                                style: TextStyle(
-                                  color: Colors.white70,
-                                  fontSize: 13,
+                              const SizedBox(width: 16),
+                              // Welcome Texts
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "Welcome back ${customerName.isNotEmpty ? ', $customerName' : ''}!",
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                      textAlign: TextAlign.left,
+                                    ),
+                                    const SizedBox(height: 2),
+                                    const Text(
+                                      "Manage your savings schemes",
+                                      style: TextStyle(
+                                        color: Colors.white70,
+                                        fontSize: 13,
+                                      ),
+                                      textAlign: TextAlign.left,
+                                    ),
+                                  ],
                                 ),
-                                textAlign: TextAlign.center,
                               ),
                             ],
                           ),
@@ -224,7 +233,8 @@ class _SchemesScreenState extends State<SchemesScreen> with TickerProviderStateM
                             ],
                           ),
                         ),
-                        const SizedBox(height: 24),
+                       const SizedBox(height: 10),
+                       const SizedBox(height: 16), // Additional spacing below stats cards
                       ],
                     ),
                   ),
@@ -235,7 +245,7 @@ class _SchemesScreenState extends State<SchemesScreen> with TickerProviderStateM
                 indicatorColor: Colors.white,
                 indicatorWeight: 3,
                 indicatorSize: TabBarIndicatorSize.tab,
-                padding: const EdgeInsets.only(top: 8, left: 20, right: 20),
+                padding: const EdgeInsets.only(left: 20, right: 20), // Removed top: 8
                 labelColor: Colors.white,
                 unselectedLabelColor: Colors.white.withOpacity(0.7),
                 labelStyle: const TextStyle(
