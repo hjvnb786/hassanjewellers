@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:hassanjewellers/Helpers/join_scheme_helpers/build_summary.dart';
 
 class DetailSummary extends StatelessWidget {
   final Map<String, dynamic> formData;
@@ -13,8 +12,6 @@ class DetailSummary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final summaryText = buildSummary(formData);
-
     return Form(
       child: SingleChildScrollView(
         child: Column(
@@ -56,49 +53,16 @@ class DetailSummary extends StatelessWidget {
                       ),
                       const SizedBox(height: 20),
                       
-                      // Summary Content
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFE8F5E8),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: const Color(0xFF388E3C).withOpacity(0.3),
-                          ),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Icon(
-                                  Icons.summarize,
-                                  color: const Color(0xFF388E3C),
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  'Form Summary',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: const Color(0xFF388E3C),
-                                    fontSize: 16,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 12),
-                            Text(
-                              summaryText,
-                              style: TextStyle(
-                                fontSize: 14,
-                                height: 1.6,
-                                color: Colors.grey[800],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                      // User Details Card
+                      _buildUserDetailsCard(),
+                      const SizedBox(height: 16),
+                      
+                      // Scheme Details Card
+                      _buildSchemeDetailsCard(),
+                      const SizedBox(height: 16),
+                      
+                      // Additional Details Card
+                      _buildAdditionalDetailsCard(),
                       const SizedBox(height: 20),
                       
                       // Confirmation Card
@@ -208,9 +172,58 @@ class DetailSummary extends StatelessWidget {
     );
   }
 
+  Widget _buildSchemeDetailsCard() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFFE8F5E8), // Light green background
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: const Color(0xFF388E3C).withOpacity(0.3), // Green border
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.account_balance_wallet,
+                color: const Color(0xFF388E3C), // Green icon
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'Scheme Details',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: const Color(0xFF388E3C), // Green text
+                  fontSize: 16,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          _buildModernDetailRow(Icons.account_balance_wallet, 'Scheme Name', (formData['schemeName'] ?? '').toString()),
+          _buildModernDetailRow(Icons.attach_money, 'Scheme Amount', (formData['schemeAmount'] ?? '').toString()),
+          _buildModernDetailRow(Icons.schedule, 'Scheme Duration', (formData['schemeDuration'] ?? '').toString()),
+          _buildModernDetailRow(Icons.calendar_today, 'Start Date', (formData['startDate'] ?? '').toString()),
+          _buildModernDetailRow(Icons.event, 'End Date', (formData['endDate'] ?? '').toString()),
+          _buildModernDetailRow(Icons.payment, 'Payment Frequency', (formData['paymentFrequency'] ?? '').toString()),
+          _buildModernDetailRow(Icons.trending_up, 'Interest Rate', (formData['interestRate'] ?? '').toString()),
+          _buildModernDetailRow(Icons.description, 'Scheme Description', (formData['schemeDescription'] ?? '').toString()),
+        ],
+      ),
+    );
+  }
+
   Widget _buildAdditionalDetailsCard() {
     // Get all fields from formData that are not standard fields
-    final standardFields = ['firstName', 'lastName', 'mobile', 'email', 'address', 'schemeName', 'schemeAmount'];
+    final standardFields = [
+      'firstName', 'lastName', 'mobile', 'email', 'address', 
+      'schemeName', 'schemeAmount', 'schemeDuration', 'startDate', 
+      'endDate', 'paymentFrequency', 'interestRate', 'schemeDescription'
+    ];
     final additionalFields = <String, String>{};
     
     // Dynamically get all additional fields from formData
@@ -271,7 +284,51 @@ class DetailSummary extends StatelessWidget {
     );
   }
 
+  Widget _buildUserDetailsCard() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFFE3F2FD), // Light blue background
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: const Color(0xFF1976D2).withOpacity(0.3), // Blue border
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.person,
+                color: const Color(0xFF1976D2), // Blue icon
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'User Details',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: const Color(0xFF1976D2), // Blue text
+                  fontSize: 16,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          _buildModernDetailRow(Icons.person, 'First Name', (formData['firstName'] ?? '').toString()),
+          _buildModernDetailRow(Icons.person, 'Last Name', (formData['lastName'] ?? '').toString()),
+          _buildModernDetailRow(Icons.phone, 'Mobile Number', (formData['mobile'] ?? '').toString()),
+          _buildModernDetailRow(Icons.email, 'Email Address', (formData['email'] ?? '').toString()),
+          _buildModernDetailRow(Icons.location_on, 'Address', (formData['address'] ?? '').toString()),
+        ],
+      ),
+    );
+  }
+
   Widget _buildModernDetailRow(IconData icon, String label, String value) {
+    if (value.isEmpty) return const SizedBox.shrink();
+    
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
@@ -313,6 +370,24 @@ class DetailSummary extends StatelessWidget {
         return 'Scheme Name';
       case 'schemeAmount':
         return 'Scheme Amount';
+      case 'schemeDuration':
+        return 'Scheme Duration';
+      case 'startDate':
+        return 'Start Date';
+      case 'endDate':
+        return 'End Date';
+      case 'paymentFrequency':
+        return 'Payment Frequency';
+      case 'interestRate':
+        return 'Interest Rate';
+      case 'schemeDescription':
+        return 'Scheme Description';
+      case 'panNumber':
+        return 'PAN Number';
+      case 'guardianName':
+        return 'Guardian Name';
+      case 'guardianRelationship':
+        return 'Relationship with Guardian';
       default:
         return key.replaceAll('_', ' ').toUpperCase();
     }

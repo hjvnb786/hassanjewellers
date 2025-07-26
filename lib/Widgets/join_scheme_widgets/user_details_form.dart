@@ -27,8 +27,8 @@ class _UserDetailsFormState extends State<UserDetailsForm> {
   
   List<Map<String, dynamic>> _userAddresses = [];
   bool _isLoadingAddresses = true;
-  String? _selectedAddressId;
   String _selectedAddressText = '';
+  String? _selectedAddressIdForDropdown; // Temporary ID for dropdown only
 
   @override
   void initState() {
@@ -42,8 +42,18 @@ class _UserDetailsFormState extends State<UserDetailsForm> {
     _lastNameController.text = widget.formData['lastName'] ?? '';
     _mobileController.text = widget.formData['mobile'] ?? '';
     _emailController.text = widget.formData['email'] ?? '';
-    _selectedAddressId = widget.formData['selectedAddressId'];
     _selectedAddressText = widget.formData['address'] ?? '';
+    
+    // Find the address ID that matches the current address text
+    if (_selectedAddressText.isNotEmpty) {
+      for (final address in _userAddresses) {
+        final addressText = '${address['firstName']} ${address['lastName']}, ${address['aptFloorDoorNumber']}, ${address['streetName']}, ${address['city']}, ${address['state']} - ${address['pincode']}';
+        if (addressText == _selectedAddressText) {
+          _selectedAddressIdForDropdown = address['id'];
+          break;
+        }
+      }
+    }
   }
 
   Future<void> _loadUserAddresses() async {
@@ -58,6 +68,17 @@ class _UserDetailsFormState extends State<UserDetailsForm> {
         _userAddresses = addresses;
         _isLoadingAddresses = false;
       });
+      
+      // After loading addresses, try to find the matching address ID
+      if (_selectedAddressText.isNotEmpty) {
+        for (final address in addresses) {
+          final addressText = '${address['firstName']} ${address['lastName']}, ${address['aptFloorDoorNumber']}, ${address['streetName']}, ${address['city']}, ${address['state']} - ${address['pincode']}';
+          if (addressText == _selectedAddressText) {
+            _selectedAddressIdForDropdown = address['id'];
+            break;
+          }
+        }
+      }
     }
   }
 
@@ -67,7 +88,6 @@ class _UserDetailsFormState extends State<UserDetailsForm> {
       'lastName': _lastNameController.text,
       'mobile': _mobileController.text,
       'email': _emailController.text,
-      'selectedAddressId': _selectedAddressId,
       'address': _selectedAddressText,
     });
   }
@@ -75,7 +95,7 @@ class _UserDetailsFormState extends State<UserDetailsForm> {
   void _selectAddress(String? addressId) {
     if (addressId == null) {
       setState(() {
-        _selectedAddressId = null;
+        _selectedAddressIdForDropdown = null;
         _selectedAddressText = '';
       });
       _updateFormData();
@@ -89,7 +109,7 @@ class _UserDetailsFormState extends State<UserDetailsForm> {
 
     if (selectedAddress.isNotEmpty) {
       setState(() {
-        _selectedAddressId = addressId;
+        _selectedAddressIdForDropdown = addressId;
         _selectedAddressText = '${selectedAddress['firstName']} ${selectedAddress['lastName']}, ${selectedAddress['aptFloorDoorNumber']}, ${selectedAddress['streetName']}, ${selectedAddress['city']}, ${selectedAddress['state']} - ${selectedAddress['pincode']}';
       });
       _updateFormData();
@@ -410,7 +430,7 @@ class _UserDetailsFormState extends State<UserDetailsForm> {
                             Column(
                               children: [
                                 DropdownButtonFormField<String>(
-                                  value: _selectedAddressId,
+                                  value: _selectedAddressIdForDropdown, // Use the temporary ID
                                   isExpanded: true,
                                   decoration: InputDecoration(
                                     hintText: 'Choose a delivery address',
@@ -474,7 +494,7 @@ class _UserDetailsFormState extends State<UserDetailsForm> {
                                       ),
                                     ),
                                     ..._userAddresses.map((address) {
-                                      final addressText = '${address['firstName']} ${address['lastName']} - ${address['city']}';
+                                      final addressText = '${address['firstName']} ${address['lastName']}, ${address['aptFloorDoorNumber']}, ${address['streetName']}, ${address['city']}, ${address['state']} - ${address['pincode']}';
                                       return DropdownMenuItem<String>(
                                         value: address['id'],
                                         child: Text(
