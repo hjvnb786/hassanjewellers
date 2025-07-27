@@ -224,14 +224,23 @@ class DetailSummary extends StatelessWidget {
       'schemeName', 'schemeAmount', 'schemeDuration', 'startDate', 
       'endDate', 'paymentFrequency', 'interestRate', 'schemeDescription'
     ];
-    final additionalFields = <String, String>{};
+    final additionalFields = <String, Map<String, String>>{};
     
     // Dynamically get all additional fields from formData
     formData.forEach((key, value) {
       if (!standardFields.contains(key) && 
+          !key.endsWith('_label') && // Skip label fields
           value != null && 
           value.toString().isNotEmpty) {
-        additionalFields[key] = value.toString();
+        
+        // Get the label for this field
+        final labelKey = '${key}_label';
+        final label = formData[labelKey] ?? key.replaceAll(RegExp(r'([A-Z])'), ' \$1').trim();
+        
+        additionalFields[key] = {
+          'label': label,
+          'value': value.toString(),
+        };
       }
     });
 
@@ -275,8 +284,8 @@ class DetailSummary extends StatelessWidget {
           ...additionalFields.entries.map((entry) => 
             _buildModernDetailRow(
               Icons.edit, 
-              _formatFieldName(entry.key), 
-              entry.value
+              entry.value['label']!, 
+              entry.value['value']!
             )
           ),
         ],
@@ -352,44 +361,5 @@ class DetailSummary extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  String _formatFieldName(String key) {
-    switch (key) {
-      case 'firstName':
-        return 'First Name';
-      case 'lastName':
-        return 'Last Name';
-      case 'mobile':
-        return 'Mobile Number';
-      case 'email':
-        return 'Email Address';
-      case 'address':
-        return 'Address';
-      case 'schemeName':
-        return 'Scheme Name';
-      case 'schemeAmount':
-        return 'Scheme Amount';
-      case 'schemeDuration':
-        return 'Scheme Duration';
-      case 'startDate':
-        return 'Start Date';
-      case 'endDate':
-        return 'End Date';
-      case 'paymentFrequency':
-        return 'Payment Frequency';
-      case 'interestRate':
-        return 'Interest Rate';
-      case 'schemeDescription':
-        return 'Scheme Description';
-      case 'panNumber':
-        return 'PAN Number';
-      case 'guardianName':
-        return 'Guardian Name';
-      case 'guardianRelationship':
-        return 'Relationship with Guardian';
-      default:
-        return key.replaceAll('_', ' ').toUpperCase();
-    }
   }
 } 

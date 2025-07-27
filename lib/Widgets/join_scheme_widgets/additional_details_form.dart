@@ -113,7 +113,9 @@ class _AdditionalDetailsFormState extends State<AdditionalDetailsForm> {
               value = formatPAN(value);
             }
             
+            // Store both value and label
             formData[subField.name] = value;
+            formData['${subField.name}_label'] = subField.label;
           }
         });
       } else {
@@ -129,7 +131,9 @@ class _AdditionalDetailsFormState extends State<AdditionalDetailsForm> {
             value = formatPAN(value);
           }
           
+          // Store both value and label
           formData[field.name] = value;
+          formData['${field.name}_label'] = field.label;
         }
       }
     }
@@ -342,31 +346,26 @@ class _AdditionalDetailsFormState extends State<AdditionalDetailsForm> {
                 size: 20,
               ),
               const SizedBox(width: 12),
-              Expanded(
-                child: Row(
-                  children: [
-                    Text(
-                      groupField.label,
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey[800],
-                      ),
-                    ),
-                    if (groupField.isRequired) ...[
-                      const SizedBox(width: 4),
-                      Text(
-                        '*',
-                        style: TextStyle(
-                          color: Colors.red[400],
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ],
+              Text(
+                groupField.label,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey[800],
                 ),
               ),
+              if (groupField.isRequired) ...[
+                const SizedBox(width: 2),
+                Text(
+                  '*',
+                  style: TextStyle(
+                    color: Colors.red[400],
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+              const Spacer(),
             ],
           ),
           if (groupField.description != null) ...[
@@ -415,104 +414,102 @@ class _AdditionalDetailsFormState extends State<AdditionalDetailsForm> {
                 ),
                 const SizedBox(width: 12),
               ],
-              Expanded(
-                child: Row(
-                  children: [
-                    Text(
-                      field.label,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                    if (field.isRequired) ...[
-                      const SizedBox(width: 4),
-                      Text(
-                        '*',
-                        style: TextStyle(
-                          color: Colors.red[400],
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ],
+              Text(
+                field.label,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey[600],
                 ),
               ),
+              if (field.isRequired) ...[
+                const SizedBox(width: 2),
+                Text(
+                  '*',
+                  style: TextStyle(
+                    color: Colors.red[400],
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+              const Spacer(),
             ],
           ),
           const SizedBox(height: 8),
           
           // Field
-          if (field.type == 'dropdown' && field.options != null)
-            DropdownButtonFormField<String>(
-              value: controller.text.isEmpty ? null : controller.text,
-              decoration: InputDecoration(
-                hintText: field.placeholder ?? 'Select ${field.label}',
-                hintStyle: TextStyle(
-                  color: Colors.grey[500],
-                  fontSize: 16,
-                ),
-                filled: true,
-                fillColor: Colors.white,
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 16,
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.grey[200]!),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(
-                    color: _getIconColorForField(field.icon),
-                    width: 2,
-                  ),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.grey[200]!),
-                ),
-                errorBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.red[300]!),
-                ),
-                focusedErrorBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.red[500]!, width: 2),
-                ),
-                suffixIcon: Icon(
-                  Icons.keyboard_arrow_down,
-                  color: Colors.grey[600],
-                  size: 24,
-                ),
-              ),
-              items: field.options!.map((String option) {
-                return DropdownMenuItem<String>(
-                  value: option,
-                  child: Text(
-                    option,
-                    style: const TextStyle(
+          field.type == 'dropdown' && field.options != null
+              ? DropdownButtonFormField<String>(
+                  value: controller.text.isEmpty ? null : controller.text,
+                  decoration: InputDecoration(
+                    hintText: field.placeholder ?? 'Select ${field.label}',
+                    hintStyle: TextStyle(
+                      color: Colors.grey[500],
                       fontSize: 16,
-                      color: Colors.black87,
+                    ),
+                    filled: true,
+                    fillColor: Colors.white,
+                    isDense: true,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 12,
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: Colors.grey[200]!),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(
+                        color: _getIconColorForField(field.icon),
+                        width: 2,
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: Colors.grey[200]!),
+                    ),
+                    errorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: Colors.red[300]!),
+                    ),
+                    focusedErrorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: Colors.red[500]!, width: 2),
+                    ),
+                    suffixIcon: Icon(
+                      Icons.keyboard_arrow_down,
+                      color: Colors.grey[600],
+                      size: 24,
                     ),
                   ),
-                );
-              }).toList(),
-              validator: _getValidatorForField(field),
-              onChanged: (String? newValue) {
-                controller.text = newValue ?? '';
-                _updateFormData();
-                setState(() {}); // Trigger rebuild for dependencies
-              },
-              dropdownColor: Colors.white,
-              icon: const SizedBox.shrink(),
-              menuMaxHeight: 200,
-              elevation: 8,
-              borderRadius: BorderRadius.circular(12),
-            )
-          else
+                  items: field.options!.map((String option) {
+                    return DropdownMenuItem<String>(
+                      value: option,
+                      child: Text(
+                        option,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.black87,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    );
+                  }).toList(),
+                  validator: _getValidatorForField(field),
+                  onChanged: (String? newValue) {
+                    controller.text = newValue ?? '';
+                    _updateFormData();
+                    setState(() {}); // Trigger rebuild for dependencies
+                  },
+                  dropdownColor: Colors.white,
+                  icon: const SizedBox.shrink(),
+                  menuMaxHeight: 200,
+                  elevation: 8,
+                  borderRadius: BorderRadius.circular(12),
+                  isExpanded: true,
+                )
+              :
             TextFormField(
               controller: controller,
               keyboardType: _getKeyboardTypeForField(field.type),
