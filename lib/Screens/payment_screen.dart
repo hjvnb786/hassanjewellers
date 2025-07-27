@@ -83,14 +83,14 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 final schemeData = widget.formData ?? {};
                 
                 fetchPaymentStatus(orderId, 'scheme_${DateTime.now().millisecondsSinceEpoch}', widget.operation, schemeData).then((value) {
-                  Navigator.of(context).pop();
+                  //Navigator.of(context).pop();
                   Navigator.of(context).pop();
                 });
               }
 
               if (request.url ==
                   'https://spt.uvm.mybluehostin.me/api/payment/close_browser.html') {
-                Navigator.of(context).pop();
+                //Navigator.of(context).pop();
                 Navigator.of(context).pop();
               }
             },
