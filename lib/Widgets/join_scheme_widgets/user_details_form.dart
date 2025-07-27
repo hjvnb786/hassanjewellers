@@ -579,7 +579,6 @@ class _UserDetailsFormState extends State<UserDetailsForm> {
                 ),
               ),
             ),
-            const SizedBox(height: 24),
           ],
         ),
       ),
