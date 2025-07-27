@@ -82,10 +82,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
                 final schemeData = widget.formData ?? {};
                 
-                fetchPaymentStatus(orderId, 'scheme_${DateTime.now().millisecondsSinceEpoch}', widget.operation, schemeData).then((value) {
-                  //Navigator.of(context).pop();
-                  Navigator.of(context).pop();
-                });
+                fetchPaymentStatus(orderId, 'scheme_${DateTime.now().millisecondsSinceEpoch}', widget.operation, schemeData, context);
               }
 
               if (request.url ==
@@ -138,10 +135,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
                 final schemeData = widget.formData ?? {};
                 
-                fetchPaymentStatus(orderId, widget.id ?? 'default', widget.operation, schemeData).then((value) {
-                  Navigator.of(context).pop();
-                  Navigator.of(context).pop();
-                });
+                fetchPaymentStatus(orderId, widget.id ?? 'default', widget.operation, schemeData, context);
               }
 
               if (request.url ==

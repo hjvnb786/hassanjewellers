@@ -1,10 +1,14 @@
 import 'dart:convert';
+import 'package:flutter/material.dart';
+import 'package:hassanjewellers/Screens/payment_status_screen.dart';
 import 'package:hassanjewellers/Services/firebase_services/updateProgressItem.dart';
 import 'package:hassanjewellers/Services/firebase_services/addNewScheme.dart';
 import 'package:http/http.dart' as http;
 
-Future<void> fetchPaymentStatus(String orderNo, String uid, String operation, Map<String, dynamic> schemeData) async {
+Future<void> fetchPaymentStatus(String orderNo, String uid, String operation, Map<String, dynamic> schemeData, BuildContext context) async {
   print("Fetching payment status started...");
+  
+  bool hasNavigated = false; // Flag to prevent multiple navigations
 
   const String url =
       'https://spt.uvm.mybluehostin.me/api/payment/payment_status.php';
@@ -38,6 +42,7 @@ Future<void> fetchPaymentStatus(String orderNo, String uid, String operation, Ma
 
           if (orderStatus == "Successful") {
             print("✅ Payment was successful!");
+            print("🔄 About to navigate to success screen...");
             
             // Call appropriate function based on operation
             if (operation == 'add') {
@@ -57,14 +62,75 @@ Future<void> fetchPaymentStatus(String orderNo, String uid, String operation, Ma
             } else {
               print("⚠️ Unknown operation: $operation");
             }
+            
+            // Navigate to success screen
+            print("🚀 Navigating to PaymentStatusScreen with success=true");
+            try {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => PaymentStatusScreen(
+                    isSuccess: true,
+                    message: "Your payment has been processed successfully.",
+                    referenceNo: referenceNo,
+                  ),
+                ),
+              );
+              hasNavigated = true;
+              print("✅ Navigation to success screen completed");
+            } catch (e) {
+              print("❌ Error during navigation: $e");
+            }
           } else {
             print("❌ Payment was not successful.");
+            print("🔄 About to navigate to failure screen...");
+            
+            // Navigate to failure screen
+            try {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => PaymentStatusScreen(
+                    isSuccess: false,
+                    message: "Payment failed. Please try again.",
+                  ),
+                ),
+              );
+              hasNavigated = true;
+              print("✅ Navigation to failure screen completed");
+            } catch (e) {
+              print("❌ Error during navigation: $e");
+            }
           }
         } else {
           print("⚠️ 'order_status' not found in response.");
+          
+          // Navigate to failure screen
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => PaymentStatusScreen(
+                isSuccess: false,
+                message: "Unable to verify payment status. Please try again.",
+              ),
+            ),
+          );
+          hasNavigated = true;
         }
       } else {
         print("⚠️ 'reference_no' not found in response.");
+        
+        // Navigate to failure screen
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => PaymentStatusScreen(
+              isSuccess: false,
+              message: "Payment verification failed. Please try again.",
+            ),
+          ),
+        );
+        hasNavigated = true;
       }
 
       // Check for status number
@@ -84,8 +150,36 @@ Future<void> fetchPaymentStatus(String orderNo, String uid, String operation, Ma
       }
     } else {
       print('❌ Error: ${response.statusCode} - ${response.body}');
+      
+      // Navigate to failure screen
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => PaymentStatusScreen(
+            isSuccess: false,
+            message: "Network error. Please check your connection and try again.",
+          ),
+        ),
+      );
+      hasNavigated = true;
     }
   } catch (e) {
     print('⚠️ Exception: $e');
+    
+    // Only navigate if no navigation has already occurred
+    if (!hasNavigated) {
+      print("🔄 Navigating to failure screen due to exception");
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => PaymentStatusScreen(
+            isSuccess: false,
+            message: "An error occurred. Please try again.",
+          ),
+        ),
+      );
+    } else {
+      print("⚠️ Skipping navigation due to exception - already navigated");
+    }
   }
 }
