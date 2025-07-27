@@ -256,16 +256,45 @@ class _JoinNewSchemeScreenState extends State<JoinNewSchemeScreen> {
                       ),
                       // Navigation Buttons
                       Container(
-                        padding: const EdgeInsets.all(20),
-                        child: Row(
-                          children: [
-                            if (_currentStep > 0)
+                        margin: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.08),
+                              blurRadius: 12,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: Row(
+                            children: [
+                              if (_currentStep > 0)
+                                Expanded(
+                                  child: OutlinedButton.icon(
+                                    onPressed: _previousStep,
+                                    icon: const Icon(Icons.arrow_back),
+                                    label: const Text('Previous'),
+                                    style: OutlinedButton.styleFrom(
+                                      padding: const EdgeInsets.symmetric(vertical: 16),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              if (_currentStep > 0) const SizedBox(width: 16),
                               Expanded(
-                                child: OutlinedButton.icon(
-                                  onPressed: _previousStep,
-                                  icon: const Icon(Icons.arrow_back),
-                                  label: const Text('Previous'),
-                                  style: OutlinedButton.styleFrom(
+                                child: ElevatedButton.icon(
+                                  onPressed: _canProceedToNext() ? _nextStep : null,
+                                  icon: Icon(_currentStep == 3 ? Icons.check : Icons.arrow_forward),
+                                  label: Text(_currentStep == 3 ? 'Complete' : 'Next'),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Theme.of(context).primaryColor,
+                                    foregroundColor: Colors.white,
                                     padding: const EdgeInsets.symmetric(vertical: 16),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(8),
@@ -273,23 +302,8 @@ class _JoinNewSchemeScreenState extends State<JoinNewSchemeScreen> {
                                   ),
                                 ),
                               ),
-                            if (_currentStep > 0) const SizedBox(width: 16),
-                            Expanded(
-                              child: ElevatedButton.icon(
-                                onPressed: _canProceedToNext() ? _nextStep : null,
-                                icon: Icon(_currentStep == 3 ? Icons.check : Icons.arrow_forward),
-                                label: Text(_currentStep == 3 ? 'Complete' : 'Next'),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Theme.of(context).primaryColor,
-                                  foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(vertical: 16),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ],
@@ -399,16 +413,45 @@ class _JoinNewSchemeScreenState extends State<JoinNewSchemeScreen> {
                       ),
                       // Navigation Buttons
                       Container(
-                        padding: const EdgeInsets.all(20),
-                        child: Row(
-                          children: [
-                            if (_currentStep > 0)
+                        margin: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.08),
+                              blurRadius: 12,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: Row(
+                            children: [
+                              if (_currentStep > 0)
+                                Expanded(
+                                  child: OutlinedButton.icon(
+                                    onPressed: _previousStep,
+                                    icon: const Icon(Icons.arrow_back),
+                                    label: const Text('Previous'),
+                                    style: OutlinedButton.styleFrom(
+                                      padding: const EdgeInsets.symmetric(vertical: 16),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              if (_currentStep > 0) const SizedBox(width: 16),
                               Expanded(
-                                child: OutlinedButton.icon(
-                                  onPressed: _previousStep,
-                                  icon: const Icon(Icons.arrow_back),
-                                  label: const Text('Previous'),
-                                  style: OutlinedButton.styleFrom(
+                                child: ElevatedButton.icon(
+                                  onPressed: _canProceedToNext() ? _nextStep : null,
+                                  icon: Icon(_currentStep == 3 ? Icons.check : Icons.arrow_forward),
+                                  label: Text(_currentStep == 3 ? 'Complete' : 'Next'),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Theme.of(context).primaryColor,
+                                    foregroundColor: Colors.white,
                                     padding: const EdgeInsets.symmetric(vertical: 16),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(8),
@@ -416,23 +459,8 @@ class _JoinNewSchemeScreenState extends State<JoinNewSchemeScreen> {
                                   ),
                                 ),
                               ),
-                            if (_currentStep > 0) const SizedBox(width: 16),
-                            Expanded(
-                              child: ElevatedButton.icon(
-                                onPressed: _canProceedToNext() ? _nextStep : null,
-                                icon: Icon(_currentStep == 3 ? Icons.check : Icons.arrow_forward),
-                                label: Text(_currentStep == 3 ? 'Complete' : 'Next'),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Theme.of(context).primaryColor,
-                                  foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(vertical: 16),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ],
@@ -543,16 +571,45 @@ class _JoinNewSchemeScreenState extends State<JoinNewSchemeScreen> {
                       ),
                       // Navigation Buttons
                       Container(
-                        padding: const EdgeInsets.all(20),
-                        child: Row(
-                          children: [
-                            if (_currentStep > 0)
+                        margin: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.08),
+                              blurRadius: 12,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: Row(
+                            children: [
+                              if (_currentStep > 0)
+                                Expanded(
+                                  child: OutlinedButton.icon(
+                                    onPressed: _previousStep,
+                                    icon: const Icon(Icons.arrow_back),
+                                    label: const Text('Previous'),
+                                    style: OutlinedButton.styleFrom(
+                                      padding: const EdgeInsets.symmetric(vertical: 16),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              if (_currentStep > 0) const SizedBox(width: 16),
                               Expanded(
-                                child: OutlinedButton.icon(
-                                  onPressed: _previousStep,
-                                  icon: const Icon(Icons.arrow_back),
-                                  label: const Text('Previous'),
-                                  style: OutlinedButton.styleFrom(
+                                child: ElevatedButton.icon(
+                                  onPressed: _canProceedToNext() ? _nextStep : null,
+                                  icon: Icon(_currentStep == 3 ? Icons.check : Icons.arrow_forward),
+                                  label: Text(_currentStep == 3 ? 'Complete' : 'Next'),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Theme.of(context).primaryColor,
+                                    foregroundColor: Colors.white,
                                     padding: const EdgeInsets.symmetric(vertical: 16),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(8),
@@ -560,23 +617,8 @@ class _JoinNewSchemeScreenState extends State<JoinNewSchemeScreen> {
                                   ),
                                 ),
                               ),
-                            if (_currentStep > 0) const SizedBox(width: 16),
-                            Expanded(
-                              child: ElevatedButton.icon(
-                                onPressed: _canProceedToNext() ? _nextStep : null,
-                                icon: Icon(_currentStep == 3 ? Icons.check : Icons.arrow_forward),
-                                label: Text(_currentStep == 3 ? 'Complete' : 'Next'),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Theme.of(context).primaryColor,
-                                  foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(vertical: 16),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ],
@@ -686,16 +728,45 @@ class _JoinNewSchemeScreenState extends State<JoinNewSchemeScreen> {
                       ),
                       // Navigation Buttons
                       Container(
-                        padding: const EdgeInsets.all(20),
-                        child: Row(
-                          children: [
-                            if (_currentStep > 0)
+                        margin: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.08),
+                              blurRadius: 12,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: Row(
+                            children: [
+                              if (_currentStep > 0)
+                                Expanded(
+                                  child: OutlinedButton.icon(
+                                    onPressed: _previousStep,
+                                    icon: const Icon(Icons.arrow_back),
+                                    label: const Text('Previous'),
+                                    style: OutlinedButton.styleFrom(
+                                      padding: const EdgeInsets.symmetric(vertical: 16),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              if (_currentStep > 0) const SizedBox(width: 16),
                               Expanded(
-                                child: OutlinedButton.icon(
-                                  onPressed: _previousStep,
-                                  icon: const Icon(Icons.arrow_back),
-                                  label: const Text('Previous'),
-                                  style: OutlinedButton.styleFrom(
+                                child: ElevatedButton.icon(
+                                  onPressed: _canProceedToNext() ? _nextStep : null,
+                                  icon: Icon(_currentStep == 3 ? Icons.check : Icons.arrow_forward),
+                                  label: Text(_currentStep == 3 ? 'Complete' : 'Next'),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Theme.of(context).primaryColor,
+                                    foregroundColor: Colors.white,
                                     padding: const EdgeInsets.symmetric(vertical: 16),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(8),
@@ -703,23 +774,8 @@ class _JoinNewSchemeScreenState extends State<JoinNewSchemeScreen> {
                                   ),
                                 ),
                               ),
-                            if (_currentStep > 0) const SizedBox(width: 16),
-                            Expanded(
-                              child: ElevatedButton.icon(
-                                onPressed: _canProceedToNext() ? _nextStep : null,
-                                icon: Icon(_currentStep == 3 ? Icons.check : Icons.arrow_forward),
-                                label: Text(_currentStep == 3 ? 'Complete' : 'Next'),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Theme.of(context).primaryColor,
-                                  foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(vertical: 16),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ],
