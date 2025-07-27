@@ -6,7 +6,9 @@ import 'package:hassanjewellers/Services/firebase_services/getCurrentUser.dart';
 import 'package:hassanjewellers/Utils/Constants/colors.dart';
 
 class SchemesScreen extends StatefulWidget {
-  const SchemesScreen({super.key});
+  final VoidCallback? onStartNewScheme;
+  
+  const SchemesScreen({super.key, this.onStartNewScheme});
 
   @override
   State<SchemesScreen> createState() => _SchemesScreenState();
@@ -414,10 +416,15 @@ class _SchemesScreenState extends State<SchemesScreen> with TickerProviderStateM
                 if (isActive)
                   ElevatedButton.icon(
                     onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const JoinNewSchemeScreen()),
-                      );
+                      if (widget.onStartNewScheme != null) {
+                        widget.onStartNewScheme!();
+                      } else {
+                        // Fallback to original navigation if no callback provided
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const JoinNewSchemeScreen()),
+                        );
+                      }
                     },
                     icon: const Icon(Icons.add),
                     label: const Text('Start New Scheme'),

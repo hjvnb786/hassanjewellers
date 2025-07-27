@@ -40,7 +40,13 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     List<Widget> screens = [
-      const SchemesScreen(),
+      SchemesScreen(
+        onStartNewScheme: () {
+          setState(() {
+            currentPageIndex = 1;
+          });
+        },
+      ),
       const JoinNewSchemeScreen(),
       AccountScreen(name: customerName, phone: customerPhone, email: customerEmail),
     ];
