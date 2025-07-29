@@ -69,8 +69,10 @@ class SchemeItem extends StatelessWidget {
       }
     }
 
-    final progressPercentage = progressNumber / 12;
-    final remainingAmount = (12 - progressNumber) * int.parse(amount.replaceAll(RegExp(r'[^0-9]'), ''));
+    // Use actual progress length instead of hardcoded 12
+    final progressLength = progress.length;
+    final progressPercentage = progressNumber / progressLength;
+    final remainingAmount = (progressLength - progressNumber) * int.parse(amount.replaceAll(RegExp(r'[^0-9]'), ''));
     final progressColor = getProgressColor(progressPercentage);
     final progressIcon = getProgressIcon(progressPercentage);
 
@@ -197,7 +199,7 @@ class SchemeItem extends StatelessWidget {
                       ),
                       const SizedBox(width: 6),
                       Text(
-                        '$progressNumber of 12 installments paid',
+                        '$progressNumber of $progressLength installments paid',
                         style: TextStyle(
                           fontSize: 14,
                           color: AppColors.textSecondary,

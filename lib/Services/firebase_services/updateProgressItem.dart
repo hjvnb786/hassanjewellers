@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hassanjewellers/Helpers/utils.dart';
 
-Future<dynamic> updateProgressItem(id, referenceId) async {
+Future<dynamic> updateProgressItem(id, referenceId, [Map<String, dynamic>? paymentResponse]) async {
   try {
     // Get the unique identifier (uid) of the currently authenticated user
     final uid = FirebaseAuth.instance.currentUser?.uid;
@@ -34,13 +34,15 @@ Future<dynamic> updateProgressItem(id, referenceId) async {
 
     if (querySnapshot.docs.isNotEmpty) {
       List<dynamic> progress = querySnapshot.docs[indexMatch]["progress"];
+      final progressLength = progress.length; // Get actual progress length
 
       final getDate = await getAccurateTime().then((time) => time);
 
-      for (int i = 0; i < 12; i++) {
+      // Use actual progress length instead of hardcoded 12
+      for (int i = 0; i < progressLength; i++) {
         print("job done ya index number $i");
 
-        if (i == 11) {
+        if (i == progressLength - 1) { // Check if it's the last month
           print("job done ya habibi");
           schemeStatus = false;
         }
@@ -49,6 +51,15 @@ Future<dynamic> updateProgressItem(id, referenceId) async {
           progress[i]["paid"] = true;
           progress[i]["date"] = getDate;
           progress[i]["referenceId"] = referenceId;
+          // Store the complete payment response if provided
+          if (paymentResponse != null) {
+            progress[i]["paymentResponse"] = paymentResponse;
+            print("✅ Payment response stored in progress month $i");
+            print("📊 Payment response data: $paymentResponse");
+            print("🔍 Progress month $i now contains: ${progress[i]}");
+          } else {
+            print("⚠️ No payment response provided for progress month $i");
+          }
           break;
         }
       }

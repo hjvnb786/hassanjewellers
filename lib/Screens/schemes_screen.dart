@@ -76,10 +76,20 @@ class _SchemesScreenState extends State<SchemesScreen> with TickerProviderStateM
       for (var doc in activeSchemes.docs) {
         final data = doc.data();
         final installmentAmount = data["installmentAmount"] ?? 0.0;
-        final progress = data["progress"] ?? 0.0;
+        final progress = data["progress"] ?? [];
         final targetAmount = data["targetAmount"] ?? 0.0;
         
-        totalSaved += progress * installmentAmount;
+        // Calculate paid installments count
+        int paidCount = 0;
+        if (progress is List) {
+          for (var item in progress) {
+            if (item is Map && item["paid"] == true) {
+              paidCount++;
+            }
+          }
+        }
+        
+        totalSaved += paidCount * double.parse(installmentAmount.toString().replaceAll('₹', '').replaceAll(',', ''));
         totalTarget += targetAmount;
       }
 

@@ -13,6 +13,9 @@ Future<String?> addNewScheme(Map<String, dynamic> schemeData) async {
     final address = schemeData['address']?.toString().trim() ?? '';
     final schemeName = schemeData['schemeName']?.toString().trim() ?? '';
     final schemeAmount = schemeData['schemeAmount']?.toString().trim() ?? '';
+    final schemeDuration = schemeData['schemeDuration'] as int?;
+    final paymentReference = schemeData['paymentReference'] as String?;
+    final paymentResponse = schemeData['paymentResponse'] as Map<String, dynamic>?;
     
     // Combine firstName and lastName for the name field
     final name = '$firstName $lastName'.trim();
@@ -24,12 +27,16 @@ Future<String?> addNewScheme(Map<String, dynamic> schemeData) async {
     }
     
     print('Adding new scheme for user: ${user.uid}');
-    print('Scheme data: Name=$name, Mobile=$mobile, Email=$email, Scheme=$schemeName, Amount=$schemeAmount');
+    print('🔍 Full schemeData: $schemeData');
+    print('🔍 schemeDuration type: ${schemeDuration.runtimeType}');
+    print('🔍 schemeDuration value: $schemeDuration');
+    print('🔍 paymentResponse: $paymentResponse');
+    print('Scheme data: Name=$name, Mobile=$mobile, Email=$email, Scheme=$schemeName, Amount=$schemeAmount, Duration=$schemeDuration');
     
     // Get accurate timestamp
     final time = await getAccurateTime();
     
-    // Create scheme document
+    // Create scheme document with dynamic progress based on duration
     final DocumentReference result = await FirebaseFirestore.instance.collection("savings").add({
       "userId": user.uid,
       "name": name,
@@ -38,13 +45,21 @@ Future<String?> addNewScheme(Map<String, dynamic> schemeData) async {
       "address": address,
       "schemeName": schemeName,
       "installmentAmount": schemeAmount,
+      "schemeDuration": schemeDuration, // Store the duration
       ...schemeData,
-      "progress": generateProgress(),
+      "progress": generateProgress(duration: schemeDuration, paymentReference: paymentReference, paymentResponse: paymentResponse),
       "status": true,
       "createdAt": FieldValue.serverTimestamp()
     });
     
     print('✅ New scheme added successfully with ID: ${result.id}');
+    print('📊 Progress created with ${schemeDuration ?? 12} months');
+    if (paymentReference != null) {
+      print('💰 Payment reference stored: $paymentReference');
+    }
+    if (paymentResponse != null) {
+      print('📊 Complete payment response stored in first month');
+    }
     
     return result.id; // Return the document ID for future reference
     
