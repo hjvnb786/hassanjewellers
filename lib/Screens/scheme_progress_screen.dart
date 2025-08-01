@@ -47,13 +47,22 @@ class _SchemeProgressScreenState extends State<SchemeProgressScreen> {
   }
 
   void handlePay() {
+    // Create formData from scheme details for consistent payment processing
+    Map<String, dynamic> formData = {
+      'firstName': widget.name.split(' ').first,
+      'lastName': widget.name.split(' ').length > 1 ? widget.name.split(' ').last : '',
+      'schemeAmount': widget.amount,
+      'schemeName': widget.schemeDetails['name'] ?? widget.name,
+      'schemeDescription': widget.schemeDetails['description'] ?? '',
+      'schemeDuration': widget.schemeDetails['duration'] ?? 12,
+    };
+    
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => PaymentScreen(
-          id: widget.id,
-          amount: widget.amount,
-          name: widget.name, operation: 'update',
+          formData: formData,
+          operation: 'update',
         ),
       ),
     );
