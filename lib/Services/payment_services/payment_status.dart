@@ -73,6 +73,13 @@ Future<void> fetchPaymentStatus(String orderNo, String uid, String operation, Ma
             // Navigate to success screen
             print("🚀 Navigating to PaymentStatusScreen with success=true");
             try {
+              // Add the amount from the original payment data to the payment response
+              Map<String, dynamic> enhancedPaymentResponse = Map<String, dynamic>.from(data);
+              if (schemeData.containsKey('schemeAmount')) {
+                enhancedPaymentResponse['schemeAmount'] = schemeData['schemeAmount'];
+                print("💰 Added amount to payment response: ${schemeData['schemeAmount']}");
+              }
+              
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
@@ -80,11 +87,13 @@ Future<void> fetchPaymentStatus(String orderNo, String uid, String operation, Ma
                     isSuccess: true,
                     message: "Your payment has been processed successfully.",
                     referenceNo: referenceNo,
+                    paymentResponse: enhancedPaymentResponse, // Pass enhanced payment response
                   ),
                 ),
               );
               hasNavigated = true;
               print("✅ Navigation to success screen completed");
+              print("📄 Enhanced payment response passed to UI: $enhancedPaymentResponse");
             } catch (e) {
               print("❌ Error during navigation: $e");
             }

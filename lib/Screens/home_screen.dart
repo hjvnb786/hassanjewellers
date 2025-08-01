@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hassanjewellers/Screens/account_screen.dart';
 import 'package:hassanjewellers/Screens/schemes_screen.dart';
 import 'package:hassanjewellers/Screens/join_new_scheme_screen.dart';
+import 'package:hassanjewellers/Screens/payment_status_screen.dart';
 import 'package:hassanjewellers/Services/firebase_services/getDocumentByUid.dart';
 import 'package:hassanjewellers/Services/firebase_services/getCurrentUser.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
