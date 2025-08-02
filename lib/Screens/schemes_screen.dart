@@ -75,14 +75,17 @@ class _SchemesScreenState extends State<SchemesScreen> with TickerProviderStateM
       // Calculate active schemes stats
       for (var doc in activeSchemes.docs) {
         final data = doc.data();
-        final installmentAmount = data["installmentAmount"] ?? 0.0;
-        final progress = data["progress"] ?? [];
+        final schemeDetails = data["schemeDetails"] as Map<String, dynamic>? ?? {};
+        final schemeProgress = data["schemeProgress"] as Map<String, dynamic>? ?? {};
+        
+        final installmentAmount = schemeDetails["installmentAmount"] ?? 0.0;
+        final installments = schemeProgress["installments"] ?? [];
         final targetAmount = data["targetAmount"] ?? 0.0;
         
         // Calculate paid installments count
         int paidCount = 0;
-        if (progress is List) {
-          for (var item in progress) {
+        if (installments is List) {
+          for (var item in installments) {
             if (item is Map && item["paid"] == true) {
               paidCount++;
             }
@@ -455,13 +458,24 @@ class _SchemesScreenState extends State<SchemesScreen> with TickerProviderStateM
           itemCount: schemes.length,
           itemBuilder: (context, index) {
             final data = schemes[index];
+            final personalDetails = data["personalDetails"] as Map<String, dynamic>? ?? {};
+            final schemeDetails = data["schemeDetails"] as Map<String, dynamic>? ?? {};
+            final schemeProgress = data["schemeProgress"] as Map<String, dynamic>? ?? {};
+            
+            // Extract data from new nested structure
+            final firstName = personalDetails["firstName"] ?? '';
+            final lastName = personalDetails["lastName"] ?? '';
+            final name = '$firstName $lastName'.trim();
+            final amount = schemeDetails["installmentAmount"] ?? '';
+            final progress = schemeProgress["installments"] ?? [];
+            
             return Padding(
               padding: const EdgeInsets.only(bottom: 16),
               child: SchemeItem(
                 id: data.id,
-                name: data["name"],
-                amount: data["installmentAmount"],
-                progress: data["progress"],
+                name: name,
+                amount: amount,
+                progress: progress,
                 schemeDetails: data.data() as Map<String, dynamic>,
               ),
             );

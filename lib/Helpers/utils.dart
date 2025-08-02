@@ -40,11 +40,6 @@ List<Map<String, dynamic>> generateProgress({int? duration, String? paymentRefer
   listOfMaps[0]['paid'] = true;
   listOfMaps[0]['date'] = currentDate;
   
-  // Add payment reference if provided
-  if (paymentReference != null) {
-    listOfMaps[0]['referenceId'] = paymentReference;
-  }
-  
   // Add complete payment response if provided
   if (paymentResponse != null) {
     listOfMaps[0]['paymentResponse'] = paymentResponse;

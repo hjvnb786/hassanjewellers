@@ -31,6 +31,11 @@ class _SchemeProgressScreenState extends State<SchemeProgressScreen> {
   bool enableButton = true;
   final currencyFormat = NumberFormat.currency(locale: 'en_IN', symbol: '₹');
   final dateFormat = DateFormat('dd MMM yyyy');
+  
+  // Add state for dropdown sections
+  bool isPersonalDetailsExpanded = false;
+  bool isSchemeDetailsExpanded = false;
+  bool isAdditionalDetailsExpanded = false;
 
   String _formatDate(dynamic date) {
     if (date == null) return 'N/A';
@@ -167,8 +172,8 @@ class _SchemeProgressScreenState extends State<SchemeProgressScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Personal Details Section - Consistent Design
                   Container(
-                    padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(16),
@@ -181,24 +186,175 @@ class _SchemeProgressScreenState extends State<SchemeProgressScreen> {
                       ],
                     ),
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          'Scheme Details',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.text,
+                        // Header
+                        InkWell(
+                          onTap: () {
+                            setState(() {
+                              isPersonalDetailsExpanded = !isPersonalDetailsExpanded;
+                            });
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(16),
+                            child: Row(
+                              children: [
+                                Icon(Icons.person, color: AppColors.primary, size: 20),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Text(
+                                    'Personal Details',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                      color: AppColors.text,
+                                    ),
+                                  ),
+                                ),
+                                Icon(
+                                  isPersonalDetailsExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                                  color: AppColors.primary,
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                        const SizedBox(height: 16),
-                        _buildDetailRow('Guardian Name', (widget.schemeDetails['guardianName'] ?? 'N/A').toString()),
-                        _buildDetailRow('Occupation', (widget.schemeDetails['occupation'] ?? 'N/A').toString()),
-                        _buildDetailRow('Nominee Name', (widget.schemeDetails['nomineeName'] ?? 'N/A').toString()),
-                        _buildDetailRow('Nominee Relation', (widget.schemeDetails['nomineeRelation'] ?? 'N/A').toString()),
-                        _buildDetailRow('Address', (widget.schemeDetails['address'] ?? 'N/A').toString()),
-                        _buildDetailRow('Age', (widget.schemeDetails['age'] ?? 'N/A').toString()),
-                        _buildDetailRow('Start Date', _formatDate(widget.schemeDetails['date'])),
+                        // Content
+                        if (isPersonalDetailsExpanded)
+                          Container(
+                            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _buildDetailRow('First Name', (widget.schemeDetails['personalDetails']?['firstName'] ?? 'N/A').toString()),
+                                _buildDetailRow('Last Name', (widget.schemeDetails['personalDetails']?['lastName'] ?? 'N/A').toString()),
+                                _buildDetailRow('Mobile', (widget.schemeDetails['personalDetails']?['mobile'] ?? 'N/A').toString()),
+                                _buildDetailRow('Email', (widget.schemeDetails['personalDetails']?['email'] ?? 'N/A').toString()),
+                                _buildDetailRow('Delivery Address', (widget.schemeDetails['personalDetails']?['deliveryAddress'] ?? 'N/A').toString()),
+                              ],
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  
+                  // Scheme Details Section - Consistent Design
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.shadowLight,
+                          blurRadius: 10,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      children: [
+                        // Header
+                        InkWell(
+                          onTap: () {
+                            setState(() {
+                              isSchemeDetailsExpanded = !isSchemeDetailsExpanded;
+                            });
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(16),
+                            child: Row(
+                              children: [
+                                Icon(Icons.account_balance_wallet, color: AppColors.primary, size: 20),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Text(
+                                    'Scheme Details',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                      color: AppColors.text,
+                                    ),
+                                  ),
+                                ),
+                                Icon(
+                                  isSchemeDetailsExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                                  color: AppColors.primary,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        // Content
+                        if (isSchemeDetailsExpanded)
+                          Container(
+                            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _buildDetailRow('Scheme Name', (widget.schemeDetails['schemeDetails']?['schemeName'] ?? 'N/A').toString()),
+                                _buildDetailRow('Scheme Description', (widget.schemeDetails['schemeDetails']?['schemeDescription'] ?? 'N/A').toString()),
+                                _buildDetailRow('Installment Amount', (widget.schemeDetails['schemeDetails']?['installmentAmount'] ?? 'N/A').toString()),
+                                _buildDetailRow('Scheme Duration', '${widget.schemeDetails['schemeDetails']?['schemeDuration'] ?? 'N/A'} months'),
+                              ],
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  
+                  // Additional Details Section - Consistent Design
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.shadowLight,
+                          blurRadius: 10,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      children: [
+                        // Header
+                        InkWell(
+                          onTap: () {
+                            setState(() {
+                              isAdditionalDetailsExpanded = !isAdditionalDetailsExpanded;
+                            });
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(16),
+                            child: Row(
+                              children: [
+                                Icon(Icons.info_outline, color: AppColors.primary, size: 20),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Text(
+                                    'Additional Details',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                      color: AppColors.text,
+                                    ),
+                                  ),
+                                ),
+                                Icon(
+                                  isAdditionalDetailsExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                                  color: AppColors.primary,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        // Content
+                        if (isAdditionalDetailsExpanded)
+                          Container(
+                            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                            child: _buildAdditionalDetails(),
+                          ),
                       ],
                     ),
                   ),
@@ -262,6 +418,7 @@ class _SchemeProgressScreenState extends State<SchemeProgressScreen> {
                     ),
                   ),
                   const SizedBox(height: 24),
+
                   Text(
                     'Installment History',
                     style: TextStyle(
@@ -413,6 +570,38 @@ class _SchemeProgressScreenState extends State<SchemeProgressScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildAdditionalDetails() {
+    final additionalDetails = widget.schemeDetails['personalDetails']?['additionalDetails'] as Map<String, dynamic>? ?? {};
+    
+    if (additionalDetails.isEmpty) {
+      return Text(
+        'No additional details available',
+        style: TextStyle(
+          fontSize: 14,
+          color: AppColors.textSecondary,
+          fontStyle: FontStyle.italic,
+        ),
+      );
+    }
+    
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: additionalDetails.entries.map((entry) {
+        final key = entry.key;
+        final value = entry.value;
+        
+        // Convert key to display format (e.g., "guardianName" -> "Guardian Name")
+        String displayKey = key.replaceAllMapped(
+          RegExp(r'([A-Z])'),
+          (match) => ' ${match.group(1)}',
+        ).trim();
+        displayKey = displayKey[0].toUpperCase() + displayKey.substring(1);
+        
+        return _buildDetailRow(displayKey, value.toString());
+      }).toList(),
     );
   }
 }
