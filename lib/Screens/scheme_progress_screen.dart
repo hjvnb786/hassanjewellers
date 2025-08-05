@@ -437,28 +437,24 @@ class _SchemeProgressScreenState extends State<SchemeProgressScreen> {
                       final isPaid = item['paid'] == true;
                       final isNextToPay = item['payButton'] == true;
 
-                      return Container(
+                                            return Container(
                         margin: const EdgeInsets.only(bottom: 16),
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(16),
+                          borderRadius: BorderRadius.circular(12),
                           border: Border.all(
                             color: isPaid 
-                                ? AppColors.successLight 
+                                ? AppColors.successLight.withOpacity(0.2)
                                 : isNextToPay 
-                                    ? AppColors.primary.withOpacity(0.3)
-                                    : Colors.grey.withOpacity(0.2),
-                            width: 1.5,
+                                    ? AppColors.primary.withOpacity(0.15)
+                                    : Colors.grey.withOpacity(0.1),
+                            width: 1,
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: isPaid 
-                                  ? AppColors.successLight.withOpacity(0.1)
-                                  : isNextToPay 
-                                      ? AppColors.primary.withOpacity(0.1)
-                                      : AppColors.shadowLight,
-                              blurRadius: 12,
-                              offset: const Offset(0, 4),
+                              color: Colors.black.withOpacity(0.04),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
                             ),
                           ],
                         ),
@@ -469,38 +465,38 @@ class _SchemeProgressScreenState extends State<SchemeProgressScreen> {
                               padding: const EdgeInsets.all(16),
                               child: Row(
                                 children: [
-                                  // Status indicator
+                                  // Simple status indicator
                                   Container(
-                                    width: 48,
-                                    height: 48,
+                                    width: 44,
+                                    height: 44,
                                     decoration: BoxDecoration(
                                       color: isPaid
-                                          ? AppColors.successLight
+                                          ? AppColors.successLight.withOpacity(0.1)
                                           : isNextToPay
-                                              ? AppColors.primaryLight
-                                              : Colors.grey.withOpacity(0.1),
+                                              ? AppColors.primary.withOpacity(0.1)
+                                              : Colors.grey.withOpacity(0.08),
                                       shape: BoxShape.circle,
                                       border: Border.all(
                                         color: isPaid
-                                            ? AppColors.successLight
+                                            ? AppColors.successLight.withOpacity(0.3)
                                             : isNextToPay
-                                                ? AppColors.primary
-                                                : Colors.grey.withOpacity(0.3),
-                                        width: 2,
+                                                ? AppColors.primary.withOpacity(0.3)
+                                                : Colors.grey.withOpacity(0.2),
+                                        width: 1,
                                       ),
                                     ),
                                     child: Icon(
                                       isPaid
-                                          ? Icons.check_circle_rounded
+                                          ? Icons.check_circle_outline
                                           : isNextToPay
-                                              ? Icons.payment_rounded
-                                              : Icons.schedule_rounded,
+                                              ? Icons.payment_outlined
+                                              : Icons.schedule_outlined,
                                       color: isPaid
-                                          ? Colors.white
+                                          ? AppColors.successLight
                                           : isNextToPay
                                               ? AppColors.primary
                                               : Colors.grey,
-                                      size: 24,
+                                      size: 22,
                                     ),
                                   ),
                                   const SizedBox(width: 16),
@@ -512,7 +508,7 @@ class _SchemeProgressScreenState extends State<SchemeProgressScreen> {
                                         Text(
                                           item['label'],
                                           style: TextStyle(
-                                            fontSize: 18,
+                                            fontSize: 16,
                                             fontWeight: FontWeight.w600,
                                             color: isPaid 
                                                 ? AppColors.text 
@@ -529,7 +525,7 @@ class _SchemeProgressScreenState extends State<SchemeProgressScreen> {
                                                   ? 'Ready to Pay'
                                                   : 'Pending',
                                           style: TextStyle(
-                                            fontSize: 14,
+                                            fontSize: 13,
                                             color: isPaid 
                                                 ? AppColors.successLight
                                                 : isNextToPay 
@@ -541,67 +537,48 @@ class _SchemeProgressScreenState extends State<SchemeProgressScreen> {
                                       ],
                                     ),
                                   ),
-                                  // Action button
+                                  // Simple action button
                                   if (!isPaid && isNextToPay)
-                                    Container(
-                                      decoration: BoxDecoration(
-                                        gradient: LinearGradient(
-                                          colors: [
-                                            AppColors.primary,
-                                            AppColors.primary.withOpacity(0.8),
-                                          ],
+                                    ElevatedButton(
+                                      onPressed: handlePay,
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: AppColors.primary,
+                                        foregroundColor: Colors.white,
+                                        elevation: 0,
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 16,
+                                          vertical: 10,
                                         ),
-                                        borderRadius: BorderRadius.circular(12),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: AppColors.primary.withOpacity(0.3),
-                                            blurRadius: 8,
-                                            offset: const Offset(0, 2),
-                                          ),
-                                        ],
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(8),
+                                        ),
                                       ),
-                                      child: ElevatedButton(
-                                        onPressed: handlePay,
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: Colors.transparent,
-                                          foregroundColor: Colors.white,
-                                          shadowColor: Colors.transparent,
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 20,
-                                            vertical: 12,
-                                          ),
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(12),
-                                          ),
-                                        ),
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Icon(Icons.payment_rounded, size: 18),
-                                            const SizedBox(width: 8),
-                                            const Text(
-                                              'Pay Now',
-                                              style: TextStyle(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                            ),
-                                          ],
+                                      child: const Text(
+                                        'Pay Now',
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w600,
                                         ),
                                       ),
                                     ),
                                 ],
                               ),
                             ),
-                            // Payment details for paid installments
+                            // Simple payment details for paid installments
                             if (isPaid) ...[
                               Container(
                                 width: double.infinity,
                                 decoration: BoxDecoration(
-                                  color: AppColors.successLight.withOpacity(0.05),
+                                  color: AppColors.successLight.withOpacity(0.03),
                                   borderRadius: const BorderRadius.only(
-                                    bottomLeft: Radius.circular(16),
-                                    bottomRight: Radius.circular(16),
+                                    bottomLeft: Radius.circular(12),
+                                    bottomRight: Radius.circular(12),
+                                  ),
+                                  border: Border(
+                                    top: BorderSide(
+                                      color: AppColors.successLight.withOpacity(0.1),
+                                      width: 1,
+                                    ),
                                   ),
                                 ),
                                 child: Padding(
@@ -612,13 +589,13 @@ class _SchemeProgressScreenState extends State<SchemeProgressScreen> {
                                       Row(
                                         children: [
                                           Icon(
-                                            Icons.receipt_rounded,
+                                            Icons.receipt_outlined,
                                             size: 16,
                                             color: AppColors.successLight,
                                           ),
                                           const SizedBox(width: 8),
                                           Text(
-                                            'Payment Details',
+                                            'Payment Information',
                                             style: TextStyle(
                                               fontSize: 14,
                                               fontWeight: FontWeight.w600,
@@ -628,22 +605,17 @@ class _SchemeProgressScreenState extends State<SchemeProgressScreen> {
                                         ],
                                       ),
                                       const SizedBox(height: 12),
-                                                                             Row(
-                                         children: [
-                                           Expanded(
-                                             child: Column(
-                                               crossAxisAlignment: CrossAxisAlignment.start,
-                                               children: [
-                                                 Text(
-                                                   'Paid on ${_formatDate(item["date"])}',
-                                                   style: TextStyle(
-                                                     fontSize: 14,
-                                                     color: AppColors.textSecondary,
-                                                   ),
-                                                 ),
-                                               ],
-                                             ),
-                                           ),
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              'Paid on ${_formatDate(item["date"])}',
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                color: AppColors.textSecondary,
+                                              ),
+                                            ),
+                                          ),
                                           Container(
                                             padding: const EdgeInsets.symmetric(
                                               horizontal: 8,
@@ -651,7 +623,7 @@ class _SchemeProgressScreenState extends State<SchemeProgressScreen> {
                                             ),
                                             decoration: BoxDecoration(
                                               color: AppColors.successLight,
-                                              borderRadius: BorderRadius.circular(8),
+                                              borderRadius: BorderRadius.circular(6),
                                             ),
                                             child: Text(
                                               'SUCCESS',
