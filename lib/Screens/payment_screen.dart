@@ -54,16 +54,79 @@ class _PaymentScreenState extends State<PaymentScreen> {
         throw Exception('User not authenticated');
       }
 
-      // Query Firestore to find the scheme document
-      final querySnapshot = await FirebaseFirestore.instance
+      // Check if we have a scheme ID (document ID) for direct lookup
+      final schemeId = widget.formData?['schemeId'];
+      
+      if (schemeId != null && schemeId.isNotEmpty) {
+        print("🔍 Using scheme ID for direct lookup: $schemeId");
+        
+        // Direct lookup using document ID
+        final document = await FirebaseFirestore.instance
+            .collection('savings')
+            .doc(schemeId)
+            .get();
+
+        if (!document.exists) {
+          throw Exception('Scheme document not found with ID: $schemeId');
+        }
+
+        final orderId = document.data()?['orderId'] as String?;
+        if (orderId == null || orderId.isEmpty) {
+          throw Exception('Order ID not found in scheme document');
+        }
+
+        print("✅ Retrieved order ID from Firestore using document ID: $orderId");
+        return orderId;
+      }
+
+      // Fallback to name-based search if no document ID
+      print("🔍 No scheme ID provided, falling back to name-based search");
+      print("🔍 Scheme name to search: ${widget.formData?['schemeName'] ?? widget.name}");
+
+      // Get all schemes for the user to debug
+      final allSchemes = await FirebaseFirestore.instance
+          .collection('savings')
+          .where('userId', isEqualTo: user.uid)
+          .get();
+
+      print("📊 Found ${allSchemes.docs.length} schemes for user");
+
+      // Log all scheme names for debugging
+      for (var doc in allSchemes.docs) {
+        final data = doc.data();
+        final schemeName = data['schemeDetails']?['schemeName'] ?? 'Unknown';
+        final orderId = data['orderId'] ?? 'No Order ID';
+        print("📋 Scheme: $schemeName, Order ID: $orderId, Doc ID: ${doc.id}");
+      }
+
+      // Try exact match first
+      var querySnapshot = await FirebaseFirestore.instance
           .collection('savings')
           .where('userId', isEqualTo: user.uid)
           .where('schemeDetails.schemeName', isEqualTo: widget.formData?['schemeName'] ?? widget.name)
           .limit(1)
           .get();
 
+      // If no exact match, try partial match
       if (querySnapshot.docs.isEmpty) {
-        throw Exception('Scheme not found in Firestore');
+        print("⚠️ No exact match found, trying partial match...");
+        
+        // Find the first scheme that contains the scheme name
+        for (var doc in allSchemes.docs) {
+          final data = doc.data();
+          final schemeName = data['schemeDetails']?['schemeName'] ?? '';
+          final searchName = widget.formData?['schemeName'] ?? widget.name ?? '';
+          
+          if (schemeName.contains(searchName) || searchName.contains(schemeName)) {
+            final orderId = data['orderId'] as String?;
+            if (orderId != null && orderId.isNotEmpty) {
+              print("✅ Found partial match - Scheme: $schemeName, Order ID: $orderId");
+              return orderId;
+            }
+          }
+        }
+        
+        throw Exception('No matching scheme found in Firestore');
       }
 
       final document = querySnapshot.docs.first;

@@ -60,6 +60,7 @@ class _SchemeProgressScreenState extends State<SchemeProgressScreen> {
       'schemeName': widget.schemeDetails['name'] ?? widget.name,
       'schemeDescription': widget.schemeDetails['description'] ?? '',
       'schemeDuration': widget.schemeDetails['duration'] ?? 12,
+      'schemeId': widget.id, // Add the Firestore document ID
     };
     
     Navigator.push(
