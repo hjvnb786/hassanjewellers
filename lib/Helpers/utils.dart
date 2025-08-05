@@ -116,7 +116,8 @@ List<Map<String, dynamic>> getProgressList(List<dynamic> progress) {
       'paid': element['paid'],
       'label': installmentLabels[index],
       'date': formattedDate,
-      'referenceId': element['referenceId']
+      'referenceId': element['referenceId'],
+      'paymentResponse': element['paymentResponse'] // Add payment response data
     };
   }).toList();
 

@@ -441,94 +441,240 @@ class _SchemeProgressScreenState extends State<SchemeProgressScreen> {
                         margin: const EdgeInsets.only(bottom: 16),
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: isPaid 
+                                ? AppColors.successLight 
+                                : isNextToPay 
+                                    ? AppColors.primary.withOpacity(0.3)
+                                    : Colors.grey.withOpacity(0.2),
+                            width: 1.5,
+                          ),
                           boxShadow: [
                             BoxShadow(
-                              color: AppColors.shadowLight,
-                              blurRadius: 8,
-                              offset: const Offset(0, 2),
+                              color: isPaid 
+                                  ? AppColors.successLight.withOpacity(0.1)
+                                  : isNextToPay 
+                                      ? AppColors.primary.withOpacity(0.1)
+                                      : AppColors.shadowLight,
+                              blurRadius: 12,
+                              offset: const Offset(0, 4),
                             ),
                           ],
                         ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Row(
-                            children: [
-                              Container(
-                                width: 40,
-                                height: 40,
-                                decoration: BoxDecoration(
-                                  color: isPaid
-                                      ? AppColors.successLight
-                                      : isNextToPay
-                                          ? AppColors.primaryLight
-                                          : AppColors.progressBackground,
-                                  shape: BoxShape.circle,
-                                ),
-                                child: Icon(
-                                  isPaid
-                                      ? Icons.check_circle
-                                      : isNextToPay
-                                          ? Icons.pending_actions
-                                          : Icons.schedule,
-                                  color: isPaid
-                                      ? Colors.white
-                                      : isNextToPay
-                                          ? AppColors.primary
-                                          : AppColors.iconSecondary,
-                                ),
-                              ),
-                              const SizedBox(width: 16),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      item['label'],
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500,
+                        child: Column(
+                          children: [
+                            // Header with status and action
+                            Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: Row(
+                                children: [
+                                  // Status indicator
+                                  Container(
+                                    width: 48,
+                                    height: 48,
+                                    decoration: BoxDecoration(
+                                      color: isPaid
+                                          ? AppColors.successLight
+                                          : isNextToPay
+                                              ? AppColors.primaryLight
+                                              : Colors.grey.withOpacity(0.1),
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: isPaid
+                                            ? AppColors.successLight
+                                            : isNextToPay
+                                                ? AppColors.primary
+                                                : Colors.grey.withOpacity(0.3),
+                                        width: 2,
                                       ),
                                     ),
-                                    if (isPaid) ...[
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        'Paid on ${_formatDate(item["date"])}',
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          color: AppColors.textSecondary,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 2),
-                                      Text(
-                                        'Reference ID: ${item["referenceId"]}',
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          color: AppColors.textSecondary,
-                                        ),
-                                      ),
-                                    ],
-                                  ],
-                                ),
-                              ),
-                              if (!isPaid && isNextToPay)
-                                ElevatedButton(
-                                  onPressed: handlePay,
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: AppColors.buttonPrimary,
-                                    foregroundColor: AppColors.buttonPrimaryText,
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 16,
-                                      vertical: 8,
-                                    ),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8),
+                                    child: Icon(
+                                      isPaid
+                                          ? Icons.check_circle_rounded
+                                          : isNextToPay
+                                              ? Icons.payment_rounded
+                                              : Icons.schedule_rounded,
+                                      color: isPaid
+                                          ? Colors.white
+                                          : isNextToPay
+                                              ? AppColors.primary
+                                              : Colors.grey,
+                                      size: 24,
                                     ),
                                   ),
-                                  child: const Text('Pay Now'),
+                                  const SizedBox(width: 16),
+                                  // Installment info
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          item['label'],
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w600,
+                                            color: isPaid 
+                                                ? AppColors.text 
+                                                : isNextToPay 
+                                                    ? AppColors.primary
+                                                    : AppColors.textSecondary,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          isPaid 
+                                              ? 'Payment Completed'
+                                              : isNextToPay 
+                                                  ? 'Ready to Pay'
+                                                  : 'Pending',
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: isPaid 
+                                                ? AppColors.successLight
+                                                : isNextToPay 
+                                                    ? AppColors.primary
+                                                    : AppColors.textSecondary,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  // Action button
+                                  if (!isPaid && isNextToPay)
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        gradient: LinearGradient(
+                                          colors: [
+                                            AppColors.primary,
+                                            AppColors.primary.withOpacity(0.8),
+                                          ],
+                                        ),
+                                        borderRadius: BorderRadius.circular(12),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: AppColors.primary.withOpacity(0.3),
+                                            blurRadius: 8,
+                                            offset: const Offset(0, 2),
+                                          ),
+                                        ],
+                                      ),
+                                      child: ElevatedButton(
+                                        onPressed: handlePay,
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.transparent,
+                                          foregroundColor: Colors.white,
+                                          shadowColor: Colors.transparent,
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 20,
+                                            vertical: 12,
+                                          ),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(12),
+                                          ),
+                                        ),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Icon(Icons.payment_rounded, size: 18),
+                                            const SizedBox(width: 8),
+                                            const Text(
+                                              'Pay Now',
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            ),
+                            // Payment details for paid installments
+                            if (isPaid) ...[
+                              Container(
+                                width: double.infinity,
+                                decoration: BoxDecoration(
+                                  color: AppColors.successLight.withOpacity(0.05),
+                                  borderRadius: const BorderRadius.only(
+                                    bottomLeft: Radius.circular(16),
+                                    bottomRight: Radius.circular(16),
+                                  ),
                                 ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(16),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Icon(
+                                            Icons.receipt_rounded,
+                                            size: 16,
+                                            color: AppColors.successLight,
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Text(
+                                            'Payment Details',
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w600,
+                                              color: AppColors.successLight,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 12),
+                                                                             Row(
+                                         children: [
+                                           Expanded(
+                                             child: Column(
+                                               crossAxisAlignment: CrossAxisAlignment.start,
+                                               children: [
+                                                 Text(
+                                                   'Paid on ${_formatDate(item["date"])}',
+                                                   style: TextStyle(
+                                                     fontSize: 14,
+                                                     color: AppColors.textSecondary,
+                                                   ),
+                                                 ),
+                                               ],
+                                             ),
+                                           ),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 8,
+                                              vertical: 4,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: AppColors.successLight,
+                                              borderRadius: BorderRadius.circular(8),
+                                            ),
+                                            child: Text(
+                                              'SUCCESS',
+                                              style: TextStyle(
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.w600,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      // Payment response details
+                                      if (item["paymentResponse"] != null) ...[
+                                        const SizedBox(height: 12),
+                                        _buildPaymentDetails(item["paymentResponse"]),
+                                      ],
+                                    ],
+                                  ),
+                                ),
+                              ),
                             ],
-                          ),
+                          ],
                         ),
                       );
                     },
@@ -564,6 +710,81 @@ class _SchemeProgressScreenState extends State<SchemeProgressScreen> {
               value,
               style: const TextStyle(
                 fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPaymentDetails(Map<String, dynamic> paymentResponse) {
+    return ExpansionTile(
+      title: Row(
+        children: [
+          Icon(
+            Icons.payment,
+            size: 16,
+            color: AppColors.primary,
+          ),
+          const SizedBox(width: 8),
+          Text(
+            'Payment Details',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: AppColors.primary,
+            ),
+          ),
+        ],
+      ),
+      children: [
+        Container(
+          padding: const EdgeInsets.all(12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: paymentResponse.entries.map((entry) {
+              String key = entry.key;
+              dynamic value = entry.value;
+              
+              // Convert key to display format (e.g., "reference_no" -> "Reference No")
+              String displayKey = key.replaceAllMapped(
+                RegExp(r'([A-Z])'),
+                (match) => ' ${match.group(1)}',
+              ).replaceAll('_', ' ').trim();
+              displayKey = displayKey[0].toUpperCase() + displayKey.substring(1);
+              
+              return _buildPaymentDetailRow(displayKey, value.toString());
+            }).toList(),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPaymentDetailRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 100,
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 12,
+                color: AppColors.textSecondary,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: const TextStyle(
+                fontSize: 12,
                 fontWeight: FontWeight.w500,
               ),
             ),
