@@ -50,9 +50,10 @@ Future<void> fetchPaymentStatus(String orderNo, String uid, String operation, Ma
               print("🆕 Adding new scheme...");
               print("🔍 Payment response data to be stored: $data");
               
-              // Add payment reference and complete payment response to schemeData for new schemes
+              // Add payment reference, complete payment response, and order ID to schemeData for new schemes
               schemeData['paymentReference'] = referenceNo;
               schemeData['paymentResponse'] = data; // Store complete payment response
+              schemeData['orderId'] = orderNo; // Store order ID
               
               final schemeId = await addNewScheme(schemeData);
               if (schemeId != null) {
@@ -63,7 +64,7 @@ Future<void> fetchPaymentStatus(String orderNo, String uid, String operation, Ma
             } else if (operation == 'update') {
               print("📝 Updating existing scheme...");
               print("🔍 Payment response data to be stored: $data");
-              updateProgressItem(uid, referenceNo, data).then((value) => {
+              updateProgressItem(uid, referenceNo, data, orderNo).then((value) => {
                     print("print final"),
                     print(value),
                   });

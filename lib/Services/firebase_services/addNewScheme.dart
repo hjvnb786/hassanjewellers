@@ -16,6 +16,7 @@ Future<String?> addNewScheme(Map<String, dynamic> schemeData) async {
     final schemeDuration = schemeData['schemeDuration'] as int?;
     final paymentReference = schemeData['paymentReference'] as String?;
     final paymentResponse = schemeData['paymentResponse'] as Map<String, dynamic>?;
+    final orderId = schemeData['orderId'] as String?;
     
     // Combine firstName and lastName for the name field
     final name = '$firstName $lastName'.trim();
@@ -41,6 +42,7 @@ Future<String?> addNewScheme(Map<String, dynamic> schemeData) async {
       "userId": user.uid,
       "status": true,
       "createdAt": FieldValue.serverTimestamp(),
+      "orderId": orderId, // Add order ID field
       
       "personalDetails": {
         "firstName": firstName,

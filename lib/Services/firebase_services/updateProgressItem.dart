@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hassanjewellers/Helpers/utils.dart';
 
-Future<dynamic> updateProgressItem(id, referenceId, [Map<String, dynamic>? paymentResponse]) async {
+Future<dynamic> updateProgressItem(id, referenceId, [Map<String, dynamic>? paymentResponse, String? orderId]) async {
   try {
     // Get the unique identifier (uid) of the currently authenticated user
     final uid = FirebaseAuth.instance.currentUser?.uid;
@@ -77,10 +77,17 @@ Future<dynamic> updateProgressItem(id, referenceId, [Map<String, dynamic>? payme
       String documentID = querySnapshot.docs[indexMatch].id;
 
       // Update the nested structure
-      await collectionRef.doc(documentID).update({
+      Map<String, dynamic> updateData = {
         'schemeProgress.installments': installments,
         'status': schemeStatus,
-      });
+      };
+      
+      // Add order ID if provided
+      if (orderId != null) {
+        updateData['orderId'] = orderId;
+      }
+      
+      await collectionRef.doc(documentID).update(updateData);
 
       return await collectionRef
           .doc(documentID)
