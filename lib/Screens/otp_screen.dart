@@ -238,9 +238,15 @@ class _OtpScreenState extends State<OtpScreen> {
                                           }
                                           
                                           print("Attempting to register user with uid: ${currentUser.uid}");
+                                          // Split the full name into first and last name
+                                          List<String> nameParts = widget.name.trim().split(' ');
+                                          String firstName = nameParts.isNotEmpty ? nameParts.first : '';
+                                          String lastName = nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '';
+                                          
                                           return registerUser(
                                             currentUser.uid,
-                                            widget.name,
+                                            firstName,
+                                            lastName,
                                             widget.phoneNumber,
                                             widget.email,
                                           );

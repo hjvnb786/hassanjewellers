@@ -33,8 +33,15 @@ Future<dynamic> updateProgressItem(id, referenceId, [Map<String, dynamic>? payme
     }
 
     if (querySnapshot.docs.isNotEmpty) {
-      List<dynamic> progress = querySnapshot.docs[indexMatch]["progress"];
-      final progressLength = progress.length; // Get actual progress length
+      // Get the document data
+      final docData = querySnapshot.docs[indexMatch].data() as Map<String, dynamic>;
+      
+      // Access the new nested structure
+      final schemeProgress = docData["schemeProgress"] as Map<String, dynamic>? ?? {};
+      List<dynamic> installments = schemeProgress["installments"] ?? [];
+      
+      final progressLength = installments.length; // Get actual progress length
+      print("📊 Progress length: $progressLength");
 
       final getDate = await getAccurateTime().then((time) => time);
 
@@ -47,16 +54,17 @@ Future<dynamic> updateProgressItem(id, referenceId, [Map<String, dynamic>? payme
           schemeStatus = false;
         }
 
-        if (progress[i]["paid"] == false) {
-          progress[i]["paid"] = true;
-          progress[i]["date"] = getDate;
-          progress[i]["referenceId"] = referenceId;
+        if (installments[i]["paid"] == false) {
+          installments[i]["paid"] = true;
+          installments[i]["date"] = getDate;
+          // Note: referenceId is now stored within paymentResponse, not as separate field
+          
           // Store the complete payment response if provided
           if (paymentResponse != null) {
-            progress[i]["paymentResponse"] = paymentResponse;
+            installments[i]["paymentResponse"] = paymentResponse;
             print("✅ Payment response stored in progress month $i");
             print("📊 Payment response data: $paymentResponse");
-            print("🔍 Progress month $i now contains: ${progress[i]}");
+            print("🔍 Progress month $i now contains: ${installments[i]}");
           } else {
             print("⚠️ No payment response provided for progress month $i");
           }
@@ -64,24 +72,30 @@ Future<dynamic> updateProgressItem(id, referenceId, [Map<String, dynamic>? payme
         }
       }
 
-      print("updated progress: $progress");
+      print("updated installments: $installments");
 
       String documentID = querySnapshot.docs[indexMatch].id;
 
+      // Update the nested structure
       await collectionRef.doc(documentID).update({
-        'progress': progress,
+        'schemeProgress.installments': installments,
         'status': schemeStatus,
       });
 
       return await collectionRef
           .doc(documentID)
           .get()
-          .then((value) => value["progress"]);
+          .then((value) {
+            final data = value.data() as Map<String, dynamic>?;
+            return data?["schemeProgress"]?["installments"];
+          });
     } else {
       print('No document found with the specified criteria');
     }
   } catch (error) {
-    print('Error updating third index: $error');
+    print('Error updating progress item: $error');
   }
   return null;
-} 
+}
+
+

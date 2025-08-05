@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hassanjewellers/Screens/home_screen.dart';
 import 'package:hassanjewellers/Screens/register_screen.dart';
+import 'package:hassanjewellers/Screens/welcome_screen.dart';
 import 'package:hassanjewellers/Utils/Constants/colors.dart';
 import 'package:hassanjewellers/Services/firebase_services/initializeApp.dart';
 import 'package:hassanjewellers/Services/firebase_services/getCurrentUser.dart';
@@ -143,7 +144,7 @@ class MyApp extends StatelessWidget {
       ),
       home: currentUser != null && currentUser.uid.isNotEmpty
           ? const HomeScreen()
-          : const RegisterScreen(),
+          : const WelcomeScreen(),
     );
   }
 }
