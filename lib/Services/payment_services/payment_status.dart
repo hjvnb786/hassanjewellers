@@ -73,12 +73,16 @@ Future<void> fetchPaymentStatus(String orderNo, String uid, String operation, Ma
               print("⚠️ Unknown operation: $operation");
             }
             
-            // Increment the order sequence after successful payment
-            try {
-              await incrementOrderSequence();
-              print("✅ Order sequence incremented successfully");
-            } catch (e) {
-              print("❌ Error incrementing order sequence: $e");
+            // Only increment the order sequence for new schemes, not for existing scheme installments
+            if (operation == 'add') {
+              try {
+                await incrementOrderSequence();
+                print("✅ Order sequence incremented successfully for new scheme");
+              } catch (e) {
+                print("❌ Error incrementing order sequence: $e");
+              }
+            } else {
+              print("ℹ️ Skipping sequence increment for existing scheme installment");
             }
             
             // Navigate to success screen
