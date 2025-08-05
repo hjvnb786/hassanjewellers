@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:hassanjewellers/Screens/payment_status_screen.dart';
 import 'package:hassanjewellers/Services/firebase_services/updateProgressItem.dart';
 import 'package:hassanjewellers/Services/firebase_services/addNewScheme.dart';
+import 'package:hassanjewellers/Services/firebase_services/generateOrderId.dart';
 import 'package:http/http.dart' as http;
 
 Future<void> fetchPaymentStatus(String orderNo, String uid, String operation, Map<String, dynamic> schemeData, BuildContext context) async {
@@ -68,6 +69,14 @@ Future<void> fetchPaymentStatus(String orderNo, String uid, String operation, Ma
                   });
             } else {
               print("⚠️ Unknown operation: $operation");
+            }
+            
+            // Increment the order sequence after successful payment
+            try {
+              await incrementOrderSequence();
+              print("✅ Order sequence incremented successfully");
+            } catch (e) {
+              print("❌ Error incrementing order sequence: $e");
             }
             
             // Navigate to success screen
