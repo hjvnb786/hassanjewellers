@@ -18,6 +18,9 @@ Future<String?> addNewScheme(Map<String, dynamic> schemeData) async {
     final paymentResponse = schemeData['paymentResponse'] as Map<String, dynamic>?;
     final orderId = schemeData['orderId'] as String?;
     
+    // Order ID is only set for new schemes
+    // Existing schemes retain their original order ID from creation
+    
     // Combine firstName and lastName for the name field
     final name = '$firstName $lastName'.trim();
     

@@ -64,7 +64,8 @@ Future<void> fetchPaymentStatus(String orderNo, String uid, String operation, Ma
             } else if (operation == 'update') {
               print("📝 Updating existing scheme...");
               print("🔍 Payment response data to be stored: $data");
-              updateProgressItem(uid, referenceNo, data, orderNo).then((value) => {
+              // For existing schemes, don't pass order ID - keep the original one
+              updateProgressItem(uid, referenceNo, data).then((value) => {
                     print("print final"),
                     print(value),
                   });

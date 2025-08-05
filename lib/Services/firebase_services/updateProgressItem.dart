@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hassanjewellers/Helpers/utils.dart';
 
-Future<dynamic> updateProgressItem(id, referenceId, [Map<String, dynamic>? paymentResponse, String? orderId]) async {
+Future<dynamic> updateProgressItem(id, referenceId, [Map<String, dynamic>? paymentResponse]) async {
   try {
     // Get the unique identifier (uid) of the currently authenticated user
     final uid = FirebaseAuth.instance.currentUser?.uid;
@@ -82,10 +82,9 @@ Future<dynamic> updateProgressItem(id, referenceId, [Map<String, dynamic>? payme
         'status': schemeStatus,
       };
       
-      // Add order ID if provided
-      if (orderId != null) {
-        updateData['orderId'] = orderId;
-      }
+      // For existing schemes, we don't update the order ID
+      // The order ID should remain the same as when the scheme was originally created
+      // Only new schemes get a new order ID
       
       await collectionRef.doc(documentID).update(updateData);
 
