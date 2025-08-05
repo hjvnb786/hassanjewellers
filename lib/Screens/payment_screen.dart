@@ -3,6 +3,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hassanjewellers/Services/firebase_services/generateOrderId.dart';
 import 'package:hassanjewellers/Services/payment_services/payment_status.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:webview_flutter/webview_flutter.dart';
 import '../main.dart';
@@ -43,11 +45,45 @@ class _PaymentScreenState extends State<PaymentScreen> {
     _initializePayment();
   }
 
+  // Function to retrieve order ID from Firestore for existing schemes
+  Future<String> _getOrderIdFromFirestore() async {
+    try {
+      // Get current user
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        throw Exception('User not authenticated');
+      }
+
+      // Query Firestore to find the scheme document
+      final querySnapshot = await FirebaseFirestore.instance
+          .collection('savings')
+          .where('userId', isEqualTo: user.uid)
+          .where('schemeDetails.schemeName', isEqualTo: widget.formData?['schemeName'] ?? widget.name)
+          .limit(1)
+          .get();
+
+      if (querySnapshot.docs.isEmpty) {
+        throw Exception('Scheme not found in Firestore');
+      }
+
+      final document = querySnapshot.docs.first;
+      final orderId = document.data()['orderId'] as String?;
+
+      if (orderId == null || orderId.isEmpty) {
+        throw Exception('Order ID not found in scheme document');
+      }
+
+      print("✅ Retrieved order ID from Firestore: $orderId");
+      return orderId;
+    } catch (e) {
+      print("❌ Error retrieving order ID from Firestore: $e");
+      // Fallback to a simple order ID
+      return "ORD-${DateTime.now().millisecondsSinceEpoch}";
+    }
+  }
+
   Future<void> _initializePayment() async {
     try {
-      // Ensure the order ID document exists in Firestore
-      await createOrderIdDocumentIfNotExists();
-      
       // Use formData if available, otherwise use the old parameters
       if (widget.formData != null) {
         // Extract data from formData for payment
@@ -59,8 +95,15 @@ class _PaymentScreenState extends State<PaymentScreen> {
         // Clean the amount for Firebase order ID generation
         String cleanAmount = schemeAmount.replaceAll('₹', '').replaceAll(',', '');
         
-        // Generate order ID using Firebase
-        orderId = await generateOrderId(cleanAmount);
+        // Determine order ID based on operation
+        if (widget.operation == 'add') {
+          // For new schemes, generate a new order ID
+          await createOrderIdDocumentIfNotExists();
+          orderId = await generateOrderId(cleanAmount);
+        } else {
+          // For existing schemes, retrieve the order ID from Firestore
+          orderId = await _getOrderIdFromFirestore();
+        }
         
         // Prepare the JSON data as a Map
         Map<String, dynamic> payload = {
@@ -79,8 +122,15 @@ class _PaymentScreenState extends State<PaymentScreen> {
         // Use old parameters for backward compatibility
         String cleanAmount = (widget.amount ?? '5000').substring(0, (widget.amount ?? '5000').length - 2);
         
-        // Generate order ID using Firebase
-        orderId = await generateOrderId(cleanAmount);
+        // Determine order ID based on operation
+        if (widget.operation == 'add') {
+          // For new schemes, generate a new order ID
+          await createOrderIdDocumentIfNotExists();
+          orderId = await generateOrderId(cleanAmount);
+        } else {
+          // For existing schemes, retrieve the order ID from Firestore
+          orderId = await _getOrderIdFromFirestore();
+        }
         
         // Prepare the JSON data as a Map
         Map<String, dynamic> payload = {
