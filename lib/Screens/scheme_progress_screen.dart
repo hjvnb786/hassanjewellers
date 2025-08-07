@@ -106,7 +106,7 @@ class _SchemeProgressScreenState extends State<SchemeProgressScreen> {
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
-            expandedHeight: 200.0,
+            expandedHeight: 180.0,
             floating: false,
             pinned: true,
             elevation: 0,
@@ -122,10 +122,11 @@ class _SchemeProgressScreenState extends State<SchemeProgressScreen> {
                 decoration: BoxDecoration(
                   gradient: RadialGradient(
                     center: Alignment.center,
-                    radius: 0.8,
+                    radius: 2.0,
                     colors: [
-                      AppColors.primaryLight, // Bright Blue from app colors
-                      AppColors.primary, // Royal Blue from app colors
+                      AppColors.primaryLight,
+                      AppColors.primary,
+                      AppColors.primaryDark,
                     ],
                   ),
                 ),
