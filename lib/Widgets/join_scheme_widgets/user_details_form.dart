@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hassanjewellers/Helpers/join_scheme_helpers/validate_email.dart';
 import 'package:hassanjewellers/Helpers/join_scheme_helpers/validate_mobile.dart';
-import 'package:hassanjewellers/Services/firebase_services/get_user_addresses.dart';
+import 'package:hassanjewellers/Services/firebase_services/get_user_data.dart';
 import 'package:hassanjewellers/Screens/address_form_screen.dart';
 
 class UserDetailsForm extends StatefulWidget {
@@ -61,17 +61,21 @@ class _UserDetailsFormState extends State<UserDetailsForm> {
       _isLoadingAddresses = true;
     });
     
-    final addresses = await getUserAddresses();
+    final userData = await getUserData();
     
-    if (mounted) {
+    if (mounted && userData != null) {
+      // Extract addresses from user data
+      final addresses = userData['addresses'] as List<dynamic>?;
+      final addressList = addresses?.map((address) => Map<String, dynamic>.from(address)).toList() ?? [];
+      
       setState(() {
-        _userAddresses = addresses;
+        _userAddresses = addressList;
         _isLoadingAddresses = false;
       });
       
       // After loading addresses, try to find the matching address ID
       if (_selectedAddressText.isNotEmpty) {
-        for (final address in addresses) {
+        for (final address in addressList) {
           final addressText = '${address['firstName']} ${address['lastName']}, ${address['aptFloorDoorNumber']}, ${address['streetName']}, ${address['city']}, ${address['state']} - ${address['pincode']}';
           if (addressText == _selectedAddressText) {
             _selectedAddressIdForDropdown = address['id'];
@@ -79,6 +83,10 @@ class _UserDetailsFormState extends State<UserDetailsForm> {
           }
         }
       }
+    } else if (mounted) {
+      setState(() {
+        _isLoadingAddresses = false;
+      });
     }
   }
 

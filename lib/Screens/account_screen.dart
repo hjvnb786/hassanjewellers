@@ -3,82 +3,86 @@ import 'package:hassanjewellers/main.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:hassanjewellers/Services/firebase_services/signOut.dart';
-import 'package:hassanjewellers/Services/firebase_services/get_user_addresses.dart';
+import 'package:hassanjewellers/Services/firebase_services/get_user_data.dart';
 import 'package:hassanjewellers/Services/firebase_services/delete_address.dart';
 import 'package:hassanjewellers/Screens/address_form_screen.dart';
 import 'package:hassanjewellers/Widgets/address_shimmer_loading.dart';
+import 'package:hassanjewellers/Utils/Constants/colors.dart';
 
 class AccountScreen extends StatefulWidget {
-  const AccountScreen({
-    super.key,
-    required this.name,
-    required this.phone,
-    required this.email,
-    required this.firstName,
-    required this.lastName,
-  });
-
-  final String name;
-  final String phone;
-  final String email;
-  final String firstName;
-  final String lastName;
+  const AccountScreen({super.key});
 
   @override
   State<AccountScreen> createState() => _AccountScreenState();
 }
 
 class _AccountScreenState extends State<AccountScreen> {
+  Map<String, dynamic>? _userData;
   List<Map<String, dynamic>> _addresses = [];
-  bool _isLoadingAddresses = true;
+  bool _isLoadingUserData = true;
   int _refreshKey = 0;
 
   @override
   void initState() {
     super.initState();
-    _loadAddresses();
+    _loadUserData();
   }
 
-  Future<void> _loadAddresses() async {
+  Future<void> _loadUserData() async {
     if (!mounted) return;
     
     setState(() {
-      _isLoadingAddresses = true;
+      _isLoadingUserData = true;
     });
     
-    final addresses = await getUserAddresses();
-    print('Loaded addresses: ${addresses.length}'); // Debug print
+    final userData = await getUserData();
+    print('Loaded user data: ${userData != null ? 'success' : 'failed'}'); // Debug print
     
-    if (mounted) {
+    if (mounted && userData != null) {
       setState(() {
-        _addresses = addresses;
-        _isLoadingAddresses = false;
+        _userData = userData;
+        // Extract addresses from user data
+        final addresses = userData['addresses'] as List<dynamic>?;
+        _addresses = addresses?.map((address) => Map<String, dynamic>.from(address)).toList() ?? [];
+        _isLoadingUserData = false;
       });
-      print('State updated with ${_addresses.length} addresses'); // Debug print
+      print('State updated with user data and ${_addresses.length} addresses'); // Debug print
+    } else if (mounted) {
+      setState(() {
+        _isLoadingUserData = false;
+      });
     }
   }
 
-  Future<void> _forceReloadAddresses() async {
+  Future<void> _forceReloadUserData() async {
     if (!mounted) return;
     
     setState(() {
-      _isLoadingAddresses = true;
+      _isLoadingUserData = true;
+      _userData = null;
       _addresses = [];
     });
     
     // Wait a bit longer to ensure Firebase cache is cleared
     await Future.delayed(const Duration(milliseconds: 500));
     
-    final addresses = await getUserAddresses();
-    print('Force reloaded addresses: ${addresses.length}'); // Debug print
+    final userData = await getUserData();
+    print('Force reloaded user data: ${userData != null ? 'success' : 'failed'}'); // Debug print
     
-    if (mounted) {
+    if (mounted && userData != null) {
       setState(() {
-        _addresses = addresses;
-        _isLoadingAddresses = false;
+        _userData = userData;
+        // Extract addresses from user data
+        final addresses = userData['addresses'] as List<dynamic>?;
+        _addresses = addresses?.map((address) => Map<String, dynamic>.from(address)).toList() ?? [];
+        _isLoadingUserData = false;
         _refreshKey++; // Increment refresh key
       });
-      print('Force reload state updated with ${_addresses.length} addresses'); // Debug print
+      print('Force reload state updated with user data and ${_addresses.length} addresses'); // Debug print
+    } else if (mounted) {
+      setState(() {
+        _isLoadingUserData = false;
+      });
     }
   }
 
@@ -91,7 +95,7 @@ class _AccountScreenState extends State<AccountScreen> {
           addressId: address['id'],
         ),
       ),
-    ).then((_) => _loadAddresses());
+    ).then((_) => _loadUserData());
   }
 
   Future<void> _deleteAddress(String addressId) async {
@@ -116,6 +120,7 @@ class _AccountScreenState extends State<AccountScreen> {
 
     if (confirmed == true) {
       final success = await deleteUserAddress(addressId);
+   
       
       if (success) {
         if (mounted) {
@@ -131,7 +136,7 @@ class _AccountScreenState extends State<AccountScreen> {
           );
         }
         // Use force reload method
-        await _forceReloadAddresses();
+        await _forceReloadUserData();
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -162,12 +167,13 @@ class _AccountScreenState extends State<AccountScreen> {
             flexibleSpace: FlexibleSpaceBar(
               background: Container(
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
+                  gradient: RadialGradient(
+                    center: Alignment.center,
+                    radius: 2.0,
                     colors: [
-                      Theme.of(context).primaryColor,
-                      Theme.of(context).primaryColor.withOpacity(0.8),
+                      AppColors.primaryLight,
+                      AppColors.primary,
+                      AppColors.primaryDark,
                     ],
                   ),
                 ),
@@ -175,27 +181,76 @@ class _AccountScreenState extends State<AccountScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const SizedBox(height: 40),
-                    CircleAvatar(
-                      radius: 50,
-                      backgroundColor: Colors.white,
-                      child: Text(
-                        widget.name.isNotEmpty ? widget.name[0].toUpperCase() : '?',
-                        style: const TextStyle(
-                          fontSize: 40,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
+                    if (_isLoadingUserData) ...[
+                      // Shimmer for profile avatar
+                      Container(
+                        width: 100,
+                        height: 100,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.3),
+                          shape: BoxShape.circle,
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      widget.name,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
+                      const SizedBox(height: 10),
+                      // Shimmer for profile name
+                      Container(
+                        width: 150,
+                        height: 24,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.3),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
                       ),
-                    ),
+                    ] else ...[
+                      Container(
+                        width: 100,
+                        height: 100,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.12),
+                              blurRadius: 12,
+                              spreadRadius: 1,
+                            ),
+                          ],
+                        ),
+                        child: Center(
+                          child: Container(
+                            width: 90,
+                            height: 90,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.grey.shade50,
+                            ),
+                            child: Center(
+                              child: Text(
+                                _userData?['firstName']?.toString().isNotEmpty == true 
+                                    ? _userData!['firstName'][0].toUpperCase() 
+                                    : '?',
+                                style: TextStyle(
+                                  fontSize: 40,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.primary,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        '${_userData?['firstName'] ?? ''} ${_userData?['lastName'] ?? ''}'.trim().isNotEmpty 
+                            ? '${_userData?['firstName'] ?? ''} ${_userData?['lastName'] ?? ''}'.trim()
+                            : 'User',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),
@@ -231,31 +286,44 @@ class _AccountScreenState extends State<AccountScreen> {
                     ),
                     child: Column(
                       children: [
-                        _buildInfoCard(
-                          icon: Icons.person_outline,
-                          title: 'First Name',
-                          content: widget.firstName.isNotEmpty ? widget.firstName : 'Not provided',
-                        ),
-                        const Divider(height: 0, indent: 16, endIndent: 16),
-                        _buildInfoCard(
-                          icon: Icons.person_outline,
-                          title: 'Last Name',
-                          content: widget.lastName.isNotEmpty ? widget.lastName : 'Not provided',
-                        ),
-                        const Divider(height: 0, indent: 16, endIndent: 16),
-                        _buildInfoCard(
-                          icon: Icons.phone_outlined,
-                          title: 'Phone',
-                          content: widget.phone,
-                        ),
-                        const Divider(height: 0, indent: 16, endIndent: 16),
-                        _buildInfoCard(
-                          icon: Icons.email_outlined,
-                          title: 'Email',
-                          content: widget.email,
-                        ),
+                        if (_isLoadingUserData) ...[
+                          // Shimmer loading for profile info cards
+                          _buildShimmerInfoCard(),
+                          const Divider(height: 0, indent: 16, endIndent: 16),
+                          _buildShimmerInfoCard(),
+                          const Divider(height: 0, indent: 16, endIndent: 16),
+                          _buildShimmerInfoCard(),
+                          const Divider(height: 0, indent: 16, endIndent: 16),
+                          _buildShimmerInfoCard(),
+                        ] else ...[
+                          _buildInfoCard(
+                            icon: Icons.person_outline,
+                            title: 'First Name',
+                            content: _userData?['firstName']?.toString() ?? 'Not provided',
+                          ),
+                          const Divider(height: 0, indent: 16, endIndent: 16),
+                          _buildInfoCard(
+                            icon: Icons.person_outline,
+                            title: 'Last Name',
+                            content: _userData?['lastName']?.toString() ?? 'Not provided',
+                          ),
+                          const Divider(height: 0, indent: 16, endIndent: 16),
+                          _buildInfoCard(
+                            icon: Icons.phone_outlined,
+                            title: 'Phone',
+                            content: _userData?['phone']?.toString() ?? 'Not provided',
+                          ),
+                          const Divider(height: 0, indent: 16, endIndent: 16),
+                          _buildInfoCard(
+                            icon: Icons.email_outlined,
+                            title: 'Email',
+                            content: _userData?['email']?.toString() ?? 'Not provided',
+                          ),
+                        ],
+                        
+                        
                         // Display existing addresses within Account Information
-                        if (_isLoadingAddresses) ...[
+                        if (_isLoadingUserData) ...[
                           const Divider(height: 0, indent: 16, endIndent: 16),
                           Padding(
                             padding: const EdgeInsets.all(16.0),
@@ -403,7 +471,7 @@ class _AccountScreenState extends State<AccountScreen> {
                                 builder: (context) => const AddressFormScreen(),
                               ),
                             );
-                            _loadAddresses();
+                            _loadUserData();
                           },
                           child: Padding(
                             padding: const EdgeInsets.all(16.0),
@@ -511,6 +579,53 @@ class _AccountScreenState extends State<AccountScreen> {
                   const SizedBox(height: 24),
                 ],
               ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildShimmerInfoCard() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      child: Row(
+        children: [
+          // Shimmer for icon container
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: Colors.grey[300],
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+          const SizedBox(width: 16),
+          // Shimmer for text content
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Shimmer for title
+                Container(
+                  width: 80,
+                  height: 14,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                // Shimmer for content
+                Container(
+                  width: 120,
+                  height: 16,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
