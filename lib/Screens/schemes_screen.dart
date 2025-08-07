@@ -88,7 +88,7 @@ class _SchemesScreenState extends State<SchemesScreen> with TickerProviderStateM
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
           return <Widget>[
             SliverAppBar(
-              expandedHeight: 140.0, // Reduced height for cleaner layout
+              expandedHeight: 180.0, // Increased height for more dominant appearance
               floating: false,
               pinned: true,
               backgroundColor: AppColors.primary,
@@ -96,13 +96,14 @@ class _SchemesScreenState extends State<SchemesScreen> with TickerProviderStateM
                 background: Container(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
-                      begin: Alignment.centerLeft,
-                      end: Alignment.centerRight,
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
                       colors: [
-                        AppColors.primaryDark,
-                        AppColors.primary,
-                        AppColors.primaryLight,
+                        Color(0xFF1E3A8A), // Deep Blue
+                        Color(0xFF3B82F6), // Bright Blue
+                        Color(0xFF1E40AF), // Dark Blue
                       ],
+                      stops: [0.0, 0.5, 1.0],
                     ),
                   ),
                   child: SafeArea(
@@ -110,39 +111,39 @@ class _SchemesScreenState extends State<SchemesScreen> with TickerProviderStateM
                       children: [
                         // Logo and Welcome Message Row
                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              // Circular Logo Card
+                              // Circular Logo Card - Increased size
                               Container(
-                                width: 60,
-                                height: 60,
+                                width: 80,
+                                height: 80,
                                 decoration: BoxDecoration(
                                   color: Colors.white,
-                                  borderRadius: BorderRadius.circular(30),
+                                  borderRadius: BorderRadius.circular(40),
                                   border: Border.all(
                                     color: Colors.white.withOpacity(0.3),
-                                    width: 2,
+                                    width: 3,
                                   ),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors.black.withOpacity(0.1),
-                                      blurRadius: 12,
-                                      offset: const Offset(0, 4),
+                                      color: Colors.black.withOpacity(0.15),
+                                      blurRadius: 15,
+                                      offset: const Offset(0, 5),
                                     ),
                                   ],
                                 ),
                                 child: Padding(
-                                  padding: const EdgeInsets.all(6),
+                                  padding: const EdgeInsets.all(4),
                                   child: Image.asset(
                                     'assets/logo.png',
                                     fit: BoxFit.contain,
                                   ),
                                 ),
                               ),
-                              const SizedBox(width: 16),
-                              // Welcome Texts
+                              const SizedBox(width: 20),
+                              // Welcome Texts - Increased sizes
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -151,17 +152,19 @@ class _SchemesScreenState extends State<SchemesScreen> with TickerProviderStateM
                                       "Hassan Jewellers",
                                       style: const TextStyle(
                                         color: Colors.white,
-                                        fontSize: 18,
+                                        fontSize: 24,
                                         fontWeight: FontWeight.bold,
+                                        letterSpacing: 0.5,
                                       ),
                                       textAlign: TextAlign.left,
                                     ),
-                                    const SizedBox(height: 2),
+                                    const SizedBox(height: 4),
                                     Text(
                                       customerName.isNotEmpty ? "Welcome, $customerName" : "Welcome back!",
                                       style: TextStyle(
                                         color: Colors.white70,
-                                        fontSize: 13,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
                                       ),
                                       textAlign: TextAlign.left,
                                     ),
