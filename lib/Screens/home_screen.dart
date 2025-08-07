@@ -21,6 +21,8 @@ class _HomeScreenState extends State<HomeScreen> {
   String customerName = "";
   String customerPhone = "";
   String customerEmail = "";
+  String customerFirstName = "";
+  String customerLastName = "";
 
   @override
   void initState() {
@@ -33,6 +35,8 @@ class _HomeScreenState extends State<HomeScreen> {
           customerName = data["name"] ?? "";
           customerPhone = data["phone"] ?? "";
           customerEmail = data["email"] ?? "";
+          customerFirstName = data["firstName"] ?? "";
+          customerLastName = data["lastName"] ?? "";
         });
       }
     });
@@ -49,7 +53,13 @@ class _HomeScreenState extends State<HomeScreen> {
         },
       ),
       const JoinNewSchemeScreen(),
-      AccountScreen(name: customerName, phone: customerPhone, email: customerEmail),
+      AccountScreen(
+        name: customerName, 
+        phone: customerPhone, 
+        email: customerEmail,
+        firstName: customerFirstName,
+        lastName: customerLastName,
+      ),
     ];
 
     return Scaffold(

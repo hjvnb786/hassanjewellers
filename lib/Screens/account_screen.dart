@@ -14,11 +14,15 @@ class AccountScreen extends StatefulWidget {
     required this.name,
     required this.phone,
     required this.email,
+    required this.firstName,
+    required this.lastName,
   });
 
   final String name;
   final String phone;
   final String email;
+  final String firstName;
+  final String lastName;
 
   @override
   State<AccountScreen> createState() => _AccountScreenState();
@@ -229,8 +233,14 @@ class _AccountScreenState extends State<AccountScreen> {
                       children: [
                         _buildInfoCard(
                           icon: Icons.person_outline,
-                          title: 'Name',
-                          content: widget.name,
+                          title: 'First Name',
+                          content: widget.firstName.isNotEmpty ? widget.firstName : 'Not provided',
+                        ),
+                        const Divider(height: 0, indent: 16, endIndent: 16),
+                        _buildInfoCard(
+                          icon: Icons.person_outline,
+                          title: 'Last Name',
+                          content: widget.lastName.isNotEmpty ? widget.lastName : 'Not provided',
                         ),
                         const Divider(height: 0, indent: 16, endIndent: 16),
                         _buildInfoCard(
@@ -516,8 +526,10 @@ class _AccountScreenState extends State<AccountScreen> {
     // Define different light colors for each icon based on title
     Color getIconColor(String title) {
       switch (title.toLowerCase()) {
-        case 'name':
+        case 'first name':
           return const Color(0xFFE3F2FD); // Light blue
+        case 'last name':
+          return const Color(0xFFE1F5FE); // Light cyan
         case 'phone':
           return const Color(0xFFF3E5F5); // Light purple
         case 'email':
@@ -529,8 +541,10 @@ class _AccountScreenState extends State<AccountScreen> {
 
     Color getIconTintColor(String title) {
       switch (title.toLowerCase()) {
-        case 'name':
+        case 'first name':
           return const Color(0xFF1976D2); // Blue
+        case 'last name':
+          return const Color(0xFF0097A7); // Cyan
         case 'phone':
           return const Color(0xFF7B1FA2); // Purple
         case 'email':
