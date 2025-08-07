@@ -3,9 +3,7 @@ import 'package:hassanjewellers/Screens/account_screen.dart';
 import 'package:hassanjewellers/Screens/schemes_screen.dart';
 import 'package:hassanjewellers/Screens/join_new_scheme_screen.dart';
 import 'package:hassanjewellers/Screens/payment_status_screen.dart';
-import 'package:hassanjewellers/Services/firebase_services/getDocumentByUid.dart';
-import 'package:hassanjewellers/Services/firebase_services/getCurrentUser.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -16,31 +14,9 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int currentPageIndex = 0;
-  final String? uid = getCurrentUser()?.uid;
-  late Future<QueryDocumentSnapshot<Map<String, dynamic>>?> userAccountDetails;
-  String customerName = "";
-  String customerPhone = "";
-  String customerEmail = "";
-  String customerFirstName = "";
-  String customerLastName = "";
 
-  @override
-  void initState() {
-    super.initState();
-    userAccountDetails = getDocumentByUid(uid, "users");
-    userAccountDetails.then((doc) {
-      if (doc != null) {
-        final data = doc.data();
-        setState(() {
-          customerName = data["name"] ?? "";
-          customerPhone = data["phone"] ?? "";
-          customerEmail = data["email"] ?? "";
-          customerFirstName = data["firstName"] ?? "";
-          customerLastName = data["lastName"] ?? "";
-        });
-      }
-    });
-  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -53,13 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
         },
       ),
       const JoinNewSchemeScreen(),
-      AccountScreen(
-        name: customerName, 
-        phone: customerPhone, 
-        email: customerEmail,
-        firstName: customerFirstName,
-        lastName: customerLastName,
-      ),
+      const AccountScreen(),
     ];
 
     return Scaffold(

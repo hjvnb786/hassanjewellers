@@ -5,6 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:hassanjewellers/Services/firebase_services/signOut.dart';
 import 'package:hassanjewellers/Services/firebase_services/get_user_data.dart';
 import 'package:hassanjewellers/Services/firebase_services/delete_address.dart';
+import 'package:hassanjewellers/Services/firebase_services/get_more_options.dart';
 import 'package:hassanjewellers/Screens/address_form_screen.dart';
 import 'package:hassanjewellers/Widgets/address_shimmer_loading.dart';
 import 'package:hassanjewellers/Utils/Constants/colors.dart';
@@ -18,6 +19,7 @@ class AccountScreen extends StatefulWidget {
 
 class _AccountScreenState extends State<AccountScreen> {
   Map<String, dynamic>? _userData;
+  Map<String, dynamic>? _moreOptionsData;
   List<Map<String, dynamic>> _addresses = [];
   bool _isLoadingUserData = true;
   int _refreshKey = 0;
@@ -35,22 +37,25 @@ class _AccountScreenState extends State<AccountScreen> {
       _isLoadingUserData = true;
     });
     
+    // Load both user data and more options data
     final userData = await getUserData();
-    print('Loaded user data: ${userData != null ? 'success' : 'failed'}'); // Debug print
+    final moreOptionsData = await getMoreOptions();
     
-    if (mounted && userData != null) {
+    print('Loaded user data: ${userData != null ? 'success' : 'failed'}'); // Debug print
+    print('Loaded more options data: ${moreOptionsData != null ? 'success' : 'failed'}'); // Debug print
+    
+    if (mounted) {
       setState(() {
         _userData = userData;
+        _moreOptionsData = moreOptionsData;
         // Extract addresses from user data
-        final addresses = userData['addresses'] as List<dynamic>?;
-        _addresses = addresses?.map((address) => Map<String, dynamic>.from(address)).toList() ?? [];
+        if (userData != null) {
+          final addresses = userData['addresses'] as List<dynamic>?;
+          _addresses = addresses?.map((address) => Map<String, dynamic>.from(address)).toList() ?? [];
+        }
         _isLoadingUserData = false;
       });
       print('State updated with user data and ${_addresses.length} addresses'); // Debug print
-    } else if (mounted) {
-      setState(() {
-        _isLoadingUserData = false;
-      });
     }
   }
 
@@ -548,21 +553,21 @@ class _AccountScreenState extends State<AccountScreen> {
                         _buildActionCard(
                           icon: Icons.share_outlined,
                           title: 'Share App',
-                          subtitle: 'Share with friends and family',
+                          subtitle: 'Spread the word about Hassan Jewellers',
                           onTap: () => _shareApp(),
                         ),
                         const Divider(height: 0, indent: 16, endIndent: 16),
                         _buildActionCard(
                           icon: Icons.location_on_outlined,
                           title: 'Visit Our Store',
-                          subtitle: '123 Jewelry Street, City',
+                          subtitle: 'Find us and explore our collection',
                           onTap: () => _launchMaps(),
                         ),
                         const Divider(height: 0, indent: 16, endIndent: 16),
                         _buildActionCard(
                           icon: Icons.help_outline,
                           title: 'Request Help',
-                          subtitle: 'Get assistance from our team',
+                          subtitle: 'We\'re here to assist you',
                           onTap: () => _showHelpDialog(),
                         ),
                         const Divider(height: 0, indent: 16, endIndent: 16),
@@ -716,7 +721,7 @@ class _AccountScreenState extends State<AccountScreen> {
   Widget _buildActionCard({
     required IconData icon,
     required String title,
-    required String subtitle,
+    String? subtitle,
     required VoidCallback onTap,
     bool isLogout = false,
   }) {
@@ -783,14 +788,16 @@ class _AccountScreenState extends State<AccountScreen> {
                       color: isLogout ? getActionIconTintColor(title) : null,
                     ),
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    subtitle,
-                    style: TextStyle(
-                      color: Colors.grey[600],
-                      fontSize: 14,
+                  if (subtitle != null) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      subtitle!,
+                      style: TextStyle(
+                        color: Colors.grey[600],
+                        fontSize: 14,
+                      ),
                     ),
-                  ),
+                  ],
                 ],
               ),
             ),
@@ -900,18 +907,42 @@ class _AccountScreenState extends State<AccountScreen> {
   }
 
   void _launchMaps() async {
-    // Replace with your store's actual coordinates
-    const url = 'https://www.google.com/maps/search/?api=1&query=YOUR_STORE_COORDINATES';
-    if (await canLaunchUrl(Uri.parse(url))) {
-      await launchUrl(Uri.parse(url));
+    // Get the Google Maps link from Firebase, with fallback
+    final mapsLink = _moreOptionsData?['visitOurStore']?.toString() ?? 'https://www.google.com/maps/search/?api=1&query=Hassan+Jewellers';
+    
+    // Debug logging
+    print('More options data: $_moreOptionsData');
+    print('Maps link from Firebase: ${_moreOptionsData?['visitOurStore']}');
+    print('Final maps link: $mapsLink');
+    
+    try {
+      final Uri mapsUri = Uri.parse(mapsLink);
+      await launchUrl(
+        mapsUri,
+        mode: LaunchMode.externalApplication,
+      );
+    } catch (e) {
+      print('Error launching maps: $e');
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Error launching maps'),
+          ),
+        );
+      }
     }
   }
 
   void _shareApp() {
-    Share.share('Check out Hassan Jewellers app! Download it now.');
+    // Get the share message from Firebase, with fallback
+    final shareMessage = _moreOptionsData?['shareApp']?.toString() ?? 'Check out Hassan Jewellers app! Download it now.';
+    Share.share(shareMessage);
   }
 
   void _showHelpDialog() {
+    // Get the phone number from Firebase, with fallback
+    final phoneNumber = _moreOptionsData?['requestHelp']?.toString() ?? '919566469670';
+    
     showDialog(
       context: context,
       builder: (context) => Dialog(
@@ -953,7 +984,7 @@ class _AccountScreenState extends State<AccountScreen> {
                         try {
                           final Uri phoneUri = Uri(
                             scheme: 'tel',
-                            path: '919566469670',
+                            path: phoneNumber,
                           );
                           await launchUrl(
                             phoneUri,
@@ -1004,7 +1035,7 @@ class _AccountScreenState extends State<AccountScreen> {
                       onTap: () async {
                         try {
                           final Uri whatsappUri = Uri.parse(
-                            'https://api.whatsapp.com/send?phone=919566469670&text=Hello, I need help with Hassan Jewellers app.',
+                            'https://api.whatsapp.com/send?phone=$phoneNumber&text=Hello, I need help with Hassan Jewellers app.',
                           );
                           await launchUrl(
                             whatsappUri,
