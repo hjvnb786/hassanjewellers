@@ -166,7 +166,7 @@ class _AccountScreenState extends State<AccountScreen> {
         slivers: [
           // Custom App Bar
           SliverAppBar(
-            expandedHeight: 200.0,
+            expandedHeight: 180.0,
             floating: false,
             pinned: true,
             flexibleSpace: FlexibleSpaceBar(
