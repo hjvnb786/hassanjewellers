@@ -23,9 +23,6 @@ class _SchemesScreenState extends State<SchemesScreen> with TickerProviderStateM
   String customerName = "";
   int activeSchemesCount = 0;
   int completedSchemesCount = 0;
-  double totalSavings = 0.0;
-  double totalTargetAmount = 0.0;
-  double overallProgress = 0.0;
 
   @override
   void initState() {
@@ -56,7 +53,7 @@ class _SchemesScreenState extends State<SchemesScreen> with TickerProviderStateM
         });
       }
 
-      // Get scheme statistics
+      // Get scheme counts
       final activeSchemes = await _firestore
           .collection("savings")
           .where("userId", isEqualTo: uid)
@@ -69,49 +66,9 @@ class _SchemesScreenState extends State<SchemesScreen> with TickerProviderStateM
           .where("status", isEqualTo: false)
           .get();
 
-      double totalSaved = 0.0;
-      double totalTarget = 0.0;
-      
-      // Calculate active schemes stats
-      for (var doc in activeSchemes.docs) {
-        final data = doc.data();
-        final schemeDetails = data["schemeDetails"] as Map<String, dynamic>? ?? {};
-        final schemeProgress = data["schemeProgress"] as Map<String, dynamic>? ?? {};
-        
-        final installmentAmount = schemeDetails["installmentAmount"] ?? 0.0;
-        final installments = schemeProgress["installments"] ?? [];
-        final targetAmount = data["targetAmount"] ?? 0.0;
-        
-        // Calculate paid installments count
-        int paidCount = 0;
-        if (installments is List) {
-          for (var item in installments) {
-            if (item is Map && item["paid"] == true) {
-              paidCount++;
-            }
-          }
-        }
-        
-        totalSaved += paidCount * double.parse(installmentAmount.toString().replaceAll('₹', '').replaceAll(',', ''));
-        totalTarget += targetAmount;
-      }
-
-      // Calculate completed schemes stats
-      for (var doc in completedSchemes.docs) {
-        final data = doc.data();
-        final targetAmount = data["targetAmount"] ?? 0.0;
-        totalTarget += targetAmount;
-        totalSaved += targetAmount; // Completed schemes are fully saved
-      }
-
-      double progress = totalTarget > 0 ? (totalSaved / totalTarget) * 100 : 0.0;
-
       setState(() {
         activeSchemesCount = activeSchemes.docs.length;
         completedSchemesCount = completedSchemes.docs.length;
-        totalSavings = totalSaved;
-        totalTargetAmount = totalTarget;
-        overallProgress = progress;
       });
     } catch (e) {
       print("Error loading user data: $e");
@@ -131,7 +88,7 @@ class _SchemesScreenState extends State<SchemesScreen> with TickerProviderStateM
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
           return <Widget>[
             SliverAppBar(
-              expandedHeight: 240.0, // Increased to accommodate additional spacing
+              expandedHeight: 140.0, // Reduced height for cleaner layout
               floating: false,
               pinned: true,
               backgroundColor: AppColors.primary,
@@ -139,57 +96,48 @@ class _SchemesScreenState extends State<SchemesScreen> with TickerProviderStateM
                 background: Container(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
                       colors: [
+                        AppColors.primaryDark,
                         AppColors.primary,
                         AppColors.primaryLight,
-                        AppColors.primaryDark,
                       ],
                     ),
                   ),
                   child: SafeArea(
                     child: Column(
                       children: [
-                        const SizedBox(height: 10),
                         // Logo and Welcome Message Row
                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              // Logo
-                              Expanded(
-                                child: Container(
-
-                                  width: 150,
-                                  height: 80,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.20), // Solid white background
-                                    borderRadius: BorderRadius.circular(16),
-                                    border: Border.all(
-                                      color: Colors.white.withOpacity(0.25
-                                      ),
-                                      width: 1,
-                                    ),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.1),
-                                        blurRadius: 8,
-                                        offset: const Offset(0, 3),
-                                      ),
-                                    ],
+                              // Circular Logo Card
+                              Container(
+                                width: 60,
+                                height: 60,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(30),
+                                  border: Border.all(
+                                    color: Colors.white.withOpacity(0.3),
+                                    width: 2,
                                   ),
-                                  child: ClipRRect(
-                                    //backgroundColor: Colors.white,
-                                    borderRadius: BorderRadius.circular(16),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(10),
-                                      child: Image.asset(
-                                        'assets/logo.png',
-                                        fit: BoxFit.cover,
-                                      ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.1),
+                                      blurRadius: 12,
+                                      offset: const Offset(0, 4),
                                     ),
+                                  ],
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(6),
+                                  child: Image.asset(
+                                    'assets/logo.png',
+                                    fit: BoxFit.contain,
                                   ),
                                 ),
                               ),
@@ -200,7 +148,7 @@ class _SchemesScreenState extends State<SchemesScreen> with TickerProviderStateM
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      "Welcome back ${customerName.isNotEmpty ? ', $customerName' : ''}!",
+                                      "Hassan Jewellers",
                                       style: const TextStyle(
                                         color: Colors.white,
                                         fontSize: 18,
@@ -209,8 +157,8 @@ class _SchemesScreenState extends State<SchemesScreen> with TickerProviderStateM
                                       textAlign: TextAlign.left,
                                     ),
                                     const SizedBox(height: 2),
-                                    const Text(
-                                      "Manage your savings schemes",
+                                    Text(
+                                      customerName.isNotEmpty ? "Welcome, $customerName" : "Welcome back!",
                                       style: TextStyle(
                                         color: Colors.white70,
                                         fontSize: 13,
@@ -223,36 +171,7 @@ class _SchemesScreenState extends State<SchemesScreen> with TickerProviderStateM
                             ],
                           ),
                         ),
-                        const SizedBox(height: 16),
-                        // Stats Cards
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: _buildStatCard(
-                                  icon: Icons.account_balance_wallet,
-                                  title: "Total Saved",
-                                  value: "₹${totalSavings.toStringAsFixed(0)}",
-                                  subtitle: "",
-                                  color: AppColors.success,
-                                ),
-                              ),
-                              const SizedBox(width: 16),
-                              Expanded(
-                                child: _buildStatCard(
-                                  icon: Icons.trending_up,
-                                  title: "Total Target",
-                                  value: "₹${totalTargetAmount.toStringAsFixed(0)}",
-                                  subtitle: "",
-                                  color: AppColors.primaryLight,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                       const SizedBox(height: 10),
-                       const SizedBox(height: 16), // Additional spacing below stats cards
+
                       ],
                     ),
                   ),
@@ -311,57 +230,7 @@ class _SchemesScreenState extends State<SchemesScreen> with TickerProviderStateM
     );
   }
 
-  Widget _buildStatCard({
-    required IconData icon,
-    required String title,
-    required String value,
-    required String subtitle,
-    required Color color,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.15),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: Colors.white.withOpacity(0.2),
-          width: 1,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(
-                icon,
-                color: Colors.white,
-                size: 16,
-              ),
-              const SizedBox(width: 6),
-              Text(
-                value,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 4),
-          Text(
-            title,
-            style: const TextStyle(
-              color: Colors.white70,
-              fontSize: 11,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+
 
   Widget _buildSchemeList(Stream<QuerySnapshot> stream, bool isActive) {
     return StreamBuilder<QuerySnapshot>(
