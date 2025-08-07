@@ -45,7 +45,7 @@ Future<String?> addNewScheme(Map<String, dynamic> schemeData) async {
       "userId": user.uid,
       "status": true,
       "createdAt": FieldValue.serverTimestamp(),
-      "orderId": orderId, // Add order ID field
+      "installmentCount": 1, // Initialize installment count to 1 for new schemes (first payment)
       
       "personalDetails": {
         "firstName": firstName,
@@ -61,12 +61,19 @@ Future<String?> addNewScheme(Map<String, dynamic> schemeData) async {
         "schemeDescription": schemeData['schemeDescription']?.toString().trim() ?? '',
         "installmentAmount": schemeAmount,
         "schemeDuration": schemeDuration,
+        "orderId": orderId, // Store order ID with suffix in schemeDetails object
       },
       
       "schemeProgress": {
         "installments": generateProgress(duration: schemeDuration, paymentReference: paymentReference, paymentResponse: paymentResponse),
       },
     });
+    
+    // Payment response already contains the order ID with suffix from payment_status.dart
+    if (paymentResponse != null) {
+      print("✅ Payment response already contains order ID with suffix");
+      print("📊 Payment response: $paymentResponse");
+    }
     
     print('✅ New scheme added successfully with ID: ${result.id}');
     print('📊 Progress created with ${schemeDuration ?? 12} months');
@@ -95,7 +102,7 @@ Map<String, dynamic> _extractAdditionalDetails(Map<String, dynamic> schemeData) 
     'schemeName', 'schemeDescription', 'schemeAmount', 'schemeDuration'
   ];
   
-  final paymentFields = ['paymentReference', 'paymentResponse'];
+  final paymentFields = ['paymentReference', 'paymentResponse', 'orderId'];
   
   // Extract additional details (any field not in basic personal or scheme lists)
   Map<String, dynamic> additionalDetails = {};

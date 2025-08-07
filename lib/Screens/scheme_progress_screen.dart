@@ -223,16 +223,7 @@ class _SchemeProgressScreenState extends State<SchemeProgressScreen> {
                         if (isPersonalDetailsExpanded)
                           Container(
                             padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                _buildDetailRow('First Name', (widget.schemeDetails['personalDetails']?['firstName'] ?? 'N/A').toString()),
-                                _buildDetailRow('Last Name', (widget.schemeDetails['personalDetails']?['lastName'] ?? 'N/A').toString()),
-                                _buildDetailRow('Mobile', (widget.schemeDetails['personalDetails']?['mobile'] ?? 'N/A').toString()),
-                                _buildDetailRow('Email', (widget.schemeDetails['personalDetails']?['email'] ?? 'N/A').toString()),
-                                _buildDetailRow('Delivery Address', (widget.schemeDetails['personalDetails']?['deliveryAddress'] ?? 'N/A').toString()),
-                              ],
-                            ),
+                            child: _buildPersonalDetails(),
                           ),
                       ],
                     ),
@@ -289,15 +280,7 @@ class _SchemeProgressScreenState extends State<SchemeProgressScreen> {
                         if (isSchemeDetailsExpanded)
                           Container(
                             padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                _buildDetailRow('Scheme Name', (widget.schemeDetails['schemeDetails']?['schemeName'] ?? 'N/A').toString()),
-                                _buildDetailRow('Scheme Description', (widget.schemeDetails['schemeDetails']?['schemeDescription'] ?? 'N/A').toString()),
-                                _buildDetailRow('Installment Amount', (widget.schemeDetails['schemeDetails']?['installmentAmount'] ?? 'N/A').toString()),
-                                _buildDetailRow('Scheme Duration', '${widget.schemeDetails['schemeDetails']?['schemeDuration'] ?? 'N/A'} months'),
-                              ],
-                            ),
+                            child: _buildSchemeDetails(),
                           ),
                       ],
                     ),
@@ -764,6 +747,81 @@ class _SchemeProgressScreenState extends State<SchemeProgressScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildPersonalDetails() {
+    final personalDetails = widget.schemeDetails['personalDetails'] as Map<String, dynamic>? ?? {};
+    
+    if (personalDetails.isEmpty) {
+      return Text(
+        'No personal details available',
+        style: TextStyle(
+          fontSize: 14,
+          color: AppColors.textSecondary,
+          fontStyle: FontStyle.italic,
+        ),
+      );
+    }
+    
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: personalDetails.entries.map((entry) {
+        final key = entry.key;
+        final value = entry.value;
+        
+        // Skip additionalDetails as it's handled separately
+        if (key == 'additionalDetails') {
+          return const SizedBox.shrink();
+        }
+        
+        // Convert key to display format (e.g., "firstName" -> "First Name")
+        String displayKey = key.replaceAllMapped(
+          RegExp(r'([A-Z])'),
+          (match) => ' ${match.group(1)}',
+        ).trim();
+        displayKey = displayKey[0].toUpperCase() + displayKey.substring(1);
+        
+        return _buildDetailRow(displayKey, value.toString());
+      }).toList(),
+    );
+  }
+
+  Widget _buildSchemeDetails() {
+    final schemeDetails = widget.schemeDetails['schemeDetails'] as Map<String, dynamic>? ?? {};
+    
+    if (schemeDetails.isEmpty) {
+      return Text(
+        'No scheme details available',
+        style: TextStyle(
+          fontSize: 14,
+          color: AppColors.textSecondary,
+          fontStyle: FontStyle.italic,
+        ),
+      );
+    }
+    
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: schemeDetails.entries.map((entry) {
+        final key = entry.key;
+        final value = entry.value;
+        
+        // Convert key to display format (e.g., "schemeName" -> "Scheme Name")
+        String displayKey = key.replaceAllMapped(
+          RegExp(r'([A-Z])'),
+          (match) => ' ${match.group(1)}',
+        ).trim();
+        displayKey = displayKey[0].toUpperCase() + displayKey.substring(1);
+        
+        // Special formatting for certain fields
+        String displayValue = value.toString();
+        if (key == 'schemeDuration') {
+          displayValue = '$value months';
+        }
+        
+        return _buildDetailRow(displayKey, displayValue);
+      }).toList(),
     );
   }
 

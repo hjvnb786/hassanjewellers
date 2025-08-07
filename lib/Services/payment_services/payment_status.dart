@@ -50,22 +50,43 @@ Future<void> fetchPaymentStatus(String orderNo, String uid, String operation, Ma
               print("🆕 Adding new scheme...");
               print("🔍 Payment response data to be stored: $data");
               
+              // The order ID already contains the suffix from payment screen
+              // Extract the base order ID by removing the suffix
+              String baseOrderId = orderNo;
+              if (orderNo.contains('-')) {
+                baseOrderId = orderNo.split('-')[0];
+                print("🆔 Extracted base order ID: $baseOrderId from full order ID: $orderNo");
+              } else {
+                print("🆔 Order ID has no suffix: $orderNo");
+              }
+              
+              // Create payment response with the order ID (already has suffix)
+              Map<String, dynamic> paymentResponseWithSuffix = Map<String, dynamic>.from(data);
+              paymentResponseWithSuffix["orderId"] = orderNo; // Use the order ID as-is (already has suffix)
+              
               // Add payment reference, complete payment response, and order ID to schemeData for new schemes
               schemeData['paymentReference'] = referenceNo;
-              schemeData['paymentResponse'] = data; // Store complete payment response
-              schemeData['orderId'] = orderNo; // Store order ID
+              schemeData['paymentResponse'] = paymentResponseWithSuffix; // Store payment response with suffix
+              schemeData['orderId'] = baseOrderId; // Store base order ID (without suffix)
+              
+              print("🆔 Order ID already contains suffix: $orderNo");
+              print("📋 Base order ID: $baseOrderId");
+              print("📊 Payment response with suffix: $paymentResponseWithSuffix");
               
               final schemeId = await addNewScheme(schemeData);
               if (schemeId != null) {
                 print("✅ New scheme added successfully with ID: $schemeId");
                 print("💰 Payment reference stored in first month: $referenceNo");
-                print("📊 Complete payment response stored in first month");
+                print("📊 Complete payment response with suffix stored in first month");
               }
             } else if (operation == 'update') {
               print("📝 Updating existing scheme...");
               print("🔍 Payment response data to be stored: $data");
-              // For existing schemes, don't pass order ID - keep the original one
-              updateProgressItem(uid, referenceNo, data).then((value) => {
+              // For existing schemes, update progress and increment installment count
+              // We need to get the scheme ID from the schemeData
+              String schemeId = schemeData['schemeId'] ?? uid;
+              print("🔍 Using scheme ID: $schemeId for updateProgressItem");
+              updateProgressItem(schemeId, referenceNo, data).then((value) => {
                     print("print final"),
                     print(value),
                   });

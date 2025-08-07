@@ -161,14 +161,16 @@ class _SchemesScreenState extends State<SchemesScreen> with TickerProviderStateM
                               // Logo
                               Expanded(
                                 child: Container(
+
                                   width: 150,
                                   height: 80,
                                   decoration: BoxDecoration(
-                                    color: Colors.white, // Solid white background
+                                    color: Colors.white.withOpacity(0.20), // Solid white background
                                     borderRadius: BorderRadius.circular(16),
                                     border: Border.all(
-                                      color: Colors.white.withOpacity(0.4),
-                                      width: 2,
+                                      color: Colors.white.withOpacity(0.25
+                                      ),
+                                      width: 1,
                                     ),
                                     boxShadow: [
                                       BoxShadow(
@@ -179,6 +181,7 @@ class _SchemesScreenState extends State<SchemesScreen> with TickerProviderStateM
                                     ],
                                   ),
                                   child: ClipRRect(
+                                    //backgroundColor: Colors.white,
                                     borderRadius: BorderRadius.circular(16),
                                     child: Padding(
                                       padding: const EdgeInsets.all(10),

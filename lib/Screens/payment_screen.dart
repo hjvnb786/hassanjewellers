@@ -45,7 +45,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
     _initializePayment();
   }
 
-  // Function to retrieve order ID from Firestore for existing schemes
+  // Function to retrieve and generate incremental order ID from Firestore for existing schemes
   Future<String> _getOrderIdFromFirestore() async {
     try {
       // Get current user
@@ -70,13 +70,18 @@ class _PaymentScreenState extends State<PaymentScreen> {
           throw Exception('Scheme document not found with ID: $schemeId');
         }
 
-        final orderId = document.data()?['orderId'] as String?;
-        if (orderId == null || orderId.isEmpty) {
-          throw Exception('Order ID not found in scheme document');
+        final data = document.data();
+        final baseOrderId = data?['schemeDetails']?['orderId'] as String? ?? data?['orderId'] as String?;
+        final installmentCount = data?['installmentCount'] as int? ?? 0;
+
+        if (baseOrderId == null || baseOrderId.isEmpty) {
+          throw Exception('Base Order ID not found in scheme document');
         }
 
-        print("✅ Retrieved order ID from Firestore using document ID: $orderId");
-        return orderId;
+        // Generate incremental order ID
+        final incrementalOrderId = '$baseOrderId-${installmentCount + 1}';
+        print("✅ Generated incremental order ID: $incrementalOrderId (Base: $baseOrderId, Count: $installmentCount)");
+        return incrementalOrderId;
       }
 
       // Fallback to name-based search if no document ID
@@ -95,8 +100,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
       for (var doc in allSchemes.docs) {
         final data = doc.data();
         final schemeName = data['schemeDetails']?['schemeName'] ?? 'Unknown';
-        final orderId = data['orderId'] ?? 'No Order ID';
-        print("📋 Scheme: $schemeName, Order ID: $orderId, Doc ID: ${doc.id}");
+        final orderId = data['schemeDetails']?['orderId'] ?? data['orderId'] ?? 'No Order ID';
+        final installmentCount = data['installmentCount'] ?? 0;
+        print("📋 Scheme: $schemeName, Base Order ID: $orderId, Installment Count: $installmentCount, Doc ID: ${doc.id}");
       }
 
       // Try exact match first
@@ -118,10 +124,13 @@ class _PaymentScreenState extends State<PaymentScreen> {
           final searchName = widget.formData?['schemeName'] ?? widget.name ?? '';
           
           if (schemeName.contains(searchName) || searchName.contains(schemeName)) {
-            final orderId = data['orderId'] as String?;
-            if (orderId != null && orderId.isNotEmpty) {
-              print("✅ Found partial match - Scheme: $schemeName, Order ID: $orderId");
-              return orderId;
+            final baseOrderId = data['schemeDetails']?['orderId'] as String? ?? data['orderId'] as String?;
+            final installmentCount = data['installmentCount'] as int? ?? 0;
+            
+            if (baseOrderId != null && baseOrderId.isNotEmpty) {
+              final incrementalOrderId = '$baseOrderId-${installmentCount + 1}';
+              print("✅ Found partial match - Scheme: $schemeName, Incremental Order ID: $incrementalOrderId");
+              return incrementalOrderId;
             }
           }
         }
@@ -130,14 +139,18 @@ class _PaymentScreenState extends State<PaymentScreen> {
       }
 
       final document = querySnapshot.docs.first;
-      final orderId = document.data()['orderId'] as String?;
+      final data = document.data();
+      final baseOrderId = data['schemeDetails']?['orderId'] as String? ?? data['orderId'] as String?;
+      final installmentCount = data['installmentCount'] as int? ?? 0;
 
-      if (orderId == null || orderId.isEmpty) {
-        throw Exception('Order ID not found in scheme document');
+      if (baseOrderId == null || baseOrderId.isEmpty) {
+        throw Exception('Base Order ID not found in scheme document');
       }
 
-      print("✅ Retrieved order ID from Firestore: $orderId");
-      return orderId;
+      // Generate incremental order ID
+      final incrementalOrderId = '$baseOrderId-${installmentCount + 1}';
+      print("✅ Generated incremental order ID: $incrementalOrderId (Base: $baseOrderId, Count: $installmentCount)");
+      return incrementalOrderId;
     } catch (e) {
       print("❌ Error retrieving order ID from Firestore: $e");
       // Fallback to a simple order ID
@@ -160,9 +173,11 @@ class _PaymentScreenState extends State<PaymentScreen> {
         
         // Determine order ID based on operation
         if (widget.operation == 'add') {
-          // For new schemes, generate a new order ID
+          // For new schemes, generate a new order ID with suffix
           await createOrderIdDocumentIfNotExists();
-          orderId = await generateOrderId(cleanAmount);
+          String baseOrderId = await generateOrderId(cleanAmount);
+          orderId = "$baseOrderId-1"; // Add suffix for first installment
+          print("🆔 Generated order ID for new scheme: $orderId (Base: $baseOrderId)");
         } else {
           // For existing schemes, retrieve the order ID from Firestore
           orderId = await _getOrderIdFromFirestore();
@@ -187,9 +202,11 @@ class _PaymentScreenState extends State<PaymentScreen> {
         
         // Determine order ID based on operation
         if (widget.operation == 'add') {
-          // For new schemes, generate a new order ID
+          // For new schemes, generate a new order ID with suffix
           await createOrderIdDocumentIfNotExists();
-          orderId = await generateOrderId(cleanAmount);
+          String baseOrderId = await generateOrderId(cleanAmount);
+          orderId = "$baseOrderId-1"; // Add suffix for first installment
+          print("🆔 Generated order ID for new scheme: $orderId (Base: $baseOrderId)");
         } else {
           // For existing schemes, retrieve the order ID from Firestore
           orderId = await _getOrderIdFromFirestore();
@@ -268,7 +285,10 @@ class _PaymentScreenState extends State<PaymentScreen> {
               final schemeData = widget.formData ?? {};
               
               if (isFormData) {
-                fetchPaymentStatus(orderId, 'scheme_${DateTime.now().millisecondsSinceEpoch}', widget.operation, schemeData, context);
+                // Use the schemeId from formData if available, otherwise fallback
+                String schemeId = schemeData['schemeId'] ?? 'scheme_${DateTime.now().millisecondsSinceEpoch}';
+                print("🔍 Using schemeId from formData: $schemeId");
+                fetchPaymentStatus(orderId, schemeId, widget.operation, schemeData, context);
               } else {
                 fetchPaymentStatus(orderId, widget.id ?? 'default', widget.operation, schemeData, context);
               }
