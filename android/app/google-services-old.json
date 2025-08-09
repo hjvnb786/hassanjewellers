@@ -7,35 +7,6 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:374772324682:android:cdeb7896f66fc80d9a89b3",
-        "android_client_info": {
-          "package_name": "com.hassanjewellers.jewelleryapp"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "374772324682-vcioat4g65bpotsveicucr1oa3e1p1m6.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyCjs39nasLsKRoVyYfqWXFik61WTB8Jhgo"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "374772324682-vcioat4g65bpotsveicucr1oa3e1p1m6.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
         "mobilesdk_app_id": "1:374772324682:android:1cc03a45d0f0146e9a89b3",
         "android_client_info": {
           "package_name": "com.hassanjewellers.savingsapp"
