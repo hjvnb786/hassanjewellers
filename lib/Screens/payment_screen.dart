@@ -274,13 +274,12 @@ class _PaymentScreenState extends State<PaymentScreen> {
             });
           },
           onUrlChange: (UrlChange request) {
-            if (kDebugMode) {
-              print(request.url);
-            }
+            // Always print URL in both debug and release mode for payment debugging
+            print("Payment URL Change: ${request.url}");
 
             if (request.url ==
                 'https://spt.uvm.mybluehostin.me/api/payment/success.html') {
-              print("success success success");
+              print("🎉 Payment success URL detected - processing payment status");
 
               final schemeData = widget.formData ?? {};
               

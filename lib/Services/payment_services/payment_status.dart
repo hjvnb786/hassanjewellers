@@ -116,22 +116,45 @@ Future<void> fetchPaymentStatus(String orderNo, String uid, String operation, Ma
                 print("💰 Added amount to payment response: ${schemeData['schemeAmount']}");
               }
               
+              print("🔧 About to create PaymentStatusScreen with data: isSuccess=true, referenceNo=$referenceNo");
+              print("🔧 Enhanced payment response: $enhancedPaymentResponse");
+              
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => PaymentStatusScreen(
-                    isSuccess: true,
-                    message: "Your payment has been processed successfully.",
-                    referenceNo: referenceNo,
-                    paymentResponse: enhancedPaymentResponse, // Pass enhanced payment response
-                  ),
+                  builder: (context) {
+                    print("🏗️ Building PaymentStatusScreen widget");
+                    return PaymentStatusScreen(
+                      isSuccess: true,
+                      message: "Your payment has been processed successfully.",
+                      referenceNo: referenceNo,
+                      paymentResponse: enhancedPaymentResponse, // Pass enhanced payment response
+                    );
+                  },
                 ),
               );
               hasNavigated = true;
-              print("✅ Navigation to success screen completed");
+              print("✅ Navigation to success screen completed successfully");
               print("📄 Enhanced payment response passed to UI: $enhancedPaymentResponse");
-            } catch (e) {
+            } catch (e, stackTrace) {
               print("❌ Error during navigation: $e");
+              print("❌ Stack trace: $stackTrace");
+              // Fallback navigation without payment response if there's an issue
+              try {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PaymentStatusScreen(
+                      isSuccess: true,
+                      message: "Your payment has been processed successfully.",
+                      referenceNo: referenceNo,
+                    ),
+                  ),
+                );
+                print("✅ Fallback navigation completed");
+              } catch (fallbackError) {
+                print("❌ Fallback navigation also failed: $fallbackError");
+              }
             }
           } else {
             print("❌ Payment was not successful.");

@@ -18,6 +18,9 @@ class PaymentStatusScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print("🎨 PaymentStatusScreen build() called - isSuccess: $isSuccess, message: $message");
+    print("🎨 PaymentResponse: $paymentResponse");
+    
     return Scaffold(
       backgroundColor: Colors.grey[50],
       body: SafeArea(
@@ -28,214 +31,213 @@ class PaymentStatusScreen extends StatelessWidget {
               // Main Card
               Padding(
                 padding: const EdgeInsets.only(top: 25.0),
-                child: Expanded(
-                  child: Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(20),
-                        topRight: Radius.circular(20),
-                        bottomLeft: Radius.circular(20),
-                        bottomRight: Radius.circular(20),
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 10,
-                          offset: const Offset(0, 5),
-                        ),
-                      ],
+                child: Container(
+                  height: MediaQuery.of(context).size.height - 120, // Fixed height instead of Expanded
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(20),
+                      topRight: Radius.circular(20),
+                      bottomLeft: Radius.circular(20),
+                      bottomRight: Radius.circular(20),
                     ),
-                    child: Stack(
-                      children: [
-                        // Main content
-                        Padding(
-                          padding: const EdgeInsets.all(24.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const SizedBox(height: 30), // Space for overlapping icon
-                              
-                              // Header
-                              Center(
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 10,
+                        offset: const Offset(0, 5),
+                      ),
+                    ],
+                  ),
+                  child: Stack(
+                    children: [
+                      // Main content
+                      Padding(
+                        padding: const EdgeInsets.all(24.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const SizedBox(height: 30), // Space for overlapping icon
+                            
+                            // Header
+                            Center(
+                              child: Column(
+                                children: [
+                                  Text(
+                                    isSuccess ? "Payment Success!" : "Payment Failed!",
+                                    style: const TextStyle(
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    message,
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey[600],
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            
+                            const SizedBox(height: 24),
+                            const Divider(color: Colors.grey, height: 1),
+                            const SizedBox(height: 24),
+                            
+                            // Payment Details Grid
+                            if (paymentResponse != null) ...[
+                              Container(
+                                height: 300, // Fixed height instead of Expanded
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: Colors.grey[300]!,
+                                    width: 1,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
                                 child: Column(
                                   children: [
-                                    Text(
-                                      isSuccess ? "Payment Success!" : "Payment Failed!",
-                                      style: const TextStyle(
-                                        fontSize: 24,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black87,
+                                    // Header for the grid
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey[50],
+                                        borderRadius: const BorderRadius.only(
+                                          topLeft: Radius.circular(8),
+                                          topRight: Radius.circular(8),
+                                        ),
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          Icon(
+                                            Icons.receipt_long,
+                                            size: 16,
+                                            color: Colors.grey[600],
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Text(
+                                            "Payment Details",
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w600,
+                                              color: Colors.grey[700],
+                                            ),
+                                          ),
+                                          const Spacer(),
+                                          Icon(
+                                            Icons.swipe_up,
+                                            size: 16,
+                                            color: Colors.grey[500],
+                                          ),
+                                        ],
                                       ),
                                     ),
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      message,
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.grey[600],
+                                    // Scrollable grid
+                                    Container(
+                                      height: 200, // Fixed height for the scrollable content
+                                      child: ListView.builder(
+                                        padding: const EdgeInsets.all(16),
+                                        itemCount: paymentResponse!.length,
+                                        itemBuilder: (context, index) {
+                                          final entry = paymentResponse!.entries.elementAt(index);
+                                          final key = entry.key;
+                                          final value = entry.value;
+                                          
+                                          if (value == null) return const SizedBox.shrink();
+                                          
+                                          return Padding(
+                                            padding: const EdgeInsets.symmetric(vertical: 8),
+                                            child: Row(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Expanded(
+                                                  flex: 2,
+                                                  child: Text(
+                                                    _formatFieldName(key),
+                                                    style: TextStyle(
+                                                      fontSize: 12,
+                                                      color: Colors.grey[600],
+                                                      fontWeight: FontWeight.w500,
+                                                    ),
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 16),
+                                                Expanded(
+                                                  flex: 3,
+                                                  child: _buildValueWidget(key, value),
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        },
                                       ),
-                                      textAlign: TextAlign.center,
                                     ),
                                   ],
                                 ),
                               ),
-                              
-                              const SizedBox(height: 24),
-                              const Divider(color: Colors.grey, height: 1),
-                              const SizedBox(height: 24),
-                              
-                              // Payment Details Grid
-                              if (paymentResponse != null) ...[
-                                Expanded(
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      border: Border.all(
-                                        color: Colors.grey[300]!,
-                                        width: 1,
-                                      ),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: Column(
-                                      children: [
-                                        // Header for the grid
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                                          decoration: BoxDecoration(
-                                            color: Colors.grey[50],
-                                            borderRadius: const BorderRadius.only(
-                                              topLeft: Radius.circular(8),
-                                              topRight: Radius.circular(8),
-                                            ),
-                                          ),
-                                          child: Row(
-                                            children: [
-                                              Icon(
-                                                Icons.receipt_long,
-                                                size: 16,
-                                                color: Colors.grey[600],
-                                              ),
-                                              const SizedBox(width: 8),
-                                              Text(
-                                                "Payment Details",
-                                                style: TextStyle(
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.w600,
-                                                  color: Colors.grey[700],
-                                                ),
-                                              ),
-                                              const Spacer(),
-                                              Icon(
-                                                Icons.swipe_up,
-                                                size: 16,
-                                                color: Colors.grey[500],
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        // Scrollable grid
-                                        Expanded(
-                                          child: ListView.builder(
-                                            padding: const EdgeInsets.all(16),
-                                            itemCount: paymentResponse!.length,
-                                            itemBuilder: (context, index) {
-                                              final entry = paymentResponse!.entries.elementAt(index);
-                                              final key = entry.key;
-                                              final value = entry.value;
-                                              
-                                              if (value == null) return const SizedBox.shrink();
-                                              
-                                              return Padding(
-                                                padding: const EdgeInsets.symmetric(vertical: 8),
-                                                child: Row(
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                  children: [
-                                                    Expanded(
-                                                      flex: 2,
-                                                      child: Text(
-                                                        _formatFieldName(key),
-                                                        style: TextStyle(
-                                                          fontSize: 12,
-                                                          color: Colors.grey[600],
-                                                          fontWeight: FontWeight.w500,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    const SizedBox(width: 16),
-                                                    Expanded(
-                                                      flex: 3,
-                                                      child: _buildValueWidget(key, value),
-                                                    ),
-                                                  ],
-                                                ),
-                                              );
-                                            },
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ],
-                              
-                              const SizedBox(height: 24),
-                              
-                              // Back to Home Button
-                              Center(
-                                child: SizedBox(
-                                  width: double.infinity,
-                                  child: ElevatedButton(
-                                    onPressed: () {
-                                      Navigator.pushAndRemoveUntil(
-                                        context,
-                                        MaterialPageRoute(builder: (context) => const HomeScreen()),
-                                        (Route<dynamic> route) => false,
-                                      );
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: AppColors.primary,
-                                      foregroundColor: Colors.white,
-                                      padding: const EdgeInsets.symmetric(vertical: 16),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                    ),
-                                    child: const Text(
-                                      "Back to Home",
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
                             ],
-                          ),
-                        ),
-                        
-                        // Perforated bottom edge
-                        Positioned(
-                          bottom: 0,
-                          left: 0,
-                          right: 0,
-                          child: Container(
-                            height: 20,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: const BorderRadius.only(
-                                bottomLeft: Radius.circular(20),
-                                bottomRight: Radius.circular(20),
+                            
+                            const SizedBox(height: 24),
+                            
+                            // Back to Home Button
+                            Center(
+                              child: SizedBox(
+                                width: double.infinity,
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    Navigator.pushAndRemoveUntil(
+                                      context,
+                                      MaterialPageRoute(builder: (context) => const HomeScreen()),
+                                      (Route<dynamic> route) => false,
+                                    );
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppColors.primary,
+                                    foregroundColor: Colors.white,
+                                    padding: const EdgeInsets.symmetric(vertical: 16),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                  child: const Text(
+                                    "Back to Home",
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
                               ),
                             ),
-                            child: CustomPaint(
-                              painter: PerforatedEdgePainter(),
+                          ],
+                        ),
+                      ),
+                      
+                      // Perforated bottom edge
+                      Positioned(
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        child: Container(
+                          height: 20,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: const BorderRadius.only(
+                              bottomLeft: Radius.circular(20),
+                              bottomRight: Radius.circular(20),
                             ),
                           ),
+                          child: CustomPaint(
+                            painter: PerforatedEdgePainter(),
+                          ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -352,4 +354,4 @@ class PerforatedEdgePainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-} 
+}
