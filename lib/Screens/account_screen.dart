@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hassanjewellers/main.dart';
-import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:hassanjewellers/Services/firebase_services/signOut.dart';
 import 'package:hassanjewellers/Services/firebase_services/get_user_data.dart';
@@ -936,7 +936,33 @@ class _AccountScreenState extends State<AccountScreen> {
   void _shareApp() {
     // Get the share message from Firebase, with fallback
     final shareMessage = _moreOptionsData?['shareApp']?.toString() ?? 'Check out Hassan Jewellers app! Download it now.';
-    Share.share(shareMessage);
+    
+    // Show a dialog with sharing options
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Share App'),
+        content: Text(shareMessage),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('App sharing feature coming soon!'),
+                  duration: Duration(seconds: 2),
+                ),
+              );
+            },
+            child: const Text('Copy Text'),
+          ),
+        ],
+      ),
+    );
   }
 
   void _showHelpDialog() {
