@@ -290,9 +290,22 @@ class _JoinNewSchemeScreenState extends State<JoinNewSchemeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Join New Scheme'),
-        backgroundColor: Theme.of(context).primaryColor,
         foregroundColor: Colors.white,
         elevation: 0,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Color(0xFF1E3A8A), // Deep Blue
+                Color(0xFF3B82F6), // Bright Blue
+                Color(0xFF1E40AF), // Dark Blue
+              ],
+              stops: [0.0, 0.5, 1.0],
+            ),
+          ),
+        ),
       ),
       body: Column(
         children: [
