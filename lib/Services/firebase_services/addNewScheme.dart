@@ -53,8 +53,9 @@ Future<String?> addNewScheme(Map<String, dynamic> schemeData) async {
         "mobile": mobile,
         "email": email,
         "deliveryAddress": schemeData['deliveryAddress']?.toString().trim() ?? address,
-        "additionalDetails": _extractAdditionalDetails(schemeData),
       },
+      
+      "additionalDetails": _extractAdditionalDetails(schemeData),
       
       "schemeDetails": {
         "schemeName": schemeName,

@@ -771,11 +771,6 @@ class _SchemeProgressScreenState extends State<SchemeProgressScreen> {
         final key = entry.key;
         final value = entry.value;
         
-        // Skip additionalDetails as it's handled separately
-        if (key == 'additionalDetails') {
-          return const SizedBox.shrink();
-        }
-        
         // Convert key to display format (e.g., "firstName" -> "First Name")
         String displayKey = key.replaceAllMapped(
           RegExp(r'([A-Z])'),
@@ -827,7 +822,7 @@ class _SchemeProgressScreenState extends State<SchemeProgressScreen> {
   }
 
   Widget _buildAdditionalDetails() {
-    final additionalDetails = widget.schemeDetails['personalDetails']?['additionalDetails'] as Map<String, dynamic>? ?? {};
+    final additionalDetails = widget.schemeDetails['additionalDetails'] as Map<String, dynamic>? ?? {};
     
     if (additionalDetails.isEmpty) {
       return Text(

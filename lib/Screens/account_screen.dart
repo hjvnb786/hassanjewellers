@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:hassanjewellers/main.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:hassanjewellers/Services/firebase_services/signOut.dart';
 import 'package:hassanjewellers/Services/firebase_services/get_user_data.dart';
 import 'package:hassanjewellers/Services/firebase_services/delete_address.dart';
 import 'package:hassanjewellers/Services/firebase_services/get_more_options.dart';
+import 'package:hassanjewellers/Services/firebase_services/migrateAdditionalDetails.dart';
 import 'package:hassanjewellers/Screens/address_form_screen.dart';
 import 'package:hassanjewellers/Widgets/address_shimmer_loading.dart';
 import 'package:hassanjewellers/Utils/Constants/colors.dart';
@@ -572,6 +572,13 @@ class _AccountScreenState extends State<AccountScreen> {
                         ),
                         const Divider(height: 0, indent: 16, endIndent: 16),
                         _buildActionCard(
+                          icon: Icons.sync,
+                          title: 'Migrate Data',
+                          subtitle: 'Update existing scheme data structure',
+                          onTap: () => _showMigrationDialog(),
+                        ),
+                        const Divider(height: 0, indent: 16, endIndent: 16),
+                        _buildActionCard(
                           icon: Icons.logout,
                           title: 'Log Out',
                           subtitle: 'Sign out of your account',
@@ -1127,5 +1134,98 @@ class _AccountScreenState extends State<AccountScreen> {
         ),
       ),
     );
+  }
+
+  void _showMigrationDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Migrate Data Structure'),
+        content: const Text(
+          'This will update existing scheme documents to move additional details to a separate section. '
+          'This is a one-time operation to improve data organization. '
+          'Do you want to proceed?'
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.of(context).pop();
+              await _runMigration();
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Migrate'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _runMigration() async {
+    // Show loading dialog
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const AlertDialog(
+        content: Row(
+          children: [
+            CircularProgressIndicator(),
+            SizedBox(width: 16),
+            Text('Migrating data...'),
+          ],
+        ),
+      ),
+    );
+
+    try {
+      await migrateAdditionalDetails();
+      
+      if (mounted) {
+        Navigator.of(context).pop(); // Close loading dialog
+        
+        // Show success dialog
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Migration Complete'),
+            content: const Text(
+              'Your scheme data has been successfully migrated to the new structure. '
+              'Additional details are now organized separately for better data management.'
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        Navigator.of(context).pop(); // Close loading dialog
+        
+        // Show error dialog
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Migration Failed'),
+            content: Text('An error occurred during migration: $e'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
+      }
+    }
   }
 }
