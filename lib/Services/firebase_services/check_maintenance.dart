@@ -27,41 +27,5 @@ class MaintenanceService {
     }
   }
 
-  static Future<String?> getMaintenanceMessage() async {
-    try {
-      DocumentSnapshot operationsDoc = await FirebaseFirestore.instance
-          .collection('info')
-          .doc('operations')
-          .get();
-      
-      if (!operationsDoc.exists) {
-        return null;
-      }
-      
-      Map<String, dynamic> data = operationsDoc.data() as Map<String, dynamic>;
-      return data['maintenanceMessage'] as String?;
-    } catch (e) {
-      print('❌ Error getting maintenance message: $e');
-      return null;
-    }
-  }
 
-  static Future<String?> getEstimatedDuration() async {
-    try {
-      DocumentSnapshot operationsDoc = await FirebaseFirestore.instance
-          .collection('info')
-          .doc('operations')
-          .get();
-      
-      if (!operationsDoc.exists) {
-        return null;
-      }
-      
-      Map<String, dynamic> data = operationsDoc.data() as Map<String, dynamic>;
-      return data['maintenanceDuration'] as String?;
-    } catch (e) {
-      print('❌ Error getting maintenance duration: $e');
-      return null;
-    }
-  }
 }

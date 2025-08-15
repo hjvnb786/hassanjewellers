@@ -12,31 +12,12 @@ class MaintenanceScreen extends StatefulWidget {
 }
 
 class _MaintenanceScreenState extends State<MaintenanceScreen> {
-  String? _maintenanceMessage;
-  String? _estimatedDuration;
   Map<String, dynamic>? _moreOptionsData;
 
   @override
   void initState() {
     super.initState();
-    _loadMaintenanceInfo();
     _loadMoreOptionsData();
-  }
-
-  Future<void> _loadMaintenanceInfo() async {
-    try {
-      String? message = await MaintenanceService.getMaintenanceMessage();
-      String? duration = await MaintenanceService.getEstimatedDuration();
-      
-      if (mounted) {
-        setState(() {
-          _maintenanceMessage = message;
-          _estimatedDuration = duration;
-        });
-      }
-    } catch (e) {
-      // Handle error silently - show default message
-    }
   }
 
   Future<void> _loadMoreOptionsData() async {
@@ -312,44 +293,13 @@ class _MaintenanceScreenState extends State<MaintenanceScreen> {
                     const SizedBox(height: 16),
                     
                                         // Message
-                    if (_maintenanceMessage != null)
-                      Text(
-                        _maintenanceMessage!,
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: AppColors.text,
-                        ),
-                        textAlign: TextAlign.center,
-                      )
-                    else
-                      Text(
-                        'We\'re working hard to get everything back up and running smoothly.',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: AppColors.text,
-                        ),
-                        textAlign: TextAlign.center,
+                    Text(
+                      'We\'re working hard to get everything back up and running smoothly.',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: AppColors.text,
                       ),
-                    
-                    const SizedBox(height: 16),
-                    
-                    // Duration
-                    if (_estimatedDuration != null)
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.primary.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Text(
-                          'Estimated: $_estimatedDuration',
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: AppColors.primary,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
+                      textAlign: TextAlign.center,
+                    ),
                   ],
                 ),
               ),

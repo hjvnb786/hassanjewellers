@@ -19,8 +19,6 @@ Document: operations
 Fields:
 - forceUpdateVersion (String) - Required version for force updates
 - maintenanceWindow (Boolean) - Whether app is in maintenance mode
-- maintenanceMessage (String) - Custom maintenance message (optional)
-- maintenanceDuration (String) - Estimated maintenance duration (optional)
 - playStoreUrl (String) - Play Store URL for updates (optional)
 - appStoreUrl (String) - App Store URL for updates (optional)
 ```
@@ -100,9 +98,7 @@ To test the force update feature:
 ```javascript
 // In Firestore operations document
 {
-  "maintenanceWindow": true,
-  "maintenanceMessage": "We're upgrading our servers to provide better service. Please check back in 2 hours.",
-  "maintenanceDuration": "2 hours"
+  "maintenanceWindow": true
 }
 ```
 
@@ -120,8 +116,6 @@ To test the force update feature:
 {
   "forceUpdateVersion": "1.2.0",
   "maintenanceWindow": false,
-  "maintenanceMessage": "Scheduled maintenance in progress",
-  "maintenanceDuration": "30 minutes",
   "playStoreUrl": "https://play.google.com/store/apps/details?id=com.hassanjewellers.jewelleryapp",
   "appStoreUrl": "https://apps.apple.com/app/your-app-id"
 }
@@ -158,8 +152,7 @@ To test the force update feature:
 
 ### Maintenance Screen Features:
 - Modern, branded UI matching app design
-- Custom maintenance message from Firestore
-- Estimated maintenance duration display
+- Standard maintenance message
 - "Please check again later" message
 - Contact support option
 - Circular white logo card with Hassan Jewellers branding
