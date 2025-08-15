@@ -247,6 +247,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
           "billing_city": addressComponents['city'] ?? "Default City",
           "billing_state": addressComponents['state'] ?? "Default State",
           "billing_zip": addressComponents['zip'] ?? "000000",
+          "billing_country": "India",
           "billing_email": widget.formData!['email'] ?? '',
           "billing_tel": widget.formData!['mobile'] ?? ''
         };
@@ -287,6 +288,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
           "billing_city": addressComponents['city'] ?? "Default City",
           "billing_state": addressComponents['state'] ?? "Default State",
           "billing_zip": addressComponents['zip'] ?? "000000",
+          "billing_country": "India",
           "billing_email": "default@email.com",
           "billing_tel": "0000000000"
         };
@@ -325,6 +327,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
           "billing_city": addressComponents['city'] ?? "Default City",
           "billing_state": addressComponents['state'] ?? "Default State",
           "billing_zip": addressComponents['zip'] ?? "000000",
+          "billing_country": "India",
           "billing_email": widget.formData!['email'] ?? '',
           "billing_tel": widget.formData!['mobile'] ?? ''
         };
@@ -347,6 +350,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
           "billing_city": addressComponents['city'] ?? "Default City",
           "billing_state": addressComponents['state'] ?? "Default State",
           "billing_zip": addressComponents['zip'] ?? "000000",
+          "billing_country": "India",
           "billing_email": "default@email.com",
           "billing_tel": "0000000000"
         };
