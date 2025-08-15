@@ -51,6 +51,7 @@ dependencies:
   url_launcher: ^6.1.10
   win32: ^5.0.0
   shimmer: ^3.0.0
+  package_info_plus: ^8.0.2
 
 dev_dependencies:
   flutter_test:

@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:hassanjewellers/Screens/home_screen.dart';
 import 'package:hassanjewellers/Screens/register_screen.dart';
 import 'package:hassanjewellers/Screens/welcome_screen.dart';
+import 'package:hassanjewellers/Screens/force_update_screen.dart';
 import 'package:hassanjewellers/Utils/Constants/colors.dart';
 import 'package:hassanjewellers/Services/firebase_services/initializeApp.dart';
 import 'package:hassanjewellers/Services/firebase_services/getCurrentUser.dart';
+import 'package:hassanjewellers/Services/firebase_services/check_force_update.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -12,8 +14,34 @@ Future<void> main() async {
   runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
-  MyApp({super.key});
+class MyApp extends StatefulWidget {
+  const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  bool _forceUpdateRequired = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkForceUpdateInBackground();
+  }
+
+  Future<void> _checkForceUpdateInBackground() async {
+    try {
+      bool updateRequired = await ForceUpdateService.isForceUpdateRequired();
+      if (mounted && updateRequired) {
+        setState(() {
+          _forceUpdateRequired = updateRequired;
+        });
+      }
+    } catch (e) {
+      print('Error checking force update: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -142,9 +170,11 @@ class MyApp extends StatelessWidget {
           thickness: 1,
         ),
       ),
-      home: currentUser != null && currentUser.uid.isNotEmpty
-          ? const HomeScreen()
-          : const WelcomeScreen(),
+      home: _forceUpdateRequired
+          ? const ForceUpdateScreen()
+          : currentUser != null && currentUser.uid.isNotEmpty
+              ? const HomeScreen()
+              : const WelcomeScreen(),
     );
   }
 }
