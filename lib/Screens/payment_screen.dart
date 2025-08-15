@@ -158,6 +158,56 @@ class _PaymentScreenState extends State<PaymentScreen> {
     }
   }
 
+  // Helper function to parse address and extract components
+  Map<String, String> _parseAddress(String address) {
+    if (address.isEmpty) {
+      return {
+        'city': 'Default City',
+        'state': 'Default State', 
+        'zip': '000000'
+      };
+    }
+    
+    print("🔍 Parsing address: $address");
+    
+    // Handle the format: "Mohammed Tuaha, 104, Ziara, Riyadh, Saudia - 100002"
+    // Split by comma first
+    List<String> commaParts = address.split(',').map((part) => part.trim()).toList();
+    
+    String city = 'Default City';
+    String state = 'Default State';
+    String zip = '000000';
+    
+    if (commaParts.length >= 4) {
+      // Extract zip code from the last part (after dash)
+      String lastPart = commaParts.last;
+      if (lastPart.contains('-')) {
+        List<String> dashParts = lastPart.split('-');
+        if (dashParts.length >= 2) {
+          String zipPart = dashParts.last.trim();
+          if (RegExp(r'^\d{6}$').hasMatch(zipPart)) {
+            zip = zipPart;
+          }
+          // State is before the dash
+          state = dashParts.first.trim();
+        }
+      }
+      
+      // City is usually the second to last part
+      if (commaParts.length >= 4) {
+        city = commaParts[commaParts.length - 2].trim();
+      }
+    }
+    
+    print("🔍 Parsed components - City: $city, State: $state, Zip: $zip");
+    
+    return {
+      'city': city,
+      'state': state,
+      'zip': zip
+    };
+  }
+
   Future<void> _initializePayment() async {
     try {
       // Use formData if available, otherwise use the old parameters
@@ -183,11 +233,20 @@ class _PaymentScreenState extends State<PaymentScreen> {
           orderId = await _getOrderIdFromFirestore();
         }
         
+        // Parse address components from formData
+        final billingAddress = widget.formData!['address'] ?? '';
+        Map<String, String> addressComponents = _parseAddress(billingAddress);
+        
         // Prepare the JSON data as a Map
         Map<String, dynamic> payload = {
           "name": fullName.isNotEmpty ? fullName : 'Scheme User',
           "amount": cleanAmount,
-          "order_no": orderId
+          "order_id": orderId,
+          "billing_name": fullName.isNotEmpty ? fullName : 'Scheme User',
+          "billing_address": billingAddress,
+          "billing_city": addressComponents['city'] ?? "Default City",
+          "billing_state": addressComponents['state'] ?? "Default State",
+          "billing_zip": addressComponents['zip'] ?? "000000"
         };
         
         // Convert the Map to a JSON string
@@ -212,11 +271,20 @@ class _PaymentScreenState extends State<PaymentScreen> {
           orderId = await _getOrderIdFromFirestore();
         }
         
+        // Parse address components from default address
+        final billingAddress = "Default Address";
+        Map<String, String> addressComponents = _parseAddress(billingAddress);
+        
         // Prepare the JSON data as a Map
         Map<String, dynamic> payload = {
           "name": widget.name ?? 'Default User',
           "amount": cleanAmount,
-          "order_no": orderId
+          "order_id": orderId,
+          "billing_name": widget.name ?? 'Default User',
+          "billing_address": billingAddress,
+          "billing_city": addressComponents['city'] ?? "Default City",
+          "billing_state": addressComponents['state'] ?? "Default State",
+          "billing_zip": addressComponents['zip'] ?? "000000"
         };
         
         // Convert the Map to a JSON string
@@ -240,10 +308,19 @@ class _PaymentScreenState extends State<PaymentScreen> {
         
         String cleanAmount = schemeAmount.replaceAll('₹', '').replaceAll(',', '');
         
+        // Parse address components from formData
+        final billingAddress = widget.formData!['address'] ?? '';
+        Map<String, String> addressComponents = _parseAddress(billingAddress);
+        
         Map<String, dynamic> payload = {
           "name": fullName.isNotEmpty ? fullName : 'Scheme User',
           "amount": cleanAmount,
-          "order_no": orderId
+          "order_id": orderId,
+          "billing_name": fullName.isNotEmpty ? fullName : 'Scheme User',
+          "billing_address": billingAddress,
+          "billing_city": addressComponents['city'] ?? "Default City",
+          "billing_state": addressComponents['state'] ?? "Default State",
+          "billing_zip": addressComponents['zip'] ?? "000000"
         };
         
         String jsonString = jsonEncode(payload);
@@ -251,10 +328,19 @@ class _PaymentScreenState extends State<PaymentScreen> {
       } else {
         String cleanAmount = (widget.amount ?? '5000').substring(0, (widget.amount ?? '5000').length - 2);
         
+        // Parse address components from default address
+        final billingAddress = "Default Address";
+        Map<String, String> addressComponents = _parseAddress(billingAddress);
+        
         Map<String, dynamic> payload = {
           "name": widget.name ?? 'Default User',
           "amount": cleanAmount,
-          "order_no": orderId
+          "order_id": orderId,
+          "billing_name": widget.name ?? 'Default User',
+          "billing_address": billingAddress,
+          "billing_city": addressComponents['city'] ?? "Default City",
+          "billing_state": addressComponents['state'] ?? "Default State",
+          "billing_zip": addressComponents['zip'] ?? "000000"
         };
         
         String jsonString = jsonEncode(payload);
