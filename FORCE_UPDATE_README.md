@@ -1,21 +1,28 @@
-# Force Update Feature
+# Force Update & Maintenance Features
 
 ## Overview
-The Hassan Jewellers app now includes a force update mechanism that ensures users are running the latest version of the app. This feature helps maintain app security, fix critical bugs, and ensure all users have access to the latest features.
+The Hassan Jewellers app now includes both force update and maintenance window mechanisms to ensure optimal app performance and user experience. These features help maintain app security, fix critical bugs, and provide scheduled maintenance windows.
 
 ## How It Works
 
-### 1. Version Check
-- The app checks for updates every time it starts
+### 1. App Status Check
+- The app checks for both force updates and maintenance status every time it starts
 - It compares the current app version with a required version stored in Firestore
-- If the current version is lower than the required version, a force update screen is shown
+- It also checks if the app is in maintenance mode
+- Priority order: Maintenance Mode > Force Update > Normal App
 
 ### 2. Firestore Configuration
-The force update version is stored in Firestore at:
+Both force update and maintenance settings are stored in Firestore at:
 ```
 Collection: info
 Document: operations
-Field: forceUpdateVersion (String)
+Fields:
+- forceUpdateVersion (String) - Required version for force updates
+- maintenanceWindow (Boolean) - Whether app is in maintenance mode
+- maintenanceMessage (String) - Custom maintenance message (optional)
+- maintenanceDuration (String) - Estimated maintenance duration (optional)
+- playStoreUrl (String) - Play Store URL for updates (optional)
+- appStoreUrl (String) - App Store URL for updates (optional)
 ```
 
 ### 3. Version Comparison
@@ -89,24 +96,58 @@ To test the force update feature:
 }
 ```
 
+### Example 4: Enable Maintenance Mode
+```javascript
+// In Firestore operations document
+{
+  "maintenanceWindow": true,
+  "maintenanceMessage": "We're upgrading our servers to provide better service. Please check back in 2 hours.",
+  "maintenanceDuration": "2 hours"
+}
+```
+
+### Example 5: Disable Maintenance Mode
+```javascript
+// In Firestore operations document
+{
+  "maintenanceWindow": false
+}
+```
+
+### Example 6: Complete Configuration
+```javascript
+// In Firestore operations document
+{
+  "forceUpdateVersion": "1.2.0",
+  "maintenanceWindow": false,
+  "maintenanceMessage": "Scheduled maintenance in progress",
+  "maintenanceDuration": "30 minutes",
+  "playStoreUrl": "https://play.google.com/store/apps/details?id=com.hassanjewellers.jewelleryapp",
+  "appStoreUrl": "https://apps.apple.com/app/your-app-id"
+}
+```
+
 ## Files Modified
 
 ### New Files Created:
 1. `lib/Services/firebase_services/check_force_update.dart` - Force update service
-2. `lib/Screens/force_update_screen.dart` - Force update UI screen
-3. `FORCE_UPDATE_README.md` - This documentation
+2. `lib/Services/firebase_services/check_maintenance.dart` - Maintenance service
+3. `lib/Screens/force_update_screen.dart` - Force update UI screen
+4. `lib/Screens/maintenance_screen.dart` - Maintenance UI screen
+5. `FORCE_UPDATE_README.md` - This documentation
 
 ### Modified Files:
-1. `lib/main.dart` - Added force update check on app startup
+1. `lib/main.dart` - Added force update and maintenance checks on app startup
 2. `pubspec.yaml` - Added `package_info_plus` dependency
 
 ## User Experience
 
 ### Normal Flow:
 1. User opens app
-2. App checks for updates (shows loading screen briefly)
-3. If no update required → Normal app flow
-4. If update required → Force update screen
+2. App checks for maintenance and updates in background
+3. If maintenance mode → Maintenance screen
+4. If force update required → Force update screen
+5. If no maintenance or update required → Normal app flow
 
 ### Force Update Screen Features:
 - Modern, branded UI matching app design
@@ -114,6 +155,14 @@ To test the force update feature:
 - Direct link to app store
 - No way to bypass the update (force update)
 - Loading state while checking for updates
+
+### Maintenance Screen Features:
+- Modern, branded UI matching app design
+- Custom maintenance message from Firestore
+- Estimated maintenance duration display
+- "Please check again later" message
+- Contact support option
+- Circular white logo card with Hassan Jewellers branding
 
 ## Error Handling
 

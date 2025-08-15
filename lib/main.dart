@@ -3,10 +3,12 @@ import 'package:hassanjewellers/Screens/home_screen.dart';
 import 'package:hassanjewellers/Screens/register_screen.dart';
 import 'package:hassanjewellers/Screens/welcome_screen.dart';
 import 'package:hassanjewellers/Screens/force_update_screen.dart';
+import 'package:hassanjewellers/Screens/maintenance_screen.dart';
 import 'package:hassanjewellers/Utils/Constants/colors.dart';
 import 'package:hassanjewellers/Services/firebase_services/initializeApp.dart';
 import 'package:hassanjewellers/Services/firebase_services/getCurrentUser.dart';
 import 'package:hassanjewellers/Services/firebase_services/check_force_update.dart';
+import 'package:hassanjewellers/Services/firebase_services/check_maintenance.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,23 +25,28 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   bool _forceUpdateRequired = false;
+  bool _maintenanceMode = false;
 
   @override
   void initState() {
     super.initState();
-    _checkForceUpdateInBackground();
+    _checkAppStatusInBackground();
   }
 
-  Future<void> _checkForceUpdateInBackground() async {
+  Future<void> _checkAppStatusInBackground() async {
     try {
+      // Check both force update and maintenance status
       bool updateRequired = await ForceUpdateService.isForceUpdateRequired();
-      if (mounted && updateRequired) {
+      bool maintenanceMode = await MaintenanceService.isMaintenanceMode();
+      
+      if (mounted) {
         setState(() {
           _forceUpdateRequired = updateRequired;
+          _maintenanceMode = maintenanceMode;
         });
       }
     } catch (e) {
-      print('Error checking force update: $e');
+      print('Error checking app status: $e');
     }
   }
 
@@ -170,11 +177,13 @@ class _MyAppState extends State<MyApp> {
           thickness: 1,
         ),
       ),
-      home: _forceUpdateRequired
-          ? const ForceUpdateScreen()
-          : currentUser != null && currentUser.uid.isNotEmpty
-              ? const HomeScreen()
-              : const WelcomeScreen(),
+      home: _maintenanceMode
+          ? const MaintenanceScreen()
+          : _forceUpdateRequired
+              ? const ForceUpdateScreen()
+              : currentUser != null && currentUser.uid.isNotEmpty
+                  ? const HomeScreen()
+                  : const WelcomeScreen(),
     );
   }
 }
