@@ -246,7 +246,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
           "billing_address": billingAddress,
           "billing_city": addressComponents['city'] ?? "Default City",
           "billing_state": addressComponents['state'] ?? "Default State",
-          "billing_zip": addressComponents['zip'] ?? "000000"
+          "billing_zip": addressComponents['zip'] ?? "000000",
+          "billing_email": widget.formData!['email'] ?? '',
+          "billing_tel": widget.formData!['mobile'] ?? ''
         };
         
         // Convert the Map to a JSON string
@@ -284,7 +286,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
           "billing_address": billingAddress,
           "billing_city": addressComponents['city'] ?? "Default City",
           "billing_state": addressComponents['state'] ?? "Default State",
-          "billing_zip": addressComponents['zip'] ?? "000000"
+          "billing_zip": addressComponents['zip'] ?? "000000",
+          "billing_email": "default@email.com",
+          "billing_tel": "0000000000"
         };
         
         // Convert the Map to a JSON string
@@ -320,7 +324,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
           "billing_address": billingAddress,
           "billing_city": addressComponents['city'] ?? "Default City",
           "billing_state": addressComponents['state'] ?? "Default State",
-          "billing_zip": addressComponents['zip'] ?? "000000"
+          "billing_zip": addressComponents['zip'] ?? "000000",
+          "billing_email": widget.formData!['email'] ?? '',
+          "billing_tel": widget.formData!['mobile'] ?? ''
         };
         
         String jsonString = jsonEncode(payload);
@@ -340,7 +346,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
           "billing_address": billingAddress,
           "billing_city": addressComponents['city'] ?? "Default City",
           "billing_state": addressComponents['state'] ?? "Default State",
-          "billing_zip": addressComponents['zip'] ?? "000000"
+          "billing_zip": addressComponents['zip'] ?? "000000",
+          "billing_email": "default@email.com",
+          "billing_tel": "0000000000"
         };
         
         String jsonString = jsonEncode(payload);
